@@ -1,7 +1,6 @@
 "use server";
 
 import { createCategory, deleteCategory } from "@/apis/category";
-import { redirect } from "next/navigation";
 
 export async function categoryFormAction(state: any, formData: FormData) {
   const category = formData.get("category");
