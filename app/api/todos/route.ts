@@ -12,6 +12,7 @@ export async function GET() {
     });
     return Response.json(serializeBigInt(todos));
   } catch (error) {
+    console.log(error);
     return Response.error();
   }
 }
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(serializeBigInt(todo));
   } catch (error) {
+    console.log(error);
     return Response.error();
   }
 }

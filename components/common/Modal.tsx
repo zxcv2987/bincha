@@ -3,7 +3,7 @@ export default function Modal({
   closeFn,
 }: {
   children: React.ReactNode;
-  closeFn?: Function;
+  closeFn?: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

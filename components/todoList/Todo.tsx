@@ -12,7 +12,7 @@ export default function Todo({ todo }: { todo: TodoType }) {
     todoState,
     (_, newState: TodoType) => newState,
   );
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const { isOpen, setIsOpen, modalRef } = useModal();
   return (
     <div

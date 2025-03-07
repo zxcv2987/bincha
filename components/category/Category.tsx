@@ -12,8 +12,8 @@ export default function Category({
   setSelected,
 }: {
   categories: CategoryType[];
-  selected: String;
-  setSelected: Function;
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   return (

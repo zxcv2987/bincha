@@ -1,13 +1,12 @@
 "use client";
 import { categoryFormAction } from "@/actions/category";
 import clsx from "clsx";
-import { redirect, useRouter } from "next/navigation";
-import { useActionState, useEffect, useTransition } from "react";
+import { redirect } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
 
 export default function CategoryForm() {
-  const router = useRouter();
   const [state, formAction, pending] = useActionState(categoryFormAction, {
     ok: false,
   });

@@ -14,7 +14,7 @@ export default function TodoList({
   todos: TodoType[];
   categories: CategoryType[];
 }) {
-  const [selected, setSelected] = useState<String>("전체");
+  const [selected, setSelected] = useState<string>("전체");
 
   return (
     <div className="flex w-full flex-col items-start justify-center">

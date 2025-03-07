@@ -3,7 +3,7 @@ import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
 import { NextResponse } from "next/server";
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
@@ -29,13 +29,14 @@ export async function PATCH(
     });
     return NextResponse.json(serializeBigInt(todo));
   } catch (error) {
+    console.log(error);
     return Response.error();
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   try {

@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(serializeBigInt(category));
   } catch (error) {
+    console.log(error);
     return NextResponse.error();
   }
 }
