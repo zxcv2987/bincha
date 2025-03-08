@@ -62,7 +62,7 @@ export default function Todo({ todo }: { todo: TodoType }) {
       <div className="relative flex w-full items-center justify-end">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="rounded-lg px-3 py-1 text-lg hover:bg-zinc-100"
+          className="rounded-lg px-3 py-1 text-lg hover:bg-zinc-200"
         >
           ⋮
         </button>
