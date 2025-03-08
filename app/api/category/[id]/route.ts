@@ -1,5 +1,6 @@
 import { prisma } from "@/prisma/prismaClient";
 import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
+import { revalidateTag } from "next/cache";
 
 export async function DELETE(
   request: Request,
@@ -12,6 +13,7 @@ export async function DELETE(
         id: Number(id),
       },
     });
+    revalidateTag("/");
     return Response.json(serializeBigInt(category));
   } catch (error) {
     console.log(error);
