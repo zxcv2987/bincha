@@ -1,6 +1,8 @@
 "use server";
 
 import { createTodo, deleteTodo } from "@/apis/todo";
+import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
+import { prisma } from "@/prisma/prismaClient";
 
 export async function todoFormAction(state: any, formData: FormData) {
   const title = formData.get("title");
@@ -29,5 +31,20 @@ export async function deleteTodoAction(state: any, categoryId: number) {
   } catch (error) {
     console.error("할 일 삭제 중 오류 발생:", error);
     return { ok: false, error: "삭제 실패" };
+  }
+}
+
+export async function getTodosServerAction() {
+  try {
+    const todos = await prisma.todos.findMany({
+      include: {
+        category: true,
+      },
+      orderBy: [{ completed: "asc" }, { id: "asc" }],
+    });
+    return Response.json(serializeBigInt(todos));
+  } catch (error) {
+    console.log(error);
+    return Response.error();
   }
 }

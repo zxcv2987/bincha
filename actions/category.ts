@@ -1,6 +1,9 @@
 "use server";
 
 import { createCategory, deleteCategory } from "@/apis/category";
+import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
+import { NextResponse } from "next/server";
+import { prisma } from "@/prisma/prismaClient";
 
 export async function categoryFormAction(state: any, formData: FormData) {
   const category = formData.get("category");
@@ -23,5 +26,15 @@ export async function deleteCategoryAction(state: any, categoryId: number) {
   } catch (error) {
     console.error("카테고리 삭제 중 오류 발생:", error);
     return { ok: false, error: "삭제 실패" };
+  }
+}
+
+export async function getCategoryServerAction() {
+  try {
+    const category = await prisma.category.findMany();
+    return NextResponse.json(serializeBigInt(category));
+  } catch (error) {
+    console.log(error);
+    return NextResponse.error();
   }
 }
