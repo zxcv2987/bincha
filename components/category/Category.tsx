@@ -52,7 +52,7 @@ export default function Category({
             setIsOpen(false);
           }}
         >
-          <CategoryForm />
+          <CategoryForm setIsOpen={setIsOpen} />
         </Modal>
       )}
     </div>
