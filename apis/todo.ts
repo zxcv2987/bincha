@@ -1,10 +1,22 @@
 import { TodoType } from "@/types/todos";
 import FetchClient from "./fetchClient";
+import { prisma } from "@/prisma/prismaClient";
+import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
+import { NextResponse } from "next/server";
 
 export async function getTodos() {
-  return await FetchClient("/api/todos", {
-    method: "GET",
-  });
+  try {
+    const todos = await prisma.todos.findMany({
+      include: {
+        category: true,
+      },
+      orderBy: [{ completed: "asc" }, { id: "asc" }],
+    });
+    return NextResponse.json(serializeBigInt(todos));
+  } catch (error) {
+    console.log(error);
+    return NextResponse.error();
+  }
 }
 
 export async function createTodo(

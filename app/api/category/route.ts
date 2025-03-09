@@ -5,7 +5,9 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const category = await prisma.category.findMany();
+    const category = await prisma.category.findMany({
+      orderBy: [{ id: "asc" }],
+    });
     return NextResponse.json(serializeBigInt(category));
   } catch (error) {
     console.log(error);
