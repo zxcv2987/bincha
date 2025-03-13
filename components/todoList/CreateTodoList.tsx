@@ -1,28 +1,29 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
 import Button from "@/components/common/Button";
 import { todoFormAction } from "@/actions/todo";
 import { CategoryType } from "@/types/category";
 import TextArea from "@/components/common/TextArea";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import Input from "@/components/common/Input";
-import { createTodo } from "@/apis/todo";
 
 export default function CreateTodoList({
   categories,
 }: {
   categories: CategoryType[];
 }) {
-  const router = useRouter();
-  const [state, formAction] = useActionState(todoFormAction, {
+  const [state, formAction, pending] = useActionState(todoFormAction, {
     ok: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    if (state.ok) {
+      redirect("/");
+    }
+  });
   return (
     <div className="w-full py-2">
       <Button onClick={() => setIsOpen(true)}>할 일 추가 +</Button>
@@ -30,27 +31,6 @@ export default function CreateTodoList({
         <Modal closeFn={() => setIsOpen(false)}>
           <form
             action={formAction}
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsLoading(true);
-              startTransition(async () => {
-                const formData = new FormData(e.currentTarget);
-                try {
-                  await createTodo(
-                    formData.get("title") as string,
-                    formData.get("text") as string,
-                    formData.get("category") as unknown as number,
-                  );
-                } catch (error) {
-                  alert("할 일 추가 실패");
-                  console.log(error);
-                }
-                setIsLoading(false);
-                setIsOpen(false);
-                router.refresh();
-              });
-            }}
             className="flex w-xs flex-col gap-4 py-4 md:w-md"
           >
             <h3 className="text-xl font-semibold text-zinc-600">할 일</h3>
@@ -87,8 +67,8 @@ export default function CreateTodoList({
                 {state.error.categoryId}
               </span>
             )}
-            <Button className={isLoading ? "cursor-not-allowed" : ""}>
-              {isLoading ? "로딩 중" : "할 일 추가"}
+            <Button disabled={pending}>
+              {pending ? "로딩 중" : "할 일 추가"}
             </Button>
           </form>
         </Modal>
