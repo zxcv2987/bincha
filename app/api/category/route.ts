@@ -1,11 +1,13 @@
 import { prisma } from "@/prisma/prismaClient";
 import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const category = await prisma.category.findMany();
+    const category = await prisma.category.findMany({
+      orderBy: [{ id: "asc" }],
+    });
     return NextResponse.json(serializeBigInt(category));
   } catch (error) {
     console.log(error);
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
         category_name,
       },
     });
-    revalidatePath("/");
+    revalidateTag("category");
     return NextResponse.json(serializeBigInt(category));
   } catch (error) {
     console.log(error);
