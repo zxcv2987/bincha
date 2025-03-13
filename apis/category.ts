@@ -6,6 +6,7 @@ export async function getCategory(): Promise<CategoryType[]> {
   return await FetchClient("/api/category", {
     method: "GET",
     next: { tags: ["category"] },
+    cache: "force-cache",
   });
 }
 

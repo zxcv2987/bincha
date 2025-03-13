@@ -13,6 +13,13 @@ export async function todoFormAction(state: any, formData: FormData) {
   if (categoryId === null)
     return { ok: false, error: { categoryId: "카테고리를 선택해 주세요." } };
 
+  try {
+    await createTodo(title as string, text as string, Number(categoryId));
+  } catch (error) {
+    console.error("할 일 추가 중 오류 발생:", error);
+    return { ok: false };
+  }
+
   return { ok: true };
 }
 

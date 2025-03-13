@@ -17,7 +17,7 @@ export default function DeleteCategoryButton({
     <button
       className={clsx(
         "z-20 rounded-lg px-4 py-2 text-red-500 hover:bg-zinc-50",
-        isPending ? "cursor-not-allowed opacity-50" : "",
+        isPending ? "disabled opacity-50" : "",
       )}
       disabled={isPending}
       onClick={() => {
