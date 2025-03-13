@@ -1,6 +1,6 @@
 import { prisma } from "@/prisma/prismaClient";
 import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 export async function PATCH(
   request: Request,
@@ -28,7 +28,7 @@ export async function PATCH(
       },
       data: updateData,
     });
-    revalidatePath("/");
+    revalidateTag("todos");
     return NextResponse.json(serializeBigInt(todo));
   } catch (error) {
     console.log(error);
@@ -47,7 +47,8 @@ export async function DELETE(
         id: Number(id),
       },
     });
-    revalidatePath("/");
+    revalidateTag("todos");
+
     return Response.json(serializeBigInt(todo));
   } catch (error) {
     console.log(error);

@@ -1,7 +1,7 @@
 import { prisma } from "@/prisma/prismaClient";
 import { NextResponse } from "next/server";
 import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function GET() {
   try {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         category_id,
       },
     });
-    revalidatePath("/");
+    revalidateTag("todos");
     return NextResponse.json(serializeBigInt(todo));
   } catch (error) {
     console.log(error);
