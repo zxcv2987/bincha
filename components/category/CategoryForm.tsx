@@ -42,7 +42,7 @@ export default function CategoryForm({
         type="submit"
         className={clsx(
           "w-full rounded-lg p-4 text-sm text-zinc-600 hover:bg-zinc-100",
-          pending && "bg-zinc-100",
+          pending && "cursor-not-allowed bg-zinc-100",
         )}
       >
         {pending ? "추가 중..." : "카테고리 추가"}

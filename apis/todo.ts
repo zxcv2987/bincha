@@ -8,6 +8,7 @@ export async function getTodos(): Promise<TodoType[]> {
   return await FetchClient("/api/todos", {
     method: "GET",
     next: { tags: ["todos"] },
+    cache: "force-cache",
   });
 }
 

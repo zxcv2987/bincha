@@ -16,9 +16,10 @@ export default function CreateTodoList({
   categories: CategoryType[];
 }) {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(todoFormAction, {
+  const [state, formAction] = useActionState(todoFormAction, {
     ok: false,
   });
+  const [isLoading, setIsLoading] = useState(false);
   const [, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,6 +33,7 @@ export default function CreateTodoList({
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              setIsLoading(true);
               startTransition(async () => {
                 const formData = new FormData(e.currentTarget);
                 try {
@@ -44,6 +46,7 @@ export default function CreateTodoList({
                   alert("할 일 추가 실패");
                   console.log(error);
                 }
+                setIsLoading(false);
                 setIsOpen(false);
                 router.refresh();
               });
@@ -84,7 +87,9 @@ export default function CreateTodoList({
                 {state.error.categoryId}
               </span>
             )}
-            <Button>{pending ? "로딩 중" : "할 일 추가"}</Button>
+            <Button className={isLoading ? "cursor-not-allowed" : ""}>
+              {isLoading ? "로딩 중" : "할 일 추가"}
+            </Button>
           </form>
         </Modal>
       )}
