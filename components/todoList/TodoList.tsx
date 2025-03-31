@@ -36,7 +36,7 @@ export default function TodoList({
               {todos.map(
                 (todo) =>
                   todo.category.category_name === category.category_name && (
-                    <Todo key={todo.id} todo={todo} />
+                    <Todo key={todo.id} todo={todo} categories={categories} />
                   ),
               )}
             </div>

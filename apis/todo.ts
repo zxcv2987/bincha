@@ -34,7 +34,13 @@ export async function updateTodo({
   text,
   category_id,
   completed,
-}: TodoType) {
+}: {
+  id: number;
+  title: string;
+  text: string;
+  category_id: number;
+  completed: boolean;
+}) {
   const res = await FetchClient(`/api/todos/${id}`, {
     method: "PATCH",
     body: JSON.stringify({
