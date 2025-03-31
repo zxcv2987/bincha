@@ -5,15 +5,8 @@ import useModal from "@/utils/hooks/useModal";
 import DeleteTodoButton from "@/components/todoList/DeleteTodoButton";
 import Content from "@/components/common/Content";
 import EditTodoList from "./EditTodoList";
-import { CategoryType } from "@/types/category";
 
-export default function Todo({
-  todo,
-  categories,
-}: {
-  todo: TodoType;
-  categories: CategoryType[];
-}) {
+export default function Todo({ todo }: { todo: TodoType }) {
   const { isOpen, setIsOpen, modalRef } = useModal();
 
   return (
@@ -44,7 +37,7 @@ export default function Todo({
             className="absolute right-1 -bottom-14 z-10 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
           >
             <DeleteTodoButton todoId={todo.id} />
-            <EditTodoList todo={todo} categories={categories} />
+            <EditTodoList todo={todo} />
           </div>
         )}
       </div>

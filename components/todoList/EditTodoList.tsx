@@ -2,13 +2,11 @@
 
 import { useActionState, useEffect, useState, useTransition } from "react";
 import Modal from "@/components/common/Modal";
-import { CategoryType } from "@/types/category";
 import { redirect } from "next/navigation";
 import { TodoType } from "@/types/todos";
 import TodoForm from "./TodoForm";
 import { editTodoAction } from "@/actions/todo";
 import { useModalStore } from "@/utils/providers/ModalProvider";
-import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 
 export default function EditTodoList({ todo }: { todo: TodoType }) {
   const [state] = useActionState(editTodoAction, {
@@ -16,7 +14,6 @@ export default function EditTodoList({ todo }: { todo: TodoType }) {
   });
   const [pending, startTransition] = useTransition();
   const { open, close } = useModalStore((set) => set);
-  const { categories } = useCategoryStore((set) => set);
 
   useEffect(() => {
     if (state.ok) {
