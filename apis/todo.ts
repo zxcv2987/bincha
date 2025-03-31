@@ -33,13 +33,11 @@ export async function updateTodo({
   title,
   text,
   category_id,
-  completed,
 }: {
   id: number;
   title: string;
   text: string;
   category_id: number;
-  completed: boolean;
 }) {
   const res = await FetchClient(`/api/todos/${id}`, {
     method: "PATCH",
@@ -47,7 +45,6 @@ export async function updateTodo({
       title,
       text,
       category_id,
-      completed,
     }),
   });
   revalidateTag("todos");

@@ -43,10 +43,9 @@ export async function editTodoAction(state: any, formData: FormData) {
       title: title as string,
       text: text as string,
       category_id: Number(categoryId),
-      completed: false,
     });
   } catch (error) {
-    console.error("할 일 추가 중 오류 발생:", error);
+    console.error("할 일 수정 중 오류 발생:", error);
     return { ok: false };
   }
 
