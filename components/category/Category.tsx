@@ -4,26 +4,23 @@ import clsx from "clsx";
 import { useState } from "react";
 import CategoryForm from "@/components/category/CategoryForm";
 import Modal from "@/components/common/Modal";
+import { useModalStore } from "@/utils/providers/ModalProvider";
+import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 
-export default function Category({
-  categories,
-  selected,
-  setSelected,
-}: {
-  categories: CategoryType[];
-  selected: string;
-  setSelected: React.Dispatch<React.SetStateAction<string>>;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Category() {
+  const { open } = useModalStore((set) => set);
+  const { categories, categoryState, setCategory, resetCategory } =
+    useCategoryStore((set) => set);
+
   return (
     <div className="flex h-auto w-full flex-col-reverse items-center justify-between gap-4 border-y-1 border-zinc-200 p-2 md:flex-row">
       <div className="flex min-w-[200px] flex-row flex-wrap md:w-full md:gap-3">
         <h2
           className={clsx(
             "cursor-pointer rounded-lg border-zinc-200 p-2 text-lg text-zinc-400 hover:text-zinc-700",
-            selected === "전체" && "font-semibold text-zinc-700",
+            categoryState === null && "font-semibold text-zinc-700",
           )}
-          onClick={() => setSelected("전체")}
+          onClick={resetCategory}
         >
           전체
         </h2>
@@ -32,10 +29,10 @@ export default function Category({
             <h2
               className={clsx(
                 "cursor-pointer rounded-lg border-zinc-200 p-2 text-lg text-zinc-400 hover:text-zinc-700",
-                selected === category.category_name &&
+                categoryState === category.category_name &&
                   "font-semibold text-zinc-700",
               )}
-              onClick={() => setSelected(category.category_name)}
+              onClick={() => setCategory(category.category_name)}
             >
               {category.category_name}
             </h2>
@@ -44,19 +41,13 @@ export default function Category({
       </div>
       <button
         className="btn w-full md:max-w-[200px]"
-        onClick={() => setIsOpen(true)}
+        onClick={() => open("category")}
       >
         카테고리 추가 +
       </button>
-      {isOpen && (
-        <Modal
-          closeFn={() => {
-            setIsOpen(false);
-          }}
-        >
-          <CategoryForm />
-        </Modal>
-      )}
+      <Modal modalType="category">
+        <CategoryForm />
+      </Modal>
     </div>
   );
 }

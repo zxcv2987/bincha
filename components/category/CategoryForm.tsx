@@ -1,5 +1,6 @@
 "use client";
 import { categoryFormAction } from "@/actions/category";
+import { useModalStore } from "@/utils/providers/ModalProvider";
 import clsx from "clsx";
 import { redirect } from "next/navigation";
 import { useActionState, useEffect } from "react";
@@ -9,12 +10,15 @@ export default function CategoryForm() {
     ok: false,
     error: "",
   });
+  const { close } = useModalStore((set) => set);
 
   useEffect(() => {
     if (state.ok) {
+      close();
       redirect("/");
     }
   });
+
   return (
     <form action={formAction} className="flex w-xs flex-col gap-4 pt-2">
       <input

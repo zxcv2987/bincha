@@ -1,11 +1,12 @@
 "use client";
 import { CategoryType } from "@/types/category";
 import { TodoType } from "@/types/todos";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Category from "@/components/category/Category";
 import TodosByCategory from "@/components/todoList/TodosByCategory";
 import CreateTodoList from "@/components/todoList/CreateTodoList";
 import Todo from "@/components/todoList/Todo";
+import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 
 export default function TodoList({
   todos,
@@ -14,20 +15,20 @@ export default function TodoList({
   todos: TodoType[];
   categories: CategoryType[];
 }) {
-  const [selected, setSelected] = useState<string>("전체");
+  const { setCategories, categoryState } = useCategoryStore((set) => set);
+  useEffect(() => {
+    setCategories(categories);
+  }, [categories]);
 
   return (
     <div className="flex w-full flex-col items-start justify-center">
-      <Category
-        categories={categories}
-        selected={selected}
-        setSelected={setSelected}
-      />
-      <CreateTodoList categories={categories} />
+      <Category />
+      <CreateTodoList />
 
       {categories.map(
         (category) =>
-          (category.category_name === selected || selected === "전체") && (
+          (category.category_name === categoryState ||
+            categoryState === null) && (
             <div
               key={category.id}
               className="flex h-auto w-full flex-col gap-3 border-y border-zinc-200 p-4"
@@ -36,7 +37,7 @@ export default function TodoList({
               {todos.map(
                 (todo) =>
                   todo.category.category_name === category.category_name && (
-                    <Todo key={todo.id} todo={todo} categories={categories} />
+                    <Todo key={todo.id} todo={todo} />
                   ),
               )}
             </div>
