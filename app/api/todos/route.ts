@@ -9,7 +9,7 @@ export async function GET() {
       include: {
         category: true,
       },
-      orderBy: [{ id: "asc", category_id: "asc" }],
+      orderBy: [{ id: "asc" }, { category_id: "asc" }],
     });
     return Response.json(serializeBigInt(todos));
   } catch (error) {
