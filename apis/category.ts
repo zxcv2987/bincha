@@ -1,3 +1,5 @@
+"use server";
+
 import { revalidateTag } from "next/cache";
 import FetchClient from "./fetchClient";
 import { CategoryType } from "@/types/category";

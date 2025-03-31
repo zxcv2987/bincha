@@ -1,1 +1,35 @@
 @import "tailwindcss";
+
+@layer components {
+  .btn {
+    width: 100%; /* w-full */
+    border-radius: 0.5rem; /* rounded-lg */
+    background-color: #fafafa; /* bg-zinc-50 */
+    padding: 0.75rem 2.5rem; /* p-3 */
+    font-size: 0.875rem; /* text-sm */
+    white-space: nowrap; /* whitespace-nowrap */
+    color: #475569; /* text-zinc-600 */
+    transition: background-color 0.2s;
+  }
+  .btn:hover {
+    background-color: #f5f5f5; /* hover:bg-zinc-100 */
+  }
+
+  .input {
+    display: flex; /* flex */
+    width: 100%; /* w-full */
+    flex-wrap: wrap; /* flex-wrap */
+    border-radius: 0.5rem; /* rounded-lg */
+    border: 1px solid #d4d4d8; /* border border-zinc-300 */
+    padding: 0.5rem; /* p-2 */
+    font-size: 1rem; /* text-base */
+    word-break: break-word; /* break-words */
+    white-space: pre-wrap; /* whitespace-pre-wrap */
+    outline: none; /* outline-none */
+    transition: border-color 0.2s;
+  }
+
+  .input:focus {
+    border-color: #a1a1aa; /* focus:border-zinc-400 */
+  }
+}

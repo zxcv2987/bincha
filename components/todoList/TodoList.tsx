@@ -30,13 +30,13 @@ export default function TodoList({
           (category.category_name === selected || selected === "전체") && (
             <div
               key={category.id}
-              className="flex h-auto w-full flex-col gap-1 border-y border-zinc-200 p-4"
+              className="flex h-auto w-full flex-col gap-3 border-y border-zinc-200 p-4"
             >
               <TodosByCategory category={category} />
               {todos.map(
                 (todo) =>
                   todo.category.category_name === category.category_name && (
-                    <Todo key={todo.id} todo={todo} />
+                    <Todo key={todo.id} todo={todo} categories={categories} />
                   ),
               )}
             </div>
