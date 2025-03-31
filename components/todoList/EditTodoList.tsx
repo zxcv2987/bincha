@@ -26,8 +26,6 @@ export default function EditTodoList({
       redirect("/");
     }
   });
-
-  console.log(todo);
   return (
     <div className="w-full py-2">
       <button className="btn" onClick={() => setIsOpen(true)}>

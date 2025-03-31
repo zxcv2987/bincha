@@ -12,7 +12,8 @@ export default function DeleteTodoButton({ todoId }: { todoId: number }) {
   return (
     <button
       className={clsx(
-        "rounded-lg px-4 py-2 text-base text-red-500 hover:bg-zinc-50",
+        "btn",
+        "text-red-500",
         isPending ? "cursor-not-allowed opacity-50" : "",
       )}
       disabled={isPending}

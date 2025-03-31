@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "@/styles/globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const LINESeedKr = localFont({
+  src: [
+    {
+      path: "../public/fonts/LINESeedKR-Rg.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/LINESeedKR-Th.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/LINESeedKR-Bd.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -24,10 +34,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <main className="mx-auto flex max-w-4xl px-4 py-24">{children}</main>
+      <body className={`${LINESeedKr.className} antialiased`}>
+        <main className="mx-auto flex max-w-4xl px-4 py-20">{children}</main>
       </body>
     </html>
   );

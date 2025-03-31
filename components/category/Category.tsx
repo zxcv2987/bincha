@@ -4,7 +4,6 @@ import clsx from "clsx";
 import { useState } from "react";
 import CategoryForm from "@/components/category/CategoryForm";
 import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
 
 export default function Category({
   categories,
@@ -17,7 +16,7 @@ export default function Category({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="flex h-auto w-full flex-row items-center justify-between gap-4 border-y-1 border-zinc-200 p-2">
+    <div className="flex h-auto w-full flex-col-reverse items-center justify-between gap-4 border-y-1 border-zinc-200 p-2 md:flex-row">
       <div className="flex min-w-[200px] flex-row flex-wrap md:w-full md:gap-3">
         <h2
           className={clsx(
@@ -43,9 +42,12 @@ export default function Category({
           </div>
         ))}
       </div>
-      <Button className="md:max-w-[200px]" onClick={() => setIsOpen(true)}>
+      <button
+        className="btn w-full md:max-w-[200px]"
+        onClick={() => setIsOpen(true)}
+      >
         카테고리 추가 +
-      </Button>
+      </button>
       {isOpen && (
         <Modal
           closeFn={() => {
