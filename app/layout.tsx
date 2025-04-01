@@ -38,9 +38,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${LINESeedKr.className} antialiased`}>
-        <main className="mx-auto flex max-w-4xl px-4 py-20">
-          <StoreProvider>{children}</StoreProvider>
-        </main>
+        <StoreProvider>
+          <div id="root">
+            <div className="mx-auto flex max-w-4xl px-4 py-20">{children}</div>
+          </div>
+          <div id="portal-root"></div>
+        </StoreProvider>
       </body>
     </html>
   );
