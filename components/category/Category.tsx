@@ -1,7 +1,5 @@
 "use client";
-import { CategoryType } from "@/types/category";
 import clsx from "clsx";
-import { useState } from "react";
 import CategoryForm from "@/components/category/CategoryForm";
 import Modal from "@/components/common/modal/Modal";
 import { useModalStore } from "@/utils/providers/ModalProvider";

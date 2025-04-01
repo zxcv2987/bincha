@@ -1,7 +1,7 @@
 "use client";
 import { CategoryType } from "@/types/category";
 import { TodoType } from "@/types/todos";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Category from "@/components/category/Category";
 import TodosByCategory from "@/components/todoList/TodosByCategory";
 import CreateTodoList from "@/components/todoList/CreateTodoList";
@@ -20,7 +20,7 @@ export default function TodoList({
 
   useEffect(() => {
     setCategories(categories);
-  }, [categories]);
+  }, [categories, setCategories]);
 
   return (
     <div className="flex w-full flex-col items-start justify-center">

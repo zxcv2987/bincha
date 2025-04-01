@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/styles/globals.css";
-import { ModalStoreProvider } from "@/utils/providers/ModalProvider";
-import { CategoryStoreProvider } from "@/utils/providers/CategoryProvider";
 import StoreProvider from "@/utils/providers/Providers";
 
 const LINESeedKr = localFont({

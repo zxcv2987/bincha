@@ -1,4 +1,3 @@
-import { CategoryType } from "@/types/category";
 import { TodoType } from "@/types/todos";
 import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 

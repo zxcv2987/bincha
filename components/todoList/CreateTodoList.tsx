@@ -1,9 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import Modal from "@/components/common/modal/Modal";
 import { createTodoAction } from "@/actions/todo";
-import { CategoryType } from "@/types/category";
 import { redirect } from "next/navigation";
 import TodoForm from "./TodoForm";
 import { useModalStore } from "@/utils/providers/ModalProvider";
