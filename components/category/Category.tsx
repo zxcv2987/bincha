@@ -3,7 +3,7 @@ import { CategoryType } from "@/types/category";
 import clsx from "clsx";
 import { useState } from "react";
 import CategoryForm from "@/components/category/CategoryForm";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { useModalStore } from "@/utils/providers/ModalProvider";
 import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 
@@ -46,6 +46,7 @@ export default function Category() {
         카테고리 추가 +
       </button>
       <Modal modalType="category">
+        <Modal.Title>카테고리</Modal.Title>
         <CategoryForm />
       </Modal>
     </div>

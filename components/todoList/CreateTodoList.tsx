@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { createTodoAction } from "@/actions/todo";
 import { CategoryType } from "@/types/category";
 import { redirect } from "next/navigation";
@@ -12,7 +12,8 @@ export default function CreateTodoList() {
   const [state, formAction, pending] = useActionState(createTodoAction, {
     ok: false,
   });
-  const { open, close } = useModalStore((set) => set);
+  const open = useModalStore((set) => set.open);
+  const close = useModalStore((set) => set.close);
 
   useEffect(() => {
     if (state.ok) {
@@ -26,6 +27,7 @@ export default function CreateTodoList() {
         할 일 추가 +
       </button>
       <Modal modalType="todo">
+        <Modal.Title>할 일 추가하기</Modal.Title>
         <form
           action={formAction}
           className="flex w-xs flex-col gap-4 py-4 md:w-md"
