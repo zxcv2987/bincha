@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState, useTransition } from "react";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { redirect } from "next/navigation";
 import { TodoType } from "@/types/todos";
 import TodoForm from "./TodoForm";
@@ -13,7 +13,8 @@ export default function EditTodoList({ todo }: { todo: TodoType }) {
     ok: false,
   });
   const [pending, startTransition] = useTransition();
-  const { open, close } = useModalStore((set) => set);
+  const open = useModalStore((set) => set.open);
+  const close = useModalStore((set) => set.close);
 
   useEffect(() => {
     if (state.ok) {
@@ -21,11 +22,12 @@ export default function EditTodoList({ todo }: { todo: TodoType }) {
     }
   });
   return (
-    <div className="w-full py-2">
+    <>
       <button className="btn" onClick={() => open("updateTodo")}>
         할 일 수정
       </button>
       <Modal modalType="updateTodo">
+        <Modal.Title>할 일 수정하기</Modal.Title>
         <form
           onSubmit={(e) => {
             startTransition(async () => {
@@ -45,6 +47,6 @@ export default function EditTodoList({ todo }: { todo: TodoType }) {
           </button>
         </form>
       </Modal>
-    </div>
+    </>
   );
 }

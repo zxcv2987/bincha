@@ -10,7 +10,7 @@ export default function CategoryForm() {
     ok: false,
     error: "",
   });
-  const { close } = useModalStore((set) => set);
+  const close = useModalStore((set) => set.close);
 
   useEffect(() => {
     if (state.ok) {

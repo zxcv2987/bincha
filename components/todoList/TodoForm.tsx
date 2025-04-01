@@ -10,7 +10,7 @@ export default function TodoForm({
   state: any;
   todo?: TodoType;
 }) {
-  const { categories } = useCategoryStore((set) => set);
+  const categories = useCategoryStore((set) => set.categories);
   return (
     <>
       <h3 className="text-xl font-semibold text-zinc-600">할 일</h3>

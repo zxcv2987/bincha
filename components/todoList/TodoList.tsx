@@ -15,7 +15,9 @@ export default function TodoList({
   todos: TodoType[];
   categories: CategoryType[];
 }) {
-  const { setCategories, categoryState } = useCategoryStore((set) => set);
+  const setCategories = useCategoryStore((set) => set.setCategories);
+  const categoryState = useCategoryStore((set) => set.categoryState);
+
   useEffect(() => {
     setCategories(categories);
   }, [categories]);
