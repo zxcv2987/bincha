@@ -1,16 +1,15 @@
-import { CategoryType } from "@/types/category";
 import { TodoType } from "@/types/todos";
+import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 
 export default function TodoForm({
   state,
   todo,
-  categories,
 }: {
   // eslint-disable-next-line
   state: any;
   todo?: TodoType;
-  categories: CategoryType[];
 }) {
+  const categories = useCategoryStore((set) => set.categories);
   return (
     <>
       <h3 className="text-xl font-semibold text-zinc-600">할 일</h3>

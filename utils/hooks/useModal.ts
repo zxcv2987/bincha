@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useModalStore } from "../providers/ModalProvider";
 
 export default function useModal() {
   const [isOpen, setIsOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const root = document.getElementById("root") ?? document.body;
     function handleClickOutside(event: MouseEvent) {
       if (
         modalRef.current &&
@@ -15,11 +17,13 @@ export default function useModal() {
     }
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      root.addEventListener("mousedown", handleClickOutside);
+    } else {
+      root.removeEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      root.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
