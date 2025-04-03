@@ -30,18 +30,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+  admin,
+  readOnly,
 }: Readonly<{
-  children: React.ReactNode;
+  admin: React.ReactNode;
+  readOnly: React.ReactNode;
 }>) {
+  const role = "";
   return (
     <html lang="en">
       <body className={`${LINESeedKr.className} antialiased`}>
         <StoreProvider>
           <div id="root">
             <div className="mx-auto flex max-w-4xl flex-col px-4 py-20">
-              <Header />
-              {children}
+              <Header role={role} />
+              {role === "admin" ? admin : readOnly}
             </div>
           </div>
           <div id="portal-root"></div>
