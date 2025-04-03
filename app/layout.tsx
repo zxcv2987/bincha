@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/styles/globals.css";
 import StoreProvider from "@/utils/providers/Providers";
+import Header from "@/components/common/layout/Header";
 
 const LINESeedKr = localFont({
   src: [
@@ -38,7 +39,10 @@ export default function RootLayout({
       <body className={`${LINESeedKr.className} antialiased`}>
         <StoreProvider>
           <div id="root">
-            <div className="mx-auto flex max-w-4xl px-4 py-20">{children}</div>
+            <div className="mx-auto flex max-w-4xl flex-col px-4 py-20">
+              <Header />
+              {children}
+            </div>
           </div>
           <div id="portal-root"></div>
         </StoreProvider>
