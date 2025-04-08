@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import Thumbnail from "@/assets/images/binchaIcon.png";
-export default function Header() {
+import LoginButton from "@/components/common/layout/LoginButton";
+import Profile from "./Profile";
+export default function Header({ role }: { role: string }) {
   return (
     <div className="flex w-full flex-row py-6 whitespace-nowrap md:justify-center">
       <div className="flex w-full flex-col items-center justify-center md:flex-row md:items-end">
@@ -16,13 +18,21 @@ export default function Header() {
       </div>
 
       <div className="flex w-full flex-row justify-end">
-        <Image
-          className="rounded-lg"
-          src={Thumbnail}
-          alt={"빈차 - 에픽하이"}
-          width={60}
-          height={60}
-        />
+        {role === "admin" ? (
+          <Profile>
+            <Image
+              className="rounded-lg"
+              src={Thumbnail}
+              alt={"빈차 - 에픽하이"}
+              width={60}
+              height={60}
+            />
+          </Profile>
+        ) : (
+          <>
+            <LoginButton />
+          </>
+        )}
       </div>
     </div>
   );
