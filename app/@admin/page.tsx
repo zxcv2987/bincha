@@ -8,7 +8,6 @@ export default async function Home() {
   const categories: CategoryType[] = await getCategory();
   const todos: TodoType[] = await getTodos();
 
-  console.log("admin");
   return (
     <div className="flex w-full flex-col gap-4">
       <TodoList todos={todos} categories={categories} />
