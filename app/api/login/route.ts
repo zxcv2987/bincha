@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function UPDATE(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const { password } = await req.json();
 
