@@ -7,10 +7,7 @@ declare global {
 export const prisma =
   global.prisma ||
   new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
+    log: ["error"],
     // 연결 시간 초과를 늘림
     datasources: {
       db: {
