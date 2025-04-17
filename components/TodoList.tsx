@@ -2,10 +2,10 @@
 import { CategoryType } from "@/types/category";
 import { TodoType } from "@/types/todos";
 import { useEffect } from "react";
-import Category from "@/components/category/Category";
-import TodosByCategory from "@/components/todoList/TodosByCategory";
-import CreateTodoList from "@/components/todoList/CreateTodoList";
-import Todo from "@/components/todoList/Todo";
+import Category from "@/components/ui/category/Category";
+import TodosByCategory from "@/components/ui/todoList/TodosByCategory";
+import CreateTodoList from "@/components/ui/todoList/CreateTodoList";
+import Todo from "@/components/ui/todoList/Todo";
 import { useCategoryStore } from "@/utils/providers/CategoryProvider";
 
 export default function TodoList({

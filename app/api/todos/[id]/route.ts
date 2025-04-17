@@ -9,12 +9,11 @@ export async function PATCH(
   const { id } = await params;
 
   try {
-    const { title, text, category_id, completed } = await request.json();
+    const { title, text, category_id } = await request.json();
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
     if (text !== undefined) updateData.text = text;
     if (category_id !== undefined) updateData.category_id = category_id;
-    if (completed !== undefined) updateData.completed = completed;
 
     if (Object.keys(updateData).length === 0) {
       return Response.json(

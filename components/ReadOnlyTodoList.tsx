@@ -13,6 +13,7 @@ export default function ReadOnlyTodoList({
   todos: TodoType[];
   categories: CategoryType[];
 }) {
+  console.log("ReadOnlyTodoList");
   const setCategories = useCategoryStore((set) => set.setCategories);
   const categoryState = useCategoryStore((set) => set.categoryState);
   const resetCategory = useCategoryStore((set) => set.resetCategory);

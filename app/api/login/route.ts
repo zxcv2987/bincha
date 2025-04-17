@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/prisma/prismaClient";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,16 +20,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Invalid credentials", status: 401 });
     }
 
-    const token = jwt.sign(
-      { id: Number(user.id), username: user.username },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" },
-    );
+    // 액세스 토큰 생성 (짧은 만료시간)
+    const accessToken = await new SignJWT({
+      id: Number(user.id),
+      username: user.username,
+      type: "access",
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("15m")
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
+
+    // 리프레시 토큰 생성 (긴 만료시간)
+    const refreshToken = await new SignJWT({
+      id: Number(user.id),
+      type: "refresh",
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(new TextEncoder().encode(process.env.JWT_REFRESH_SECRET as string));
+
+    // 리프레시 토큰을 데이터베이스에 저장
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        refresh_token: refreshToken,
+      },
+    });
 
     return NextResponse.json({
-      message: "로그인 성공",
-      token,
-      status: 200,
+      accessToken,
+      refreshToken,
     });
   } catch (err) {
     console.error(err);
