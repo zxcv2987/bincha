@@ -3,7 +3,7 @@
 import { useModalStore } from "@/utils/providers/ModalProvider";
 import Modal from "../modal/Modal";
 import { useActionState, useEffect } from "react";
-import { loginAction, setCookieAction } from "@/actions/auth";
+import { loginAction } from "@/actions/auth";
 export default function LoginButton() {
   const open = useModalStore((set) => set.open);
   const close = useModalStore((set) => set.close);
@@ -16,7 +16,7 @@ export default function LoginButton() {
     if (state.ok) {
       close();
     }
-  }, [state.ok]);
+  }, [state.ok, close]);
   return (
     <>
       <button

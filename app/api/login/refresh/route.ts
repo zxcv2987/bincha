@@ -1,15 +1,14 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/prisma/prismaClient";
 import { jwtVerify, SignJWT } from "jose";
+import { cookies } from "next/headers";
 
-export default async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     // 쿠키에서 리프레시 토큰 가져오기
-    const cookieStore = cookies();
-    const refreshToken = (await cookieStore).get("refresh_token")?.value;
+    const { refreshToken } = await req.json();
 
     if (!refreshToken) {
       return NextResponse.json({
@@ -64,7 +63,7 @@ export default async function POST(req: NextRequest) {
       console.error("리프레시 토큰 검증 실패:", error);
 
       // 쿠키에서 리프레시 토큰 제거
-      (await cookieStore).delete("refresh_token");
+      (await cookies()).delete("refresh_token");
 
       return NextResponse.json({
         message: "리프레시 토큰이 유효하지 않습니다. 다시 로그인해주세요.",

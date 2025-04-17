@@ -4,13 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000", "your-production-domain.com"],
+      allowedOrigins: ["localhost:3000", "https://bincha.vercel.app"],
     },
-  },
-  poweredByHeader: false,
-  compress: true,
-  images: {
-    formats: ["image/avif", "image/webp"],
   },
 };
 
