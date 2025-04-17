@@ -1,6 +1,6 @@
 "use client";
 import clsx from "clsx";
-import CategoryForm from "@/components/category/CategoryForm";
+import CategoryForm from "@/components/ui/category/CategoryForm";
 import Modal from "@/components/common/modal/Modal";
 import { useModalStore } from "@/utils/providers/ModalProvider";
 import { useCategoryStore } from "@/utils/providers/CategoryProvider";

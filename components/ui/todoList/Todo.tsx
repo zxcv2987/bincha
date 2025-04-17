@@ -2,7 +2,7 @@
 
 import { TodoType } from "@/types/todos";
 import useModal from "@/utils/hooks/useModal";
-import DeleteTodoButton from "@/components/todoList/DeleteTodoButton";
+import DeleteTodoButton from "@/components/ui/todoList/DeleteTodoButton";
 import Content from "@/components/common/Content";
 import EditTodoList from "./EditTodoList";
 

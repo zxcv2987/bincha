@@ -31,11 +31,9 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-  admin,
-  readOnly,
+  children,
 }: Readonly<{
-  admin: React.ReactNode;
-  readOnly: React.ReactNode;
+  children: React.ReactNode;
 }>) {
   const username = await getUserRole();
   return (
@@ -44,8 +42,8 @@ export default async function RootLayout({
         <StoreProvider>
           <div id="root">
             <div className="mx-auto flex max-w-4xl flex-col px-6 pt-16 pb-40 md:px-0">
-              <Header role={username} />
-              {username === "admin" ? admin : readOnly}
+              <Header role={username ?? ""} />
+              {children}
             </div>
           </div>
           <div id="portal-root"></div>

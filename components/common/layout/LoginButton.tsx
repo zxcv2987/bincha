@@ -10,13 +10,11 @@ export default function LoginButton() {
   const [state, formAction] = useActionState(loginAction, {
     ok: false,
     error: undefined,
-    token: undefined,
   });
 
   useEffect(() => {
     if (state.ok) {
       close();
-      setCookieAction(state.token);
     }
   }, [state.ok]);
   return (
