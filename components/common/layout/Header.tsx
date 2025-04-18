@@ -3,9 +3,9 @@ import Image from "next/image";
 import Thumbnail from "@/assets/images/binchaIcon.png";
 import LoginButton from "@/components/common/layout/LoginButton";
 import Profile from "./Profile";
-export default function Header({ role }: { role: string }) {
+export default function Header({ isReadOnly }: { isReadOnly?: boolean }) {
   return (
-    <div className="flex w-full flex-row py-6 whitespace-nowrap md:justify-center">
+    <div className="flex w-full flex-row border-b border-zinc-200 py-6 whitespace-nowrap md:justify-center">
       <div className="flex w-full flex-col items-center justify-center md:flex-row md:items-end">
         <Link href="/" className="w-fit">
           <h1 className="pr-3 text-4xl font-semibold text-zinc-700">
@@ -18,7 +18,7 @@ export default function Header({ role }: { role: string }) {
       </div>
 
       <div className="flex w-full flex-row justify-end">
-        {role === "admin" ? (
+        {!isReadOnly ? (
           <Profile>
             <Image
               className="rounded-lg"
