@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { refreshAccessToken } from "./apis/auth";
 import { jwtVerify } from "jose";
-import { cookies } from "next/headers";
+
 // 토큰 검증이 필요하지 않은 경로
 const publicPaths = ["/api/login", "/api/refresh", "/login", "/readonly"];
 
@@ -12,7 +12,6 @@ const publicEndpoints = [
 ];
 
 export async function middleware(request: NextRequest) {
-  console.log("middleware");
   const { pathname } = request.nextUrl;
 
   if (publicPaths.some((path) => pathname.startsWith(path))) {
@@ -28,14 +27,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const cookieStore = await cookies();
   const accessToken =
     request.headers.get("Authorization")?.split(" ")[1] ||
-    cookieStore.get("access_token")?.value;
-  const refreshToken = cookieStore.get("refresh_token")?.value;
+    request.cookies.get("access_token")?.value;
+  const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  console.log("accessToken", accessToken);
-  console.log("refreshToken", refreshToken);
   // 액세스 토큰이 있는 경우 먼저 유효성 검증
   if (accessToken) {
     try {
@@ -43,6 +39,7 @@ export async function middleware(request: NextRequest) {
         process.env.JWT_SECRET || "",
       );
       await jwtVerify(accessToken, accessSecret);
+      return NextResponse.next();
     } catch (error) {
       console.error("액세스 토큰 검증 실패:", error);
 
@@ -85,7 +82,7 @@ export async function middleware(request: NextRequest) {
         }
       }
 
-      // 리프레시 토큰도 없는 경우
+      // 리프레시 토큰 없는 경우
       if (pathname.startsWith("/api/")) {
         return new NextResponse(
           JSON.stringify({ error: "인증이 필요합니다." }),
@@ -98,6 +95,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL("/readonly", request.url));
     }
   }
+
+  return NextResponse.rewrite(new URL("/readonly", request.url));
 }
 
 // 미들웨어가 적용될 경로 설정

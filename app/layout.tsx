@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/styles/globals.css";
 import StoreProvider from "@/utils/providers/Providers";
-import Header from "@/components/common/layout/Header";
-import { getUserRole } from "@/actions/auth";
 
 const LINESeedKr = localFont({
   src: [
