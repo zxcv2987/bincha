@@ -6,11 +6,12 @@ import { revalidateTag } from "next/cache";
 
 export async function getTodos(): Promise<TodoType[]> {
   try {
-    return await FetchClient("/api/todos", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/todos`, {
       method: "GET",
       next: { tags: ["todos"] },
       cache: "force-cache",
     });
+    return res.json();
   } catch (error) {
     console.error("할 일 목록 조회 중 오류 발생:", error);
     throw new Error(`할 일 목록 조회 실패: ${error}`);

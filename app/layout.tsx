@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/styles/globals.css";
 import StoreProvider from "@/utils/providers/Providers";
-import Header from "@/components/common/layout/Header";
-import { getUserRole } from "@/actions/auth";
 
 const LINESeedKr = localFont({
   src: [
@@ -35,14 +33,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const username = await getUserRole();
   return (
     <html lang="en">
       <body className={`${LINESeedKr.className} antialiased`}>
         <StoreProvider>
           <div id="root">
             <div className="mx-auto flex max-w-4xl flex-col px-6 pt-16 pb-40 md:px-0">
-              <Header role={username ?? ""} />
               {children}
             </div>
           </div>

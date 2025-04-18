@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { refreshAccessToken } from "./apis/auth";
 import { jwtVerify } from "jose";
+
 // 토큰 검증이 필요하지 않은 경로
 const publicPaths = ["/api/login", "/api/refresh", "/login", "/readonly"];
 
@@ -26,35 +27,76 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("access_token")?.value;
+  const accessToken =
+    request.headers.get("Authorization")?.split(" ")[1] ||
+    request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  if (!refreshToken && !accessToken) {
-    return NextResponse.redirect(new URL("/readonly", request.url));
-  }
-
-  if (!accessToken && refreshToken) {
+  // 액세스 토큰이 있는 경우 먼저 유효성 검증
+  if (accessToken) {
     try {
-      // 리프레시 토큰 검증
-      const secret = new TextEncoder().encode(
-        process.env.JWT_REFRESH_SECRET || "",
+      const accessSecret = new TextEncoder().encode(
+        process.env.JWT_SECRET || "",
       );
-      const decoded = await jwtVerify(refreshToken, secret);
-      const { accessToken: newAccessToken } =
-        await refreshAccessToken(refreshToken);
-      const response = NextResponse.next();
-      response.cookies.set("accessToken", newAccessToken, {
-        httpOnly: true,
-        path: "/",
-      });
-      return response;
+      await jwtVerify(accessToken, accessSecret);
+      return NextResponse.next();
     } catch (error) {
-      console.error("Token verification failed:", error);
-      return NextResponse.redirect(new URL("/readonly", request.url));
+      console.error("액세스 토큰 검증 실패:", error);
+
+      // 액세스 토큰 만료되었고 리프레시 토큰이 있는 경우
+      if (refreshToken) {
+        try {
+          // 리프레시 토큰 검증 및 새 액세스 토큰 발급
+          const refreshSecret = new TextEncoder().encode(
+            process.env.JWT_REFRESH_SECRET || "",
+          );
+
+          await jwtVerify(refreshToken, refreshSecret);
+          const { accessToken: newAccessToken } =
+            await refreshAccessToken(refreshToken);
+
+          // 새 액세스 토큰으로 응답 설정
+          const response = NextResponse.next();
+          response.cookies.set("access_token", newAccessToken, {
+            httpOnly: true,
+            path: "/",
+          });
+          return response;
+        } catch (refreshError) {
+          console.error("리프레시 토큰 검증 실패:", refreshError);
+
+          if (pathname.startsWith("/api/")) {
+            return new NextResponse(
+              JSON.stringify({
+                error: "인증이 만료되었습니다. 다시 로그인해주세요.",
+              }),
+              {
+                status: 401,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
+          }
+
+          // API가 아닌 페이지 요청은 로그인 페이지로 리다이렉트
+          return NextResponse.rewrite(new URL("/readonly", request.url));
+        }
+      }
+
+      // 리프레시 토큰 없는 경우
+      if (pathname.startsWith("/api/")) {
+        return new NextResponse(
+          JSON.stringify({ error: "인증이 필요합니다." }),
+          {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+      return NextResponse.rewrite(new URL("/readonly", request.url));
     }
   }
 
-  return NextResponse.next();
+  return NextResponse.rewrite(new URL("/readonly", request.url));
 }
 
 // 미들웨어가 적용될 경로 설정

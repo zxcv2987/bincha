@@ -6,12 +6,16 @@ import { CategoryType } from "@/types/category";
 
 export async function getCategory(): Promise<CategoryType[]> {
   try {
-    const data = await FetchClient("/api/category", {
-      method: "GET",
-      next: { tags: ["category"] },
-      cache: "force-cache",
-    });
-    return data;
+    const data = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/category`,
+      {
+        method: "GET",
+        next: { tags: ["category"] },
+        cache: "force-cache",
+      },
+    );
+
+    return data.json();
   } catch (error) {
     console.error("카테고리 조회 중 오류 발생:", error);
     throw new Error(`카테고리 조회 실패: ${error}`);

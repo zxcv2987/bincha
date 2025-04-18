@@ -4,10 +4,10 @@ import { useActionState, useEffect } from "react";
 import Modal from "@/components/common/modal/Modal";
 import { createTodoAction } from "@/actions/todo";
 import { redirect } from "next/navigation";
-import TodoForm from "./TodoForm";
+import TodoForm from "@/components/ui/todoList/TodoForm";
 import { useModalStore } from "@/utils/providers/ModalProvider";
 
-export default function CreateTodoList() {
+export default function CreateTodoButton() {
   const [state, formAction, pending] = useActionState(createTodoAction, {
     ok: false,
   });
