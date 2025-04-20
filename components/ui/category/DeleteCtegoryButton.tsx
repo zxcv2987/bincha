@@ -11,7 +11,7 @@ export default function DeleteCategoryButton({
 }: {
   categoryId: number;
 }) {
-  const { isOpen, setIsOpen, modalRef, isLoading, setIsLoading } = useModal();
+  const { isOpen, setIsOpen, modalRef, setIsLoading } = useModal();
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();

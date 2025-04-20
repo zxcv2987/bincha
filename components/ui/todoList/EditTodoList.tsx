@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useTransition } from "react";
+import { useActionState, useEffect } from "react";
 import Modal from "@/components/common/modal/Modal";
 import { redirect } from "next/navigation";
 import { TodoType } from "@/types/todos";
