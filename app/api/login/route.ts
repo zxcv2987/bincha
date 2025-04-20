@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       type: "access",
     })
       .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("15m")
+      .setExpirationTime("30m")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 
     // 리프레시 토큰 생성 (긴 만료시간)

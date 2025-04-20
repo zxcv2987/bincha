@@ -25,17 +25,9 @@ export default function CreateTodoButton() {
       <button className="btn" onClick={() => open("todo")}>
         할 일 추가 +
       </button>
-      <Modal modalType="todo">
+      <Modal modalType="todo" isLoading={pending}>
         <Modal.Title>할 일 추가하기</Modal.Title>
-        <form
-          action={formAction}
-          className="flex w-xs flex-col gap-4 py-4 md:w-md"
-        >
-          <TodoForm state={state} />
-          <button className="btn" disabled={pending}>
-            {pending ? "로딩 중" : "할 일 추가"}
-          </button>
-        </form>
+        <TodoForm formAction={formAction} state={state} isLoading={pending} />
       </Modal>
     </div>
   );

@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { deleteTodoAction } from "@/actions/todo";
 
-export default function DeleteTodoButton({ todoId }: { todoId: number }) {
+export default function DeleteTodoButton({
+  todoId,
+  setIsLoading,
+}: {
+  todoId: number;
+  setIsLoading: (isLoading: boolean) => void;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -18,12 +24,18 @@ export default function DeleteTodoButton({ todoId }: { todoId: number }) {
       )}
       disabled={isPending}
       onClick={() => {
+        setIsLoading(true);
+
         startTransition(async () => {
-          const res = await deleteTodoAction({ ok: false }, todoId);
-          if (res.ok) {
-            router.refresh();
-          } else {
-            alert("삭제 실패");
+          try {
+            const res = await deleteTodoAction({ ok: false }, todoId);
+            if (res.ok) {
+              router.refresh();
+            } else {
+              alert("삭제 실패");
+            }
+          } finally {
+            setIsLoading(false);
           }
         });
       }}

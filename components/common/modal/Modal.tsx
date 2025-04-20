@@ -6,9 +6,11 @@ import React from "react";
 function Modal({
   children,
   modalType,
+  isLoading = false,
 }: {
   children: React.ReactNode;
   modalType: string;
+  isLoading?: boolean;
 }) {
   const isOpen = useModalStore((state) => state.isOpen);
   const openModal = useModalStore((state) => state.openModal);
@@ -22,7 +24,7 @@ function Modal({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        onClick={close}
+        onClick={isLoading ? undefined : close}
         className="absolute inset-0 bg-zinc-700 opacity-10"
       ></div>
       <div
