@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useModalStore } from "../providers/ModalProvider";
 
 export default function useModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -10,7 +10,8 @@ export default function useModal() {
     function handleClickOutside(event: MouseEvent) {
       if (
         modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
+        !modalRef.current.contains(event.target as Node) &&
+        !isLoading
       ) {
         setIsOpen(false);
       }
@@ -25,7 +26,7 @@ export default function useModal() {
     return () => {
       root.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, isLoading]);
 
-  return { isOpen, setIsOpen, modalRef };
+  return { isOpen, setIsOpen, modalRef, isLoading, setIsLoading };
 }

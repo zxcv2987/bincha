@@ -1,8 +1,8 @@
 "use client";
 
 import { TodoType } from "@/types/todos";
-import Content from "@/components/common/Content";
-import TodoMoreActionButton from "./TodoMoreActionButton";
+import Content from "@/components/ui/Content";
+import TodoMoreActionButton from "@/components/ui/todoList/TodoMoreActionButton";
 
 export default function Todo({
   todo,

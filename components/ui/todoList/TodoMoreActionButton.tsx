@@ -5,7 +5,7 @@ import EditTodoList from "@/components/ui/todoList/EditTodoList";
 import { TodoType } from "@/types/todos";
 
 export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
-  const { isOpen, setIsOpen, modalRef } = useModal();
+  const { isOpen, setIsOpen, modalRef, isLoading, setIsLoading } = useModal();
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
             ref={modalRef}
             className="absolute right-1 -bottom-30 z-10 flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
           >
-            <DeleteTodoButton todoId={todo.id} />
+            <DeleteTodoButton todoId={todo.id} setIsLoading={setIsLoading} />
             <EditTodoList todo={todo} />
           </div>
         )}

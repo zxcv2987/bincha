@@ -11,7 +11,7 @@ export default function DeleteCategoryButton({
 }: {
   categoryId: number;
 }) {
-  const { isOpen, setIsOpen, modalRef } = useModal();
+  const { isOpen, setIsOpen, modalRef, isLoading, setIsLoading } = useModal();
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -36,6 +36,7 @@ export default function DeleteCategoryButton({
             )}
             disabled={isPending}
             onClick={() => {
+              setIsLoading(true);
               startTransition(async () => {
                 const res = await deleteCategoryAction(
                   { ok: false },
@@ -46,6 +47,7 @@ export default function DeleteCategoryButton({
                 } else {
                   alert("삭제 실패");
                 }
+                setIsLoading(false);
               });
             }}
           >

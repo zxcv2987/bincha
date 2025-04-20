@@ -4,10 +4,11 @@ import { useModalStore } from "@/utils/providers/ModalProvider";
 import Modal from "../modal/Modal";
 import { useActionState, useEffect } from "react";
 import { loginAction } from "@/actions/auth";
+import clsx from "clsx";
 export default function LoginButton() {
   const open = useModalStore((set) => set.open);
   const close = useModalStore((set) => set.close);
-  const [state, formAction] = useActionState(loginAction, {
+  const [state, formAction, isLoading] = useActionState(loginAction, {
     ok: false,
     error: undefined,
   });
@@ -25,7 +26,7 @@ export default function LoginButton() {
       >
         로그인
       </button>
-      <Modal modalType="login">
+      <Modal modalType="login" isLoading={isLoading}>
         <Modal.Title>Login</Modal.Title>
         <form className="flex w-xs flex-col gap-4" action={formAction}>
           <input
@@ -38,9 +39,13 @@ export default function LoginButton() {
           )}
           <button
             type="submit"
-            className="w-full rounded-lg bg-zinc-100 p-2 text-sm font-semibold text-zinc-500 hover:bg-zinc-200"
+            className={clsx(
+              "w-full rounded-lg bg-zinc-100 p-2 text-sm font-semibold text-zinc-500 hover:bg-zinc-200",
+              isLoading && "bg-zinc-200",
+            )}
+            disabled={isLoading}
           >
-            로그인
+            {isLoading ? "로그인 중..." : "로그인"}
           </button>
         </form>
       </Modal>
