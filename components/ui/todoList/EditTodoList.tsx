@@ -18,7 +18,7 @@ export default function EditTodoList({ todo }: { todo: TodoType }) {
     if (state.ok) {
       redirect("/");
     }
-  });
+  }, [state.ok]);
   return (
     <>
       <button className="btn" onClick={() => open("updateTodo")}>
@@ -26,12 +26,7 @@ export default function EditTodoList({ todo }: { todo: TodoType }) {
       </button>
       <Modal modalType="updateTodo" isLoading={isLoading}>
         <Modal.Title>할 일 수정하기</Modal.Title>
-        <TodoForm
-          state={state}
-          todo={todo}
-          isLoading={isLoading}
-          formAction={formAction}
-        />
+        <TodoForm state={state} todo={todo} formAction={formAction} />
       </Modal>
     </>
   );

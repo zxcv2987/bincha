@@ -1,23 +1,35 @@
 import { TodoType } from "@/types/todos";
 import { useCategoryStore } from "@/utils/providers/CategoryProvider";
+import { useTransition } from "react";
 
 export default function TodoForm({
   state,
   formAction,
   todo,
-  isLoading,
 }: {
   // eslint-disable-next-line
   state: any;
   formAction: (formData: FormData) => void;
   todo?: TodoType;
-  isLoading: boolean;
 }) {
   const categories = useCategoryStore((set) => set.categories);
+  const [isPending, startTransition] = useTransition();
+
   return (
     <>
       <form
-        action={formAction}
+        onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+          startTransition(() => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+
+            if (todo) {
+              formData.append("id", todo.id.toString());
+            }
+
+            formAction(formData);
+          });
+        }}
         className="flex w-xs flex-col gap-4 py-4 md:w-md"
       >
         <h3 className="text-xl font-semibold text-zinc-600">할 일</h3>
@@ -66,8 +78,8 @@ export default function TodoForm({
         {state.error?.categoryId && (
           <span className="text-xs text-red-400">{state.error.categoryId}</span>
         )}
-        <button className="btn" disabled={isLoading}>
-          {isLoading ? "로딩 중" : "할 일 추가"}
+        <button className="btn" disabled={isPending} type="submit">
+          {isPending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
         </button>
       </form>
     </>
