@@ -27,7 +27,7 @@ export default function CreateTodoButton() {
       </button>
       <Modal modalType="todo" isLoading={pending}>
         <Modal.Title>할 일 추가하기</Modal.Title>
-        <TodoForm formAction={formAction} state={state} isLoading={pending} />
+        <TodoForm formAction={formAction} state={state} />
       </Modal>
     </div>
   );
