@@ -7,15 +7,16 @@ export default function Content({ content }: { content: string }) {
     return text.split(urlRegex).map((part, i) => {
       if (part.match(urlRegex)) {
         return (
-          <Link
-            key={i}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-zinc-400 underline underline-offset-2"
-          >
-            {part}
-          </Link>
+          <span key={i} className="break-words">
+            <Link
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="break-all text-zinc-400 underline underline-offset-2"
+            >
+              {part}
+            </Link>
+          </span>
         );
       }
       return part;
@@ -25,7 +26,10 @@ export default function Content({ content }: { content: string }) {
   return (
     <>
       {content.split("\n").map((item, index) => (
-        <p className="flex w-full flex-wrap break-words" key={index}>
+        <p
+          className="flex w-full flex-wrap break-all whitespace-pre-wrap"
+          key={index}
+        >
           {linkifyText(item)}
         </p>
       ))}
