@@ -1,5 +1,3 @@
-"use server";
-
 import { TodoType } from "@/types/todos";
 import FetchClient from "./fetchClient";
 import { revalidateTag } from "next/cache";

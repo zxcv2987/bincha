@@ -1,5 +1,3 @@
-"use server";
-
 import { cookies } from "next/headers";
 
 export default async function FetchClient(url: string, init: RequestInit) {
@@ -10,16 +8,23 @@ export default async function FetchClient(url: string, init: RequestInit) {
 
   const accessToken = (await cookies()).get("access_token")?.value;
 
-  init = {
-    ...init,
-    headers: {
-      ...init.headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-    },
+  const headers: Record<string, string> = {
+    ...(init.headers as Record<string, string>),
   };
-  const response = await fetch(baseURL, init);
 
-  // 응답 상태 확인
+  if (init.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  const response = await fetch(baseURL, {
+    ...init,
+    headers,
+  });
+
   if (!response.ok) {
     throw new Error(`API 요청 실패: ${response.status} ${response.statusText}`);
   }

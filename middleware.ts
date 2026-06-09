@@ -1,15 +1,42 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { refreshAccessToken } from "./apis/auth";
 import { jwtVerify } from "jose";
+import { authCookieOptions } from "@/lib/auth/cookie-options";
 
-// 토큰 검증이 필요하지 않은 경로
-const publicPaths = ["/api/login", "/api/refresh", "/login", "/readonly"];
+const publicPaths = ["/api/login", "/login", "/readonly"];
 
 const publicEndpoints = [
   { path: "/api/category", methods: ["GET"] },
   { path: "/api/todos", methods: ["GET"] },
 ];
+
+function getAccessSecret(): Uint8Array | null {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return null;
+  return new TextEncoder().encode(secret);
+}
+
+async function fetchNewAccessToken(
+  request: NextRequest,
+  refreshToken: string,
+): Promise<string> {
+  const res = await fetch(new URL("/api/login/refresh", request.url), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to refresh access token");
+  }
+
+  const data = await res.json();
+  if (!data.accessToken) {
+    throw new Error("No access token in refresh response");
+  }
+
+  return data.accessToken;
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,40 +54,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const accessSecret = getAccessSecret();
+  if (!accessSecret) {
+    console.error("JWT_SECRET is not set");
+    return NextResponse.rewrite(new URL("/readonly", request.url));
+  }
+
   const accessToken =
     request.headers.get("Authorization")?.split(" ")[1] ||
     request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  // 액세스 토큰이 있는 경우 먼저 유효성 검증
   if (accessToken) {
     try {
-      const accessSecret = new TextEncoder().encode(
-        process.env.JWT_SECRET || "",
-      );
       await jwtVerify(accessToken, accessSecret);
       return NextResponse.next();
     } catch (error) {
       console.error("액세스 토큰 검증 실패:", error);
 
-      // 액세스 토큰 만료되었고 리프레시 토큰이 있는 경우
       if (refreshToken) {
         try {
-          // 리프레시 토큰 검증 및 새 액세스 토큰 발급
-          const refreshSecret = new TextEncoder().encode(
-            process.env.JWT_REFRESH_SECRET || "",
+          const newAccessToken = await fetchNewAccessToken(
+            request,
+            refreshToken,
           );
 
-          await jwtVerify(refreshToken, refreshSecret);
-          const { accessToken: newAccessToken } =
-            await refreshAccessToken(refreshToken);
-
-          // 새 액세스 토큰으로 응답 설정
           const response = NextResponse.next();
-          response.cookies.set("access_token", newAccessToken, {
-            httpOnly: true,
-            path: "/",
-          });
+          response.cookies.set("access_token", newAccessToken, authCookieOptions);
           return response;
         } catch (refreshError) {
           console.error("리프레시 토큰 검증 실패:", refreshError);
@@ -77,12 +97,10 @@ export async function middleware(request: NextRequest) {
             );
           }
 
-          // API가 아닌 페이지 요청은 로그인 페이지로 리다이렉트
           return NextResponse.rewrite(new URL("/readonly", request.url));
         }
       }
 
-      // 리프레시 토큰 없는 경우
       if (pathname.startsWith("/api/")) {
         return new NextResponse(
           JSON.stringify({ error: "인증이 필요합니다." }),
@@ -99,12 +117,6 @@ export async function middleware(request: NextRequest) {
   return NextResponse.rewrite(new URL("/readonly", request.url));
 }
 
-// 미들웨어가 적용될 경로 설정
 export const config = {
-  matcher: [
-    // 모든 API 라우트에 적용
-    "/api/:path*",
-    // /admin으로 시작하는 모든 경로에 적용
-    "/",
-  ],
+  matcher: ["/api/:path*", "/"],
 };
