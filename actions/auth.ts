@@ -2,10 +2,9 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { authenticateAndIssueTokens } from "@/lib/auth/login";
 import { changePassword } from "@/lib/auth/password";
 import { revokeRefreshToken } from "@/lib/auth/refresh";
-import { setAuthCookies, clearAuthCookies } from "@/lib/auth/cookies";
+import { clearAuthCookies } from "@/lib/auth/cookies";
 import { verifyAccessToken } from "@/lib/auth/tokens";
 import { AuthError } from "@/lib/auth/errors";
 
@@ -34,37 +33,6 @@ async function getAuthenticatedUserId() {
   } catch {
     return null;
   }
-}
-
-export async function loginAction(
-  _state: unknown,
-  formData: FormData,
-): Promise<{
-  ok?: boolean;
-  error?: string;
-}> {
-  const password = formData.get("password") as string;
-  if (password === null || password === "") {
-    return { ok: false, error: "비밀번호를 입력해 주세요" };
-  }
-
-  try {
-    const res = await authenticateAndIssueTokens(password);
-
-    if (!res.accessToken || !res.refreshToken) {
-      return { ok: false, error: "로그인 실패" };
-    }
-
-    await setAuthCookies(res.accessToken, res.refreshToken);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return { ok: false, error: "로그인 실패" };
-    }
-    console.error("로그인 중 오류 발생:", error);
-    return { ok: false, error: "로그인 실패" };
-  }
-
-  redirect("/");
 }
 
 export async function changePasswordAction(

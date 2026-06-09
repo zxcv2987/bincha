@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { authCookieOptions } from "@/lib/auth/cookie-options";
+import {
+  clearRefreshTokenOnResponse,
+  forwardSetCookieHeaders,
+} from "@/lib/auth/response-cookies";
 
 const publicPaths = ["/api/login", "/login", "/readonly"];
 
@@ -19,7 +22,7 @@ function getAccessSecret(): Uint8Array | null {
 async function fetchNewAccessToken(
   request: NextRequest,
   refreshToken: string,
-): Promise<string> {
+): Promise<Response> {
   const res = await fetch(new URL("/api/login/refresh", request.url), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -30,12 +33,35 @@ async function fetchNewAccessToken(
     throw new Error("Failed to refresh access token");
   }
 
-  const data = await res.json();
-  if (!data.accessToken) {
-    throw new Error("No access token in refresh response");
+  return res;
+}
+
+function authExpiredResponse(request: NextRequest, pathname: string) {
+  const message = "인증이 만료되었습니다. 다시 로그인해주세요.";
+
+  if (pathname.startsWith("/api/")) {
+    const response = new NextResponse(JSON.stringify({ error: message }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+    return clearRefreshTokenOnResponse(response);
   }
 
-  return data.accessToken;
+  const response = NextResponse.rewrite(new URL("/readonly", request.url));
+  return clearRefreshTokenOnResponse(response);
+}
+
+function authRequiredResponse(request: NextRequest, pathname: string) {
+  if (pathname.startsWith("/api/")) {
+    return new NextResponse(
+      JSON.stringify({ error: "인증이 필요합니다." }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+  return NextResponse.rewrite(new URL("/readonly", request.url));
 }
 
 export async function middleware(request: NextRequest) {
@@ -74,47 +100,25 @@ export async function middleware(request: NextRequest) {
 
       if (refreshToken) {
         try {
-          const newAccessToken = await fetchNewAccessToken(
+          const refreshResponse = await fetchNewAccessToken(
             request,
             refreshToken,
           );
 
           const response = NextResponse.next();
-          response.cookies.set("access_token", newAccessToken, authCookieOptions);
+          forwardSetCookieHeaders(response, refreshResponse);
           return response;
         } catch (refreshError) {
           console.error("리프레시 토큰 검증 실패:", refreshError);
-
-          if (pathname.startsWith("/api/")) {
-            return new NextResponse(
-              JSON.stringify({
-                error: "인증이 만료되었습니다. 다시 로그인해주세요.",
-              }),
-              {
-                status: 401,
-                headers: { "Content-Type": "application/json" },
-              },
-            );
-          }
-
-          return NextResponse.rewrite(new URL("/readonly", request.url));
+          return authExpiredResponse(request, pathname);
         }
       }
 
-      if (pathname.startsWith("/api/")) {
-        return new NextResponse(
-          JSON.stringify({ error: "인증이 필요합니다." }),
-          {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
-      return NextResponse.rewrite(new URL("/readonly", request.url));
+      return authRequiredResponse(request, pathname);
     }
   }
 
-  return NextResponse.rewrite(new URL("/readonly", request.url));
+  return authRequiredResponse(request, pathname);
 }
 
 export const config = {

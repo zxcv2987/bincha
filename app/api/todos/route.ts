@@ -1,42 +1,37 @@
-import { prisma } from "@/prisma/prismaClient";
+import { createTodo, getTodos } from "@/lib/services/todo";
 import { NextResponse } from "next/server";
-import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
-import { revalidateTag } from "next/cache";
 
 export async function GET() {
   try {
-    const todos = await prisma.todos.findMany({
-      include: {
-        category: true,
-      },
-      orderBy: [{ id: "asc" }, { category_id: "asc" }],
-    });
-    return Response.json(serializeBigInt(todos));
+    const todos = await getTodos();
+    return NextResponse.json(todos);
   } catch (error) {
-    console.log(error);
-    return Response.error();
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to fetch todos" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
     const { title, text, category_id } = await request.json();
-    if (!title || !text || !category_id)
-      return Response.json(
-        { error: "Missing required fields:" },
+
+    if (!title || !text || !category_id) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
         { status: 400 },
       );
-    const todo = await prisma.todos.create({
-      data: {
-        title,
-        text,
-        category_id,
-      },
-    });
-    revalidateTag("todos");
-    return NextResponse.json(serializeBigInt(todo));
+    }
+
+    const todo = await createTodo(title, text, category_id);
+    return NextResponse.json(todo);
   } catch (error) {
-    console.log(error);
-    return Response.error();
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to create todo" },
+      { status: 500 },
+    );
   }
 }

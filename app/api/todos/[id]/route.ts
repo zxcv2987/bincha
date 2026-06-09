@@ -1,7 +1,6 @@
-import { prisma } from "@/prisma/prismaClient";
-import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
-import { revalidateTag } from "next/cache";
+import { deleteTodo, updateTodo } from "@/lib/services/todo";
 import { NextResponse } from "next/server";
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -10,47 +9,42 @@ export async function PATCH(
 
   try {
     const { title, text, category_id } = await request.json();
-    const updateData: Record<string, unknown> = {};
-    if (title !== undefined) updateData.title = title;
-    if (text !== undefined) updateData.text = text;
-    if (category_id !== undefined) updateData.category_id = category_id;
-
-    if (Object.keys(updateData).length === 0) {
-      return Response.json(
-        { error: "At least one field must be provided to update." },
-        { status: 400 },
-      );
-    }
-    const todo = await prisma.todos.update({
-      where: {
-        id: Number(id),
-      },
-      data: updateData,
+    const todo = await updateTodo({
+      id: Number(id),
+      title,
+      text,
+      category_id,
     });
-    revalidateTag("todos");
-    return NextResponse.json(serializeBigInt(todo));
+    return NextResponse.json(todo);
   } catch (error) {
-    console.log(error);
-    return Response.error();
+    if (
+      error instanceof Error &&
+      error.message === "At least one field must be provided to update."
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to update todo" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  try {
-    const todo = await prisma.todos.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-    revalidateTag("todos");
 
-    return Response.json(serializeBigInt(todo));
+  try {
+    const todo = await deleteTodo(Number(id));
+    return NextResponse.json(todo);
   } catch (error) {
-    console.log(error);
-    return Response.error();
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to delete todo" },
+      { status: 500 },
+    );
   }
 }

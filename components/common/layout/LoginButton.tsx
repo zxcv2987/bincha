@@ -2,22 +2,54 @@
 
 import { useModalStore } from "@/utils/providers/ModalProvider";
 import Modal from "../modal/Modal";
-import { useActionState, useEffect } from "react";
-import { loginAction } from "@/actions/auth";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
+
 export default function LoginButton() {
+  const router = useRouter();
   const open = useModalStore((set) => set.open);
   const close = useModalStore((set) => set.close);
-  const [state, formAction, isLoading] = useActionState(loginAction, {
-    ok: false,
-    error: undefined,
-  });
+  const [error, setError] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (state.ok) {
-      close();
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(undefined);
+    setIsLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const password = formData.get("password") as string;
+
+    if (!password) {
+      setError("비밀번호를 입력해 주세요");
+      setIsLoading(false);
+      return;
     }
-  }, [state.ok, close]);
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        setError("로그인 실패");
+        setIsLoading(false);
+        return;
+      }
+
+      close();
+      router.refresh();
+      router.push("/");
+    } catch {
+      setError("로그인 실패");
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
       <button
@@ -28,15 +60,13 @@ export default function LoginButton() {
       </button>
       <Modal modalType="login" isLoading={isLoading}>
         <Modal.Title>Login</Modal.Title>
-        <form className="flex w-xs flex-col gap-4" action={formAction}>
+        <form className="flex w-xs flex-col gap-4" onSubmit={handleSubmit}>
           <input
             type="password"
             name="password"
             className="input border-zinc-300 outline-none"
           />
-          {state.error && (
-            <span className="text-xs text-red-400">{state.error}</span>
-          )}
+          {error && <span className="text-xs text-red-400">{error}</span>}
           <button
             type="submit"
             className={clsx(

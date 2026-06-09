@@ -1,23 +1,20 @@
-import { prisma } from "@/prisma/prismaClient";
-import { serializeBigInt } from "@/utils/serialize/serializeBigInt";
-import { revalidateTag } from "next/cache";
+import { deleteCategory } from "@/lib/services/category";
+import { NextResponse } from "next/server";
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  try {
-    const category = await prisma.category.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-    revalidateTag("category");
 
-    return Response.json(serializeBigInt(category));
+  try {
+    const category = await deleteCategory(Number(id));
+    return NextResponse.json(category);
   } catch (error) {
-    console.log(error);
-    return Response.error();
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to delete category" },
+      { status: 500 },
+    );
   }
 }

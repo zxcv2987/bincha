@@ -1,6 +1,6 @@
 "use server";
 
-import { createTodo, deleteTodo, updateTodo } from "@/apis/todo";
+import { createTodo, deleteTodo, updateTodo } from "@/lib/services/todo";
 
 export async function createTodoAction(state: any, formData: FormData) {
   const title = formData.get("title");
