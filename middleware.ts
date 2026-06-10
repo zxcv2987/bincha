@@ -5,8 +5,9 @@ import {
   clearRefreshTokenOnResponse,
   forwardSetCookieHeaders,
 } from "@/lib/auth/response-cookies";
+import { updateSession } from "@/utils/supabase/middleware";
 
-const publicPaths = ["/api/login", "/login", "/readonly"];
+const publicPaths = ["/api/login", "/login", "/readonly", "/supabase-test"];
 
 const publicEndpoints = [
   { path: "/api/category", methods: ["GET"] },
@@ -51,6 +52,16 @@ function authExpiredResponse(request: NextRequest, pathname: string) {
   return clearRefreshTokenOnResponse(response);
 }
 
+function applySupabaseCookies(
+  response: NextResponse,
+  supabaseResponse: NextResponse,
+) {
+  supabaseResponse.cookies.getAll().forEach((cookie) => {
+    response.cookies.set(cookie);
+  });
+  return response;
+}
+
 function authRequiredResponse(request: NextRequest, pathname: string) {
   if (pathname.startsWith("/api/")) {
     return new NextResponse(
@@ -65,10 +76,11 @@ function authRequiredResponse(request: NextRequest, pathname: string) {
 }
 
 export async function middleware(request: NextRequest) {
+  const supabaseResponse = await updateSession(request);
   const { pathname } = request.nextUrl;
 
   if (publicPaths.some((path) => pathname.startsWith(path))) {
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   const isPublicEndpoint = publicEndpoints.some(
@@ -77,13 +89,16 @@ export async function middleware(request: NextRequest) {
       endpoint.methods.includes(request.method),
   );
   if (isPublicEndpoint) {
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
   const accessSecret = getAccessSecret();
   if (!accessSecret) {
     console.error("JWT_SECRET is not set");
-    return NextResponse.rewrite(new URL("/readonly", request.url));
+    return applySupabaseCookies(
+      NextResponse.rewrite(new URL("/readonly", request.url)),
+      supabaseResponse,
+    );
   }
 
   const accessToken =
@@ -94,7 +109,7 @@ export async function middleware(request: NextRequest) {
   if (accessToken) {
     try {
       await jwtVerify(accessToken, accessSecret);
-      return NextResponse.next();
+      return supabaseResponse;
     } catch (error) {
       console.error("액세스 토큰 검증 실패:", error);
 
@@ -107,20 +122,31 @@ export async function middleware(request: NextRequest) {
 
           const response = NextResponse.next();
           forwardSetCookieHeaders(response, refreshResponse);
-          return response;
+          return applySupabaseCookies(response, supabaseResponse);
         } catch (refreshError) {
           console.error("리프레시 토큰 검증 실패:", refreshError);
-          return authExpiredResponse(request, pathname);
+          return applySupabaseCookies(
+            authExpiredResponse(request, pathname),
+            supabaseResponse,
+          );
         }
       }
 
-      return authRequiredResponse(request, pathname);
+      return applySupabaseCookies(
+        authRequiredResponse(request, pathname),
+        supabaseResponse,
+      );
     }
   }
 
-  return authRequiredResponse(request, pathname);
+  return applySupabaseCookies(
+    authRequiredResponse(request, pathname),
+    supabaseResponse,
+  );
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
