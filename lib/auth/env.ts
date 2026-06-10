@@ -1,9 +1,17 @@
-function encodeSecret(envName: string): Uint8Array {
-  const secret = process.env[envName];
-  if (!secret) {
+function readEnv(envName: string): string {
+  const value = process.env[envName];
+  if (!value) {
     throw new Error(`${envName} is not set`);
   }
-  return new TextEncoder().encode(secret);
+  return value;
+}
+
+function encodeSecret(envName: string): Uint8Array {
+  return new TextEncoder().encode(readEnv(envName));
+}
+
+export function getAdminPassword(): string {
+  return readEnv("ADMIN_PASSWORD");
 }
 
 export function getAccessSecret(): Uint8Array {
