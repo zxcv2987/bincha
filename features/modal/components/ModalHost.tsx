@@ -8,7 +8,10 @@ import ModalTitle from "@/features/modal/components/ModalTitle";
 import LoginFormContent from "@/features/modal/components/LoginFormContent";
 import CategoryForm from "@/features/category/components/CategoryForm";
 import TodoForm from "@/features/todo/components/TodoForm";
-import { createTodoAction, editTodoAction } from "@/features/todo/actions";
+import {
+  createTodoAction,
+  updateTodoAction,
+} from "@/features/todo/todo.actions";
 
 const MODAL_TITLES: Record<string, string> = {
   login: "Login",
@@ -28,7 +31,7 @@ export default function ModalHost() {
     createTodoAction,
     { ok: false },
   );
-  const [editState, editAction, editPending] = useActionState(editTodoAction, {
+  const [editState, editAction, editPending] = useActionState(updateTodoAction, {
     ok: false,
   });
 

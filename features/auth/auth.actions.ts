@@ -8,7 +8,7 @@ import { clearAuthCookies } from "@/lib/auth/cookies";
 import { verifyAccessToken } from "@/lib/auth/tokens";
 import { AuthError } from "@/lib/auth/errors";
 
-export async function getUserRole() {
+export async function getAuthenticatedUsername() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
   if (!accessToken) return null;
@@ -65,7 +65,7 @@ export async function changePasswordAction(
   }
 }
 
-export async function logout() {
+export async function logoutAction() {
   try {
     const userId = await getAuthenticatedUserId();
     if (userId) {

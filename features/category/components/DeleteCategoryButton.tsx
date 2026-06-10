@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { deleteCategoryAction } from "@/features/category/actions";
+import { deleteCategoryAction } from "@/features/category/category.actions";
 import clsx from "clsx";
 import useModal from "@/features/shared/hooks/useModal";
 

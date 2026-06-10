@@ -1,6 +1,6 @@
 "use server";
 
-import { createTodo, deleteTodo, updateTodo } from "@/lib/services/todo";
+import { createTodo, deleteTodo, updateTodo } from "./todo.service";
 
 export async function createTodoAction(
   _state: unknown,
@@ -26,7 +26,7 @@ export async function createTodoAction(
   return { ok: true };
 }
 
-export async function editTodoAction(
+export async function updateTodoAction(
   _state: unknown,
   formData: FormData,
 ) {

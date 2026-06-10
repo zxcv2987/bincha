@@ -1,5 +1,5 @@
 "use client";
-import { categoryFormAction } from "@/features/category/actions";
+import { createCategoryAction } from "@/features/category/category.actions";
 import { useModalStore } from "@/features/modal/provider";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
@@ -7,7 +7,7 @@ import { useActionState, useEffect } from "react";
 
 export default function CategoryForm() {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(categoryFormAction, {
+  const [state, formAction, pending] = useActionState(createCategoryAction, {
     ok: false,
     error: "",
   });

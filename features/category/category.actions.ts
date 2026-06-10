@@ -1,11 +1,8 @@
 "use server";
 
-import {
-  createCategory,
-  deleteCategory,
-} from "@/lib/services/category";
+import { createCategory, deleteCategory } from "./category.service";
 
-export async function categoryFormAction(
+export async function createCategoryAction(
   _state: unknown,
   formData: FormData,
 ) {

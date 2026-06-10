@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
 import { revalidateTag } from "next/cache";
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "./types";
 
 export async function getCategories(): Promise<CategoryType[]> {
   const categories = await prisma.category.findMany({

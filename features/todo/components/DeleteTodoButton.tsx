@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { deleteTodoAction } from "@/features/todo/actions";
+import { deleteTodoAction } from "@/features/todo/todo.actions";
 
 export default function DeleteTodoButton({
   todoId,

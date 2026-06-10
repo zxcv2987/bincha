@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { getCategories } from "@/lib/services/category";
+import { getCategories } from "./category.service";
 
 export const getCachedCategories = unstable_cache(
   getCategories,

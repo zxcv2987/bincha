@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
 import { revalidateTag } from "next/cache";
-import { TodoType } from "@/features/todo/types";
+import { TodoType } from "./types";
 
 export async function getTodos(): Promise<TodoType[]> {
   const todos = await prisma.todos.findMany({

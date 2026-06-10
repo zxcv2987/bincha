@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
+import { loginWithPassword } from "@/features/auth/login.client";
 import { useModalStore } from "@/features/modal/provider";
 
 export default function LoginFormContent({
@@ -31,29 +32,18 @@ export default function LoginFormContent({
       return;
     }
 
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-        credentials: "include",
-      });
+    const result = await loginWithPassword(password);
 
-      if (!res.ok) {
-        setError("로그인 실패");
-        setIsLoading(false);
-        onLoadingChange(false);
-        return;
-      }
-
-      close();
-      router.refresh();
-      router.push("/");
-    } catch {
-      setError("로그인 실패");
+    if (!result.ok) {
+      setError(result.error);
       setIsLoading(false);
       onLoadingChange(false);
+      return;
     }
+
+    close();
+    router.refresh();
+    router.push("/");
   }
 
   return (

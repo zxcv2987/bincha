@@ -1,10 +1,10 @@
-import { getListData } from "@/lib/data/list";
+import { getTodoBoardData } from "@/features/shared/todo-board.queries";
 import Header from "@/features/shared/components/Header";
 import ListFetchError from "@/features/shared/components/ListFetchError";
 import TodoList from "@/features/todo/components/TodoList";
 
 export default async function Page() {
-  const result = await getListData();
+  const result = await getTodoBoardData();
 
   return (
     <>

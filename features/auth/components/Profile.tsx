@@ -1,10 +1,10 @@
 "use client";
 
-import { logout } from "@/features/auth/actions";
+import { logoutAction } from "@/features/auth/auth.actions";
 
 export default function Profile({ children }: { children: React.ReactNode }) {
   return (
-    <div className="cursor-pointer" onClick={() => logout()}>
+    <div className="cursor-pointer" onClick={() => logoutAction()}>
       {children}
     </div>
   );
