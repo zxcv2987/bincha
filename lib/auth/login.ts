@@ -1,19 +1,18 @@
-import bcrypt from "bcrypt";
-import { prisma } from "@/prisma/prismaClient";
+import { prisma } from "@/lib/db/prisma";
+import { getAdminPassword } from "./env";
 import { AuthError } from "./errors";
 import { createAccessToken, createRefreshToken } from "./tokens";
 
 export async function authenticateAndIssueTokens(password: string) {
+  if (password !== getAdminPassword()) {
+    throw new AuthError("INVALID_CREDENTIALS", "Invalid credentials");
+  }
+
   const user = await prisma.user.findUnique({
     where: { username: "admin" },
   });
 
   if (!user) {
-    throw new AuthError("INVALID_CREDENTIALS", "Invalid credentials");
-  }
-
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) {
     throw new AuthError("INVALID_CREDENTIALS", "Invalid credentials");
   }
 

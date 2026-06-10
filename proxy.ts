@@ -5,14 +5,9 @@ import {
   clearRefreshTokenOnResponse,
   forwardSetCookieHeaders,
 } from "@/lib/auth/response-cookies";
-import { updateSession } from "@/utils/supabase/middleware";
+import { updateSession } from "@/lib/supabase/middleware";
 
-const publicPaths = ["/api/login", "/login", "/readonly", "/supabase-test"];
-
-const publicEndpoints = [
-  { path: "/api/category", methods: ["GET"] },
-  { path: "/api/todos", methods: ["GET"] },
-];
+const publicPaths = ["/api/login", "/login", "/readonly"];
 
 function getAccessSecret(): Uint8Array | null {
   const secret = process.env.JWT_SECRET;
@@ -80,15 +75,6 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (publicPaths.some((path) => pathname.startsWith(path))) {
-    return supabaseResponse;
-  }
-
-  const isPublicEndpoint = publicEndpoints.some(
-    (endpoint) =>
-      pathname.startsWith(endpoint.path) &&
-      endpoint.methods.includes(request.method),
-  );
-  if (isPublicEndpoint) {
     return supabaseResponse;
   }
 
