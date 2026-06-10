@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { prisma } from "@/prisma/prismaClient";
+import { prisma } from "@/lib/db/prisma";
 import { AuthError } from "./errors";
 
 export async function changePassword(userId: bigint, newPassword: string) {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/styles/globals.css";
-import StoreProvider from "@/utils/providers/Providers";
+import StoreProvider from "@/providers";
 
 const LINESeedKr = localFont({
   src: [
@@ -34,7 +34,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={`${LINESeedKr.className} antialiased`}>
         <StoreProvider>
           <div id="root">

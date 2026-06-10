@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismaClient";
+import { prisma } from "@/lib/db/prisma";
 import { AuthError } from "./errors";
 import { createAccessToken, verifyRefreshToken } from "./tokens";
 

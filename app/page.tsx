@@ -1,13 +1,15 @@
 import { getCachedCategories } from "@/lib/data/category";
 import { getCachedTodos } from "@/lib/data/todo";
-import Header from "@/components/common/layout/Header";
-import TodoList from "@/components/TodoList";
-import { CategoryType } from "@/types/category";
-import { TodoType } from "@/types/todos";
+import Header from "@/features/shared/components/Header";
+import TodoList from "@/features/todo/components/TodoList";
+import { CategoryType } from "@/features/category/types";
+import { TodoType } from "@/features/todo/types";
 
 export default async function Home() {
-  const categories: CategoryType[] = await getCachedCategories();
-  const todos: TodoType[] = await getCachedTodos();
+  const [categories, todos] = await Promise.all([
+    getCachedCategories(),
+    getCachedTodos(),
+  ]) as [CategoryType[], TodoType[]];
   return (
     <>
       <Header />
