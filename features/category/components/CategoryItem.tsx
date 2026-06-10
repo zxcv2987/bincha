@@ -18,7 +18,7 @@ export default function CategoryItem({
       )}
       onClick={() => setCategory(category.category_name)}
     >
-      {category.category_name}
+      {category.category_name.trim() || "이름 없음"}
     </button>
   );
 }

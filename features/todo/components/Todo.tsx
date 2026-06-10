@@ -19,11 +19,15 @@ export default function Todo({
       <div className="flex w-full flex-row items-center bg-zinc-50">
         <div className="flex w-full flex-col gap-2">
           <h3 className="w-full truncate text-lg font-bold break-words">
-            {todo.title}
+            {todo.title.trim() || "제목 없음"}
           </h3>
-          <span className="w-full pl-1 text-base break-words">
-            <Content content={todo.text} />
-          </span>
+          {todo.text.trim() ? (
+            <span className="w-full pl-1 text-base break-words">
+              <Content content={todo.text} />
+            </span>
+          ) : (
+            <span className="w-full pl-1 text-base text-zinc-400">내용 없음</span>
+          )}
         </div>
       </div>
       {!isReadOnly && <TodoMoreActionButton todo={todo} />}

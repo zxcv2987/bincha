@@ -9,6 +9,7 @@ import Todo from "@/features/todo/components/Todo";
 import { useCategoryStore } from "@/features/category/provider";
 import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
+import ListEmptyState from "@/features/shared/components/ListEmptyState";
 
 export default function TodoList({
   todos,
@@ -27,6 +28,11 @@ export default function TodoList({
   useEffect(() => {
     setCategories(categories);
   }, [categories, setCategories]);
+
+  const visibleCategories = categories.filter(
+    (category) =>
+      categoryState === null || category.category_name === categoryState,
+  );
 
   return (
     <div
@@ -53,23 +59,43 @@ export default function TodoList({
       </div>
       {!isReadOnly && <CreateTodoButton />}
 
-      {categories.map(
-        (category) =>
-          (category.category_name === categoryState ||
-            categoryState === null) && (
+      {categories.length === 0 ? (
+        <ListEmptyState
+          message={
+            isReadOnly
+              ? "표시할 카테고리가 없습니다."
+              : "카테고리를 추가하면 할 일을 정리할 수 있어요."
+          }
+        />
+      ) : todos.length === 0 ? (
+        <ListEmptyState
+          message={
+            isReadOnly
+              ? "표시할 할 일이 없습니다."
+              : "할 일을 추가해 보세요."
+          }
+        />
+      ) : visibleCategories.length === 0 ? (
+        <ListEmptyState message="선택한 카테고리에 할 일이 없습니다." />
+      ) : (
+        visibleCategories.map((category) => {
+          const categoryTodos = todos.filter(
+            (todo) => todo.category.category_name === category.category_name,
+          );
+
+          return (
             <TodosByCategory
               key={category.id}
               category={category}
               isReadOnly={isReadOnly}
+              isEmpty={categoryTodos.length === 0}
             >
-              {todos.map(
-                (todo) =>
-                  todo.category.category_name === category.category_name && (
-                    <Todo key={todo.id} todo={todo} isReadOnly={isReadOnly} />
-                  ),
-              )}
+              {categoryTodos.map((todo) => (
+                <Todo key={todo.id} todo={todo} isReadOnly={isReadOnly} />
+              ))}
             </TodosByCategory>
-          ),
+          );
+        })
       )}
     </div>
   );

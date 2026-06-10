@@ -1,20 +1,20 @@
-import { getCachedCategories } from "@/lib/data/category";
-import { getCachedTodos } from "@/lib/data/todo";
+import { getListData } from "@/lib/data/list";
 import Header from "@/features/shared/components/Header";
+import ListFetchError from "@/features/shared/components/ListFetchError";
 import TodoList from "@/features/todo/components/TodoList";
-import { CategoryType } from "@/features/category/types";
-import { TodoType } from "@/features/todo/types";
 
 export default async function Home() {
-  const [categories, todos] = await Promise.all([
-    getCachedCategories(),
-    getCachedTodos(),
-  ]) as [CategoryType[], TodoType[]];
+  const result = await getListData();
+
   return (
     <>
       <Header />
       <div className="flex w-full flex-col gap-4">
-        <TodoList todos={todos} categories={categories} />
+        {result.ok ? (
+          <TodoList todos={result.todos} categories={result.categories} />
+        ) : (
+          <ListFetchError message={result.error} />
+        )}
       </div>
     </>
   );

@@ -1,6 +1,10 @@
 import Link from "next/link";
 
 export default function Content({ content }: { content: string }) {
+  if (!content.trim()) {
+    return null;
+  }
+
   const linkifyText = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
