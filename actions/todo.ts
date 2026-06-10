@@ -2,7 +2,10 @@
 
 import { createTodo, deleteTodo, updateTodo } from "@/lib/services/todo";
 
-export async function createTodoAction(state: any, formData: FormData) {
+export async function createTodoAction(
+  _state: unknown,
+  formData: FormData,
+) {
   const title = formData.get("title");
   if (title === null || title === "")
     return { ok: false, error: { title: "할 일을 입력해 주세요." } };
@@ -23,7 +26,10 @@ export async function createTodoAction(state: any, formData: FormData) {
   return { ok: true };
 }
 
-export async function editTodoAction(state: any, formData: FormData) {
+export async function editTodoAction(
+  _state: unknown,
+  formData: FormData,
+) {
   const id = formData.get("id");
   if (id === null || id === "")
     return { ok: false, error: { id: "id가 잘못되었습니다." } };
@@ -52,7 +58,10 @@ export async function editTodoAction(state: any, formData: FormData) {
   return { ok: true };
 }
 
-export async function deleteTodoAction(state: any, categoryId: number) {
+export async function deleteTodoAction(
+  _state: unknown,
+  categoryId: number,
+) {
   try {
     await deleteTodo(categoryId);
     return { ok: true };

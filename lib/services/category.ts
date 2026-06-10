@@ -16,7 +16,7 @@ export async function createCategory(
   const category = await prisma.category.create({
     data: { category_name },
   });
-  revalidateTag("category");
+  revalidateTag("category", "max");
   return serializeBigInt(category);
 }
 
@@ -24,6 +24,6 @@ export async function deleteCategory(id: number): Promise<CategoryType> {
   const category = await prisma.category.delete({
     where: { id },
   });
-  revalidateTag("category");
+  revalidateTag("category", "max");
   return serializeBigInt(category);
 }

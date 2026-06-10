@@ -5,7 +5,10 @@ import {
   deleteCategory,
 } from "@/lib/services/category";
 
-export async function categoryFormAction(state: any, formData: FormData) {
+export async function categoryFormAction(
+  _state: unknown,
+  formData: FormData,
+) {
   const category = formData.get("category");
   if (category === null || category === "")
     return { ok: false, error: "카테고리를 입력해 주세요." };
@@ -19,7 +22,10 @@ export async function categoryFormAction(state: any, formData: FormData) {
   }
 }
 
-export async function deleteCategoryAction(state: any, categoryId: number) {
+export async function deleteCategoryAction(
+  _state: unknown,
+  categoryId: number,
+) {
   try {
     await deleteCategory(categoryId);
     return { ok: true };

@@ -23,7 +23,7 @@ export async function createTodo(
   const todo = await prisma.todos.create({
     data: { title, text, category_id },
   });
-  revalidateTag("todos");
+  revalidateTag("todos", "max");
   return serializeBigInt(todo);
 }
 
@@ -51,7 +51,7 @@ export async function updateTodo({
     where: { id },
     data: updateData,
   });
-  revalidateTag("todos");
+  revalidateTag("todos", "max");
   return serializeBigInt(todo);
 }
 
@@ -59,6 +59,6 @@ export async function deleteTodo(id: number) {
   const todo = await prisma.todos.delete({
     where: { id },
   });
-  revalidateTag("todos");
+  revalidateTag("todos", "max");
   return serializeBigInt(todo);
 }

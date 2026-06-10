@@ -75,7 +75,7 @@ function authRequiredResponse(request: NextRequest, pathname: string) {
   return NextResponse.rewrite(new URL("/readonly", request.url));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const supabaseResponse = await updateSession(request);
   const { pathname } = request.nextUrl;
 
