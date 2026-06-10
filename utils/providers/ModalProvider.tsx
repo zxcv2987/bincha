@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { type ReactNode, createContext, useContext, useState } from "react";
 import { useStore } from "zustand";
 
 import {
@@ -16,13 +16,10 @@ export const ModalStoreContext = createContext<ModalStoreApi | undefined>(
 );
 
 export const ModalStoreProvider = ({ children }: { children: ReactNode }) => {
-  const storeRef = useRef<ModalStoreApi | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createModalStore(initModalStore());
-  }
+  const [store] = useState(() => createModalStore(initModalStore()));
 
   return (
-    <ModalStoreContext.Provider value={storeRef.current}>
+    <ModalStoreContext.Provider value={store}>
       {children}
     </ModalStoreContext.Provider>
   );

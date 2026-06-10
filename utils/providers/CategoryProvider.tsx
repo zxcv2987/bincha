@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { type ReactNode, createContext, useContext, useState } from "react";
 import { useStore } from "zustand";
 
 import {
@@ -20,13 +20,12 @@ export const CategoryStoreProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const storeRef = useRef<CategoryStoreApi | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createCategoryStore(initCategoryStore());
-  }
+  const [store] = useState(() =>
+    createCategoryStore(initCategoryStore()),
+  );
 
   return (
-    <CategoryStoreContext.Provider value={storeRef.current}>
+    <CategoryStoreContext.Provider value={store}>
       {children}
     </CategoryStoreContext.Provider>
   );
