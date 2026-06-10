@@ -2,7 +2,7 @@
 
 import { CategoryType } from "@/features/category/types";
 import DeleteCategoryButton from "@/features/category/components/DeleteCategoryButton";
-import ListEmptyState from "@/features/shared/components/ListEmptyState";
+import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
 
 export default function TodosByCategory({
   category,
@@ -26,10 +26,7 @@ export default function TodosByCategory({
         {!isReadOnly && <DeleteCategoryButton categoryId={category.id} />}
       </div>
       {isEmpty ? (
-        <ListEmptyState
-          message="이 카테고리에 할 일이 없습니다."
-          className="py-4"
-        />
+        <TodoEmptyCard message="이 카테고리에 할 일이 없습니다." />
       ) : (
         children
       )}

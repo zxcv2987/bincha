@@ -1,7 +1,6 @@
 import { CategoryType } from "@/features/category/types";
 import clsx from "clsx";
 import CategoryItem from "@/features/category/components/CategoryItem";
-import ListEmptyState from "@/features/shared/components/ListEmptyState";
 
 export default function CategoryList({
   categoryState,
@@ -25,22 +24,15 @@ export default function CategoryList({
       >
         전체
       </h2>
-      {categories.length === 0 ? (
-        <ListEmptyState
-          message="등록된 카테고리가 없습니다."
-          className="py-2 text-left"
-        />
-      ) : (
-        categories.map((category) => (
-          <div key={category.id} className="relative flex items-center">
-            <CategoryItem
-              category={category}
-              categoryState={categoryState}
-              setCategory={setCategory}
-            />
-          </div>
-        ))
-      )}
+      {categories.map((category) => (
+        <div key={category.id} className="relative flex items-center">
+          <CategoryItem
+            category={category}
+            categoryState={categoryState}
+            setCategory={setCategory}
+          />
+        </div>
+      ))}
     </div>
   );
 }
