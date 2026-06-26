@@ -26,4 +26,4 @@
 
 <br/>
 
-#### [웹페이지 링크](https://bincha.vercel.app)
+#### [웹페이지 링크](https://bincha-livid.vercel.app/)
