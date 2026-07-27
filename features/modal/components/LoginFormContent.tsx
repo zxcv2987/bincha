@@ -1,18 +1,14 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { loginWithPassword } from "@/features/auth/login.client";
-import { useModalStore } from "@/features/modal/provider";
 
 export default function LoginFormContent({
   onLoadingChange,
 }: {
   onLoadingChange: (loading: boolean) => void;
 }) {
-  const router = useRouter();
-  const close = useModalStore((s) => s.close);
   const [error, setError] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,9 +37,8 @@ export default function LoginFormContent({
       return;
     }
 
-    close();
-    router.refresh();
-    router.push("/");
+    // 쿠키 세팅 후 RSC를 확실히 다시 그리기 위해 soft refresh 대신 풀 리로드
+    window.location.assign("/");
   }
 
   return (
