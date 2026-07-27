@@ -237,9 +237,7 @@ app/
 ├─ page.tsx           Todo 목록
 ├─ results/
 │  └─ page.tsx        결과 기록 대기 및 결과 목록
-├─ login/
-│  └─ page.tsx
-└─ readonly/
+└─ login/
    └─ page.tsx
 ```
 
@@ -409,7 +407,7 @@ Hard Delete로 시작한다(Soft Delete는 MVP 이후 검토).
 
 ## 12. 읽기 전용 페이지
 
-`/readonly`는 현재 실제 Todo 데이터를 조회한다. 사용자 데이터 분리 이후 인증되지 않은 사용자가 실제 데이터를 보지 않도록, 하드코딩된 정적 데모로 전환한다.
+`/readonly` 정적 데모는 계획만 있었고 구현되지 않았다. 이후 `isReadOnly` 분기 및 관련 라우트를 정리하면서 범위에서 제외했다.
 
 ---
 
@@ -517,9 +515,8 @@ user_id BigInt
 3. Category/Todo에 `user_id` 추가 (NOT NULL, 백필 없음)
 4. Query에 사용자 조건 추가, 수정/삭제 소유권 검증
 5. 전역 캐시 제거 (`todo.queries.ts` / `category.queries.ts` 삭제)
-6. `/readonly` 정적 데모 전환
-7. Todo `text` 선택값으로 변경
-8. Category FK `Restrict`로 변경
+6. Todo `text` 선택값으로 변경
+7. Category FK `Restrict`로 변경
 
 **완료 조건**: 사용자는 자신의 데이터만 조회할 수 있다. 다른 사용자의 데이터 수정/삭제 불가. 기존 데이터 유지.
 

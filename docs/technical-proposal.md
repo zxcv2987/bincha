@@ -811,10 +811,7 @@ app/
 ├─ review/
 │  └─ page.tsx
 │
-├─ login/
-│  └─ page.tsx
-│
-└─ readonly/
+└─ login/
    └─ page.tsx
 ```
 
@@ -1306,18 +1303,9 @@ Achievement를 삭제해도 Result와 Todo는 유지한다.
 
 ## 16. 읽기 전용 페이지
 
-현재 `/readonly`는 실제 Todo 데이터를 조회한다.
+`/readonly` 정적 데모는 계획만 있었고 구현되지 않았다. 이후 `isReadOnly` 분기 및 관련 라우트를 정리하면서 범위에서 제외했다.
 
-사용자 데이터 분리가 추가되면 인증되지 않은 사용자가 실제 데이터를 조회하지 않도록 변경해야 한다.
-
-MVP 권장안:
-
-```text
-/readonly:
-하드코딩 또는 별도 Demo Seed 데이터를 사용하는 정적 데모
-```
-
-대안:
+대안으로 검토했던 안:
 
 ```text
 /share/[token]:
@@ -1608,8 +1596,7 @@ Foreign Key 정책 변경 전에 기존 데이터를 확인한다.
 6. Query에 사용자 조건 추가
 7. 수정 및 삭제 소유권 검증
 8. 전역 캐시 제거 또는 사용자별 분리
-9. `/readonly` 정적 데모 전환
-10. Todo `text` 선택값으로 변경
+9. Todo `text` 선택값으로 변경
 
 완료 조건:
 
