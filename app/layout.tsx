@@ -38,7 +38,7 @@ export default async function RootLayout({
       <body className={`${LINESeedKr.className} antialiased`}>
         <StoreProvider>
           <div id="root">
-            <div className="mx-auto flex max-w-4xl flex-col px-6 pt-16 pb-40 md:px-0">
+            <div className="mx-auto flex max-w-5xl flex-col px-6 pt-16 pb-40 md:px-0">
               {children}
             </div>
           </div>

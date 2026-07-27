@@ -12,9 +12,9 @@ export default function CategoryItem({
   return (
     <button
       className={clsx(
-        "cursor-pointer rounded-lg border-zinc-200 p-2 text-lg text-zinc-400 hover:text-zinc-700",
+        "w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
         categoryState === category.category_name &&
-          "bg-brand-50 font-semibold text-brand-700",
+          "bg-brand-50 font-semibold text-brand-700 hover:bg-brand-50",
       )}
       onClick={() => setCategory(category.category_name)}
     >

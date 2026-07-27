@@ -24,12 +24,6 @@ export default async function Header() {
       <div className="flex w-full flex-row justify-end">
         {isLoggedIn ? (
           <div className="flex items-center gap-4">
-            <Link
-              href="/results"
-              className="text-sm font-semibold text-zinc-500 hover:text-zinc-800"
-            >
-              결과함
-            </Link>
             <Profile>
               <Image
                 className="rounded-lg"

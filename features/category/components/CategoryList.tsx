@@ -14,19 +14,20 @@ export default function CategoryList({
   setCategory: (category: string) => void;
 }) {
   return (
-    <div className="flex flex-row flex-wrap gap-2 py-3">
+    <div className="flex flex-col gap-0.5">
       <button
         type="button"
         className={clsx(
-          "cursor-pointer rounded-lg border-zinc-200 p-2 text-lg text-zinc-400 hover:text-zinc-700",
-          categoryState === null && "bg-brand-50 font-semibold text-brand-700",
+          "w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
+          categoryState === null &&
+            "bg-brand-50 font-semibold text-brand-700 hover:bg-brand-50",
         )}
         onClick={resetCategory}
       >
         전체
       </button>
       {categories.map((category) => (
-        <div key={category.id} className="relative flex items-center">
+        <div key={category.id} className="relative flex w-full items-center">
           <CategoryItem
             category={category}
             categoryState={categoryState}
