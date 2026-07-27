@@ -64,6 +64,8 @@ export default function TodoList({
           <CreateCategoryButton />
         </div>
 
+        <div className="border-t border-zinc-200" />
+
         <div className="flex flex-col gap-1">
           <h2 className="px-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
             완료 상태

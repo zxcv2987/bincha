@@ -13,7 +13,7 @@ export default function Sidebar({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-6 md:w-48">
+    <aside className="flex w-full shrink-0 flex-col gap-5 md:w-48">
       <nav
         aria-label="주요 메뉴"
         className="flex flex-row gap-1 overflow-x-auto md:flex-col md:overflow-visible"
@@ -37,7 +37,11 @@ export default function Sidebar({ children }: { children?: React.ReactNode }) {
           );
         })}
       </nav>
-      {children}
+      {children && (
+        <div className="flex flex-col gap-5 border-t border-zinc-200 pt-5">
+          {children}
+        </div>
+      )}
     </aside>
   );
 }

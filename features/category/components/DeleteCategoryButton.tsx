@@ -31,7 +31,7 @@ export default function DeleteCategoryButton({
       {isOpen && (
         <div
           ref={modalRef}
-          className="absolute right-1 -bottom-14 z-10 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
+          className="absolute right-1 -bottom-14 z-10 w-64 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
         >
           <button
             className={clsx(
@@ -50,7 +50,7 @@ export default function DeleteCategoryButton({
                 if (res.ok) {
                   router.refresh();
                 } else {
-                  setError("삭제에 실패했습니다. 다시 시도해 주세요.");
+                  setError(res.error ?? "삭제에 실패했습니다. 다시 시도해 주세요.");
                 }
                 setIsLoading(false);
               });

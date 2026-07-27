@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createCategory, deleteCategory } from "./category.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
-import { CategoryAlreadyExistsError } from "./category.errors";
+import {
+  CategoryAlreadyExistsError,
+  CategoryHasTodosError,
+} from "./category.errors";
 
 export async function createCategoryAction(
   _state: unknown,
@@ -37,6 +40,12 @@ export async function deleteCategoryAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
+    if (error instanceof CategoryHasTodosError) {
+      return {
+        ok: false,
+        error: `이 카테고리에 할 일이 ${error.todoCount}개 있어 삭제할 수 없어요. 먼저 할 일을 다른 카테고리로 옮기거나 삭제해 주세요.`,
+      };
+    }
     console.error("카테고리 삭제 중 오류 발생:", error);
     return { ok: false, error: "삭제 실패" };
   }
