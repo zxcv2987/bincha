@@ -55,10 +55,7 @@ export default function LoginFormContent({
       {error && <span className="text-xs text-red-400">{error}</span>}
       <button
         type="submit"
-        className={clsx(
-          "w-full rounded-lg bg-zinc-100 p-2 text-sm font-semibold text-zinc-500 hover:bg-zinc-200",
-          isLoading && "bg-zinc-200",
-        )}
+        className={clsx("btn btn-primary", isLoading && "opacity-90")}
         disabled={isLoading}
       >
         {isLoading ? "로그인 중..." : "로그인"}

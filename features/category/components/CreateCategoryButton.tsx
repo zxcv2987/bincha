@@ -7,7 +7,7 @@ export default function CreateCategoryButton() {
 
   return (
     <button
-      className="btn max-h-[50px] w-full md:max-w-[200px]"
+      className="btn btn-primary max-h-[50px] w-full md:max-w-[200px]"
       onClick={() => open("category")}
     >
       카테고리 추가 +

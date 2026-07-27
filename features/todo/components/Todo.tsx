@@ -33,7 +33,7 @@ export default function Todo({ todo }: { todo: TodoType }) {
         checked={todo.completed}
         disabled={isPending}
         onChange={toggleCompleted}
-        className="mt-1 mr-3 size-5 shrink-0 accent-zinc-700"
+        className="mt-1 mr-3 size-5 shrink-0 accent-brand-600"
       />
       <div className="flex w-full flex-row items-center bg-zinc-50">
         <div className="flex w-full flex-col gap-2">

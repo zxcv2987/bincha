@@ -63,7 +63,8 @@ export default function TodoList({
               type="button"
               className={clsx(
                 "rounded-lg p-2 text-sm text-zinc-400 hover:text-zinc-700",
-                completionFilter === value && "font-semibold text-zinc-700",
+                completionFilter === value &&
+                  "bg-brand-50 font-semibold text-brand-700",
               )}
               onClick={() => setCompletionFilter(value)}
             >

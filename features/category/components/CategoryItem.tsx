@@ -14,7 +14,7 @@ export default function CategoryItem({
       className={clsx(
         "cursor-pointer rounded-lg border-zinc-200 p-2 text-lg text-zinc-400 hover:text-zinc-700",
         categoryState === category.category_name &&
-          "font-semibold text-zinc-700",
+          "bg-brand-50 font-semibold text-brand-700",
       )}
       onClick={() => setCategory(category.category_name)}
     >

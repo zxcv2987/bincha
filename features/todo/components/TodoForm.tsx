@@ -78,7 +78,7 @@ export default function TodoForm({
         {state.error?.categoryId && (
           <span className="text-xs text-red-400">{state.error.categoryId}</span>
         )}
-        <button className="btn" disabled={isPending} type="submit">
+        <button className="btn btn-primary" disabled={isPending} type="submit">
           {isPending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
         </button>
       </form>

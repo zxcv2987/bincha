@@ -7,7 +7,7 @@ export default function CreateTodoButton() {
 
   return (
     <div className="w-full py-2">
-      <button className="btn" onClick={() => open("todo")}>
+      <button className="btn btn-primary" onClick={() => open("todo")}>
         할 일 추가 +
       </button>
     </div>

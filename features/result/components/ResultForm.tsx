@@ -114,7 +114,7 @@ export default function ResultForm({
         )}
         <button
           type="submit"
-          className="btn ml-auto w-auto"
+          className="btn btn-primary ml-auto w-auto"
           disabled={pending || deleting}
         >
           {pending ? "저장 중..." : result ? "결과 수정" : "결과 저장"}

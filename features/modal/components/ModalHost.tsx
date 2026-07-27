@@ -151,7 +151,7 @@ export default function ModalHost() {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         onClick={isLoading ? undefined : close}
-        className="absolute inset-0 bg-zinc-700 opacity-10"
+        className="absolute inset-0 bg-zinc-700 opacity-20"
       />
       <div
         ref={dialogRef}
@@ -159,7 +159,7 @@ export default function ModalHost() {
         aria-modal="true"
         aria-labelledby="modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="relative max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl bg-white p-4"
+        className="relative max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl bg-white p-4 shadow-xl"
       >
         <ModalTitle>{MODAL_TITLES[openModal]}</ModalTitle>
         {openModal === "login" && (
