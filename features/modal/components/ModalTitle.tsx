@@ -10,9 +10,9 @@ export default function ModalTitle({
   const close = useModalStore((s) => s.close);
   return (
     <div className="flex w-full flex-row items-center justify-between py-2">
-      <h1 id="modal-title" className="text-2xl font-bold text-zinc-700">
+      <h2 id="modal-title" className="text-2xl font-bold text-zinc-700">
         {children}
-      </h1>
+      </h2>
       <button
         type="button"
         aria-label="모달 닫기"

@@ -46,6 +46,10 @@ export default function LoginFormContent({
       <input
         type="password"
         name="password"
+        placeholder="비밀번호"
+        aria-label="비밀번호"
+        autoComplete="current-password"
+        autoFocus
         className="input border-zinc-300 outline-none"
       />
       {error && <span className="text-xs text-red-400">{error}</span>}

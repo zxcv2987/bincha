@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { TodoType } from "@/features/todo/types";
 import { deleteTaskResultAction } from "@/features/result/result.actions";
@@ -20,17 +20,19 @@ export default function ResultForm({
   const router = useRouter();
   const close = useModalStore((store) => store.close);
   const [deleting, startDeleteTransition] = useTransition();
+  const [deleteError, setDeleteError] = useState<string | undefined>();
   const result = todo.result;
 
   const deleteResult = () => {
     if (!result || !confirm("이 결과 기록을 삭제할까요?")) return;
+    setDeleteError(undefined);
     startDeleteTransition(async () => {
       const response = await deleteTaskResultAction(result.id);
       if (response.ok) {
         close();
         router.refresh();
       } else {
-        alert(response.error);
+        setDeleteError(response.error);
       }
     });
   };
@@ -98,6 +100,7 @@ export default function ResultForm({
         나중에 측정 필요
       </label>
       {state.error && <p className="text-sm text-red-500">{state.error}</p>}
+      {deleteError && <p className="text-sm text-red-500">{deleteError}</p>}
       <div className="flex justify-between gap-2">
         {result && (
           <button

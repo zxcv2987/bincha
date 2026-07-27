@@ -15,7 +15,8 @@ export default function CategoryList({
 }) {
   return (
     <div className="flex flex-row flex-wrap gap-2 py-3">
-      <h2
+      <button
+        type="button"
         className={clsx(
           "cursor-pointer rounded-lg border-zinc-200 p-2 text-lg text-zinc-400 hover:text-zinc-700",
           categoryState === null && "font-semibold text-zinc-700",
@@ -23,7 +24,7 @@ export default function CategoryList({
         onClick={resetCategory}
       >
         전체
-      </h2>
+      </button>
       {categories.map((category) => (
         <div key={category.id} className="relative flex items-center">
           <CategoryItem

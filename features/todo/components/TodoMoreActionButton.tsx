@@ -12,6 +12,9 @@ export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
       <div className="relative flex items-center justify-end">
         <button
           onClick={() => setIsOpen(true)}
+          aria-label="할 일 더보기"
+          aria-haspopup="true"
+          aria-expanded={isOpen}
           className="rounded-lg px-3 py-1 text-lg hover:bg-zinc-200"
         >
           ⋮

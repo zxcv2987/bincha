@@ -5,18 +5,20 @@ import Content from "@/features/shared/components/Content";
 import TodoMoreActionButton from "@/features/todo/components/TodoMoreActionButton";
 import { toggleTodoCompletedAction } from "@/features/todo/todo.actions";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
 
 export default function Todo({ todo }: { todo: TodoType }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | undefined>();
 
   const toggleCompleted = () => {
+    setError(undefined);
     startTransition(async () => {
       const result = await toggleTodoCompletedAction(todo.id);
       if (result.ok) router.refresh();
-      else alert(result.error);
+      else setError(result.error);
     });
   };
 
@@ -51,6 +53,9 @@ export default function Todo({ todo }: { todo: TodoType }) {
             <span className="w-full pl-1 text-sm text-zinc-500">
               완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
             </span>
+          )}
+          {error && (
+            <span className="w-full pl-1 text-xs text-red-400">{error}</span>
           )}
           {todo.completed && (
             <div className="flex items-center gap-2 pl-1 text-sm text-zinc-500">

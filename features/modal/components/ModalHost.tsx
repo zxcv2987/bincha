@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { useModalStore } from "@/features/modal/provider";
@@ -19,8 +19,11 @@ import {
 } from "@/features/result/result.actions";
 import { TodoType } from "@/features/todo/types";
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 const MODAL_TITLES: Record<string, string> = {
-  login: "Login",
+  login: "로그인",
   category: "카테고리",
   todo: "할 일 추가하기",
   updateTodo: "할 일 수정하기",
@@ -76,6 +79,7 @@ export default function ModalHost() {
     },
   );
   const [loginLoading, setLoginLoading] = useState(false);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (createState.ok) {
@@ -100,6 +104,35 @@ export default function ModalHost() {
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [isOpen, close]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.contains(document.activeElement)) {
+      dialog.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
+    }
+
+    const trapTab = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", trapTab);
+    return () => document.removeEventListener("keydown", trapTab);
+  }, [isOpen, openModal]);
+
   if (!isOpen || !openModal) return null;
 
   const portalRoot = document.getElementById("portal-root");
@@ -121,6 +154,7 @@ export default function ModalHost() {
         className="absolute inset-0 bg-zinc-700 opacity-10"
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
