@@ -1,7 +1,4 @@
 import { cookies } from "next/headers";
-import { authCookieOptions } from "./cookie-options";
-
-export { authCookieOptions };
 
 export async function clearAuthCookies() {
   const cookieStore = await cookies();
