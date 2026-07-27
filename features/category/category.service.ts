@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
-import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { CategoryType } from "./types";
 import {
@@ -24,7 +23,6 @@ export async function createCategory(
     const category = await prisma.category.create({
       data: { category_name, user_id: userId },
     });
-    revalidatePath("/");
     return serializeBigInt(category);
   } catch (error) {
     if (
@@ -45,5 +43,4 @@ export async function deleteCategory(
     where: { id, user_id: userId },
   });
   if (deleted.count === 0) throw new CategoryNotFoundError();
-  revalidatePath("/");
 }

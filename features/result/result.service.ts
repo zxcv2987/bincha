@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
 import {
@@ -7,7 +6,6 @@ import {
   ResultAlreadyExistsError,
   ResultNotFoundError,
 } from "./result.errors";
-import { createCheckedTaskResult } from "./result.persistence.mjs";
 
 type ResultInput = {
   summary: string;
@@ -24,12 +22,21 @@ export async function createTaskResult({
   ...input
 }: ResultInput & { todoId: number; userId: bigint }) {
   try {
-    const result = await createCheckedTaskResult(
-      prisma,
-      {
-        todoId,
-        userId,
+    const result = await prisma.$transaction(async (tx) => {
+      const todo = await tx.todos.findFirst({
+        where: { id: todoId, user_id: userId, completed: true },
+      });
+      if (!todo) throw new CompletedTodoRequiredError();
+
+      const existing = await tx.task_result.findUnique({
+        where: { todo_id: todo.id },
+      });
+      if (existing) throw new ResultAlreadyExistsError();
+
+      return tx.task_result.create({
         data: {
+          todo_id: todo.id,
+          user_id: userId,
           summary: input.summary,
           change_summary: input.changeSummary,
           unexpected: input.unexpected,
@@ -37,13 +44,8 @@ export async function createTaskResult({
           evidence_url: input.evidenceUrl,
           needs_measurement: input.needsMeasurement,
         },
-      },
-      {
-        CompletedRequiredError: CompletedTodoRequiredError,
-        AlreadyExistsError: ResultAlreadyExistsError,
-      },
-    );
-    revalidateResultPaths();
+      });
+    });
     return serializeBigInt(result);
   } catch (error) {
     if (
@@ -77,7 +79,6 @@ export async function updateTaskResult({
       needs_measurement: input.needsMeasurement,
     },
   });
-  revalidateResultPaths();
   return serializeBigInt(result);
 }
 
@@ -86,7 +87,6 @@ export async function deleteTaskResult(resultId: number, userId: bigint) {
     where: { id: resultId, user_id: userId },
   });
   if (deleted.count === 0) throw new ResultNotFoundError();
-  revalidateResultPaths();
 }
 
 export async function getPendingTodos(userId: bigint) {
@@ -105,9 +105,4 @@ export async function getResults(userId: bigint) {
     orderBy: { created_at: "desc" },
   });
   return serializeBigInt(results);
-}
-
-function revalidateResultPaths() {
-  revalidatePath("/");
-  revalidatePath("/results");
 }

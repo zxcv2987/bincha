@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createCategory, deleteCategory } from "./category.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 import { CategoryAlreadyExistsError } from "./category.errors";
@@ -15,6 +16,7 @@ export async function createCategoryAction(
   try {
     const userId = await requireCurrentUserId();
     await createCategory(category as string, userId);
+    revalidatePath("/");
     return { ok: true };
   } catch (error) {
     if (error instanceof CategoryAlreadyExistsError) {
@@ -32,6 +34,7 @@ export async function deleteCategoryAction(
   try {
     const userId = await requireCurrentUserId();
     await deleteCategory(categoryId, userId);
+    revalidatePath("/");
     return { ok: true };
   } catch (error) {
     console.error("카테고리 삭제 중 오류 발생:", error);
