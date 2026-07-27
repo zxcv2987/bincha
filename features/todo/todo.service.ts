@@ -53,16 +53,11 @@ export async function updateTodo({
 }) {
   await requireOwnedCategory(category_id, userId);
 
-  const existing = await prisma.todos.findFirst({
+  const updated = await prisma.todos.updateMany({
     where: { id, user_id: userId },
-  });
-  if (!existing) throw new TodoNotFoundError();
-
-  const todo = await prisma.todos.update({
-    where: { id: existing.id },
     data: { title, text, category_id },
   });
-  return serializeBigInt(todo);
+  if (updated.count === 0) throw new TodoNotFoundError();
 }
 
 export async function deleteTodo(id: number, userId: bigint) {

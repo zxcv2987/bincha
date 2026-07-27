@@ -65,10 +65,10 @@ export async function updateTodoAction(_state: unknown, formData: FormData) {
   return { ok: true };
 }
 
-export async function deleteTodoAction(_state: unknown, categoryId: number) {
+export async function deleteTodoAction(_state: unknown, todoId: number) {
   try {
     const userId = await requireCurrentUserId();
-    await deleteTodo(categoryId, userId);
+    await deleteTodo(todoId, userId);
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
