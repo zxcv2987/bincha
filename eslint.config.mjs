@@ -7,7 +7,7 @@ const eslintConfig = [
   ...nextTypescript,
   eslintConfigPrettier,
   {
-    ignores: [".next/**", "node_modules/**"],
+    ignores: [".next/**", "node_modules/**", ".agents/**"],
   },
 ];
 
