@@ -8,9 +8,11 @@ import { deleteTodoAction } from "@/features/todo/todo.actions";
 export default function DeleteTodoButton({
   todoId,
   setIsLoading,
+  hasResult = false,
 }: {
   todoId: number;
   setIsLoading: (isLoading: boolean) => void;
+  hasResult?: boolean;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -24,6 +26,12 @@ export default function DeleteTodoButton({
       )}
       disabled={isPending}
       onClick={() => {
+        if (
+          hasResult &&
+          !confirm("이 할 일과 연결된 결과 기록도 함께 삭제됩니다. 계속할까요?")
+        ) {
+          return;
+        }
         setIsLoading(true);
 
         startTransition(async () => {

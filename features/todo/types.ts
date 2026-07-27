@@ -1,4 +1,5 @@
 import { CategoryType } from "@/features/category/types";
+import type { TaskResultType } from "@/features/result/types";
 
 export interface TodoType {
   id: number;
@@ -9,4 +10,5 @@ export interface TodoType {
   completed: boolean;
   completed_at: Date | null;
   category: CategoryType;
+  result?: TaskResultType | null;
 }

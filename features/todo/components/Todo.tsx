@@ -6,6 +6,7 @@ import TodoMoreActionButton from "@/features/todo/components/TodoMoreActionButto
 import { toggleTodoCompletedAction } from "@/features/todo/todo.actions";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import ResultModalButton from "@/features/result/components/ResultModalButton";
 
 export default function Todo({
   todo,
@@ -58,6 +59,12 @@ export default function Todo({
             <span className="w-full pl-1 text-sm text-zinc-500">
               완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
             </span>
+          )}
+          {todo.completed && !isReadOnly && (
+            <div className="flex items-center gap-2 pl-1 text-sm text-zinc-500">
+              <span>{todo.result ? "결과 기록됨" : "결과 기록 대기"}</span>
+              <ResultModalButton todo={todo} />
+            </div>
           )}
         </div>
       </div>

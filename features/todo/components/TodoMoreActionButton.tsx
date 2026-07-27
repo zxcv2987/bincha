@@ -21,7 +21,11 @@ export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
             ref={modalRef}
             className="absolute right-1 -bottom-30 z-10 flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
           >
-            <DeleteTodoButton todoId={todo.id} setIsLoading={setIsLoading} />
+            <DeleteTodoButton
+              todoId={todo.id}
+              hasResult={Boolean(todo.result)}
+              setIsLoading={setIsLoading}
+            />
             <EditTodoButton todo={todo} />
           </div>
         )}
