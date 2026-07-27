@@ -2,13 +2,22 @@ import { TodoType } from "@/features/todo/types";
 import { useCategoryStore } from "@/features/category/provider";
 import { useTransition } from "react";
 
+type TodoFormState = {
+  ok: boolean;
+  error?: {
+    id?: string;
+    title?: string;
+    text?: string;
+    categoryId?: string;
+  };
+};
+
 export default function TodoForm({
   state,
   formAction,
   todo,
 }: {
-  // eslint-disable-next-line
-  state: any;
+  state: TodoFormState;
   formAction: (formData: FormData) => void;
   todo?: TodoType;
 }) {
