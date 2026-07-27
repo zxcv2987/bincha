@@ -19,15 +19,23 @@ export default function Header({ isReadOnly }: { isReadOnly?: boolean }) {
 
       <div className="flex w-full flex-row justify-end">
         {!isReadOnly ? (
-          <Profile>
-            <Image
-              className="rounded-lg"
-              src={Thumbnail}
-              alt={"빈차 - 에픽하이"}
-              width={60}
-              height={60}
-            />
-          </Profile>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/results"
+              className="text-sm font-semibold text-zinc-500 hover:text-zinc-800"
+            >
+              결과함
+            </Link>
+            <Profile>
+              <Image
+                className="rounded-lg"
+                src={Thumbnail}
+                alt={"빈차 - 에픽하이"}
+                width={60}
+                height={60}
+              />
+            </Profile>
+          </div>
         ) : (
           <>
             <LoginButton />

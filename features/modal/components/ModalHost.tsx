@@ -12,13 +12,51 @@ import {
   createTodoAction,
   updateTodoAction,
 } from "@/features/todo/todo.actions";
+import ResultForm from "@/features/result/components/ResultForm";
+import {
+  createTaskResultAction,
+  updateTaskResultAction,
+} from "@/features/result/result.actions";
+import { TodoType } from "@/features/todo/types";
 
 const MODAL_TITLES: Record<string, string> = {
   login: "Login",
   category: "카테고리",
   todo: "할 일 추가하기",
   updateTodo: "할 일 수정하기",
+  result: "실행 결과 기록",
+  updateResult: "실행 결과 보기",
 };
+
+function ResultModalContent({
+  todo,
+  mode,
+}: {
+  todo: TodoType;
+  mode: "create" | "update";
+}) {
+  const router = useRouter();
+  const close = useModalStore((state) => state.close);
+  const action =
+    mode === "create" ? createTaskResultAction : updateTaskResultAction;
+  const [state, formAction, pending] = useActionState(action, { ok: false });
+
+  useEffect(() => {
+    if (state.ok) {
+      close();
+      router.refresh();
+    }
+  }, [state.ok, close, router]);
+
+  return (
+    <ResultForm
+      todo={todo}
+      state={state}
+      formAction={formAction}
+      pending={pending}
+    />
+  );
+}
 
 export default function ModalHost() {
   const router = useRouter();
@@ -31,10 +69,12 @@ export default function ModalHost() {
     createTodoAction,
     { ok: false },
   );
-  const [editState, editAction, editPending] = useActionState(updateTodoAction, {
-    ok: false,
-  });
-
+  const [editState, editAction, editPending] = useActionState(
+    updateTodoAction,
+    {
+      ok: false,
+    },
+  );
   const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
@@ -50,6 +90,15 @@ export default function ModalHost() {
       router.refresh();
     }
   }, [editState.ok, close, router]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen, close]);
 
   if (!isOpen || !openModal) return null;
 
@@ -72,8 +121,11 @@ export default function ModalHost() {
         className="absolute inset-0 bg-zinc-700 opacity-10"
       />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="relative h-auto rounded-xl bg-white p-4"
+        className="relative max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl bg-white p-4"
       >
         <ModalTitle>{MODAL_TITLES[openModal]}</ModalTitle>
         {openModal === "login" && (
@@ -88,6 +140,20 @@ export default function ModalHost() {
             formAction={editAction}
             state={editState}
             todo={editingTodo}
+          />
+        )}
+        {openModal === "result" && editingTodo && (
+          <ResultModalContent
+            key={`create-${editingTodo.id}`}
+            todo={editingTodo}
+            mode="create"
+          />
+        )}
+        {openModal === "updateResult" && editingTodo?.result && (
+          <ResultModalContent
+            key={`update-${editingTodo.id}-${editingTodo.result.id}`}
+            todo={editingTodo}
+            mode="update"
           />
         )}
       </div>

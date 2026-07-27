@@ -2,7 +2,8 @@
 
 import { CategoryType } from "@/features/category/types";
 import { TodoType } from "@/features/todo/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import clsx from "clsx";
 import TodosByCategory from "@/features/todo/components/TodosByCategory";
 import CreateTodoButton from "@/features/todo/components/CreateTodoButton";
 import Todo from "@/features/todo/components/Todo";
@@ -20,6 +21,9 @@ export default function TodoList({
   categories: CategoryType[];
   isReadOnly?: boolean;
 }) {
+  const [completionFilter, setCompletionFilter] = useState<
+    "all" | "active" | "completed"
+  >("all");
   const setCategories = useCategoryStore((s) => s.setCategories);
   const categoryState = useCategoryStore((s) => s.categoryState);
   const resetCategory = useCategoryStore((s) => s.resetCategory);
@@ -33,6 +37,11 @@ export default function TodoList({
     (category) =>
       categoryState === null || category.category_name === categoryState,
   );
+  const filteredTodos = todos.filter((todo) => {
+    if (completionFilter === "active") return !todo.completed;
+    if (completionFilter === "completed") return todo.completed;
+    return true;
+  });
 
   return (
     <div
@@ -55,23 +64,48 @@ export default function TodoList({
           categories={categories}
           setCategory={setCategory}
         />
+        {!isReadOnly && (
+          <div className="flex gap-1" aria-label="완료 상태 필터">
+            {(
+              [
+                ["all", "전체"],
+                ["active", "진행 중"],
+                ["completed", "완료"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={clsx(
+                  "rounded-lg p-2 text-sm text-zinc-400 hover:text-zinc-700",
+                  completionFilter === value && "font-semibold text-zinc-700",
+                )}
+                onClick={() => setCompletionFilter(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         {!isReadOnly && <CreateCategoryButton />}
       </div>
       {!isReadOnly && <CreateTodoButton />}
 
-      {todos.length === 0 ? (
+      {filteredTodos.length === 0 ? (
         <TodoEmptyCard
           message={
             isReadOnly
               ? "표시할 할 일이 없습니다."
-              : "할 일을 추가해 보세요."
+              : todos.length === 0
+                ? "할 일을 추가해 보세요."
+                : "선택한 상태의 할 일이 없습니다."
           }
         />
       ) : visibleCategories.length === 0 ? (
         <TodoEmptyCard message="선택한 카테고리에 할 일이 없습니다." />
       ) : (
         visibleCategories.map((category) => {
-          const categoryTodos = todos.filter(
+          const categoryTodos = filteredTodos.filter(
             (todo) => todo.category.category_name === category.category_name,
           );
 

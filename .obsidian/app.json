@@ -1,0 +1,22 @@
+{
+  "userIgnoreFilters": [
+    "node_modules/",
+    ".next/",
+    ".git/",
+    ".agents/",
+    ".claude/",
+    ".codex/",
+    ".cursor/",
+    ".impeccable/",
+    "public/",
+    "assets/",
+    "styles/",
+    "app/",
+    "features/",
+    "lib/",
+    "prisma/",
+    "providers/"
+  ],
+  "newFileLocation": "current",
+  "attachmentFolderPath": "docs/attachments"
+}
