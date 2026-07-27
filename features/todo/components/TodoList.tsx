@@ -4,7 +4,7 @@ import { CategoryType } from "@/features/category/types";
 import { TodoType } from "@/features/todo/types";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import TodosByCategory from "@/features/todo/components/TodosByCategory";
+import TodosByCategory from "@/features/shared/components/TodosByCategory";
 import CreateTodoButton from "@/features/todo/components/CreateTodoButton";
 import Todo from "@/features/todo/components/Todo";
 import { useCategoryStore } from "@/features/category/provider";
