@@ -7,7 +7,7 @@ import {
 } from "@/lib/auth/response-cookies";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const publicPaths = ["/api/login", "/login", "/readonly"];
+const publicPaths = ["/api/login", "/login"];
 
 function getAccessSecret(): Uint8Array | null {
   const secret = process.env.JWT_SECRET;
@@ -43,8 +43,8 @@ function authExpiredResponse(request: NextRequest, pathname: string) {
     return clearRefreshTokenOnResponse(response);
   }
 
-  const response = NextResponse.rewrite(new URL("/readonly", request.url));
-  return clearRefreshTokenOnResponse(response);
+  // 페이지는 각자 requireCurrentUserId로 인증을 확인하므로 그대로 통과시킨다.
+  return clearRefreshTokenOnResponse(NextResponse.next());
 }
 
 function applySupabaseCookies(
@@ -67,7 +67,7 @@ function authRequiredResponse(request: NextRequest, pathname: string) {
       },
     );
   }
-  return NextResponse.rewrite(new URL("/readonly", request.url));
+  return NextResponse.next();
 }
 
 export async function proxy(request: NextRequest) {
@@ -81,10 +81,7 @@ export async function proxy(request: NextRequest) {
   const accessSecret = getAccessSecret();
   if (!accessSecret) {
     console.error("JWT_SECRET is not set");
-    return applySupabaseCookies(
-      NextResponse.rewrite(new URL("/readonly", request.url)),
-      supabaseResponse,
-    );
+    return applySupabaseCookies(NextResponse.next(), supabaseResponse);
   }
 
   const accessToken =

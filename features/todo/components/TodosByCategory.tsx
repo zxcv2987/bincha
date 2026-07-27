@@ -7,12 +7,10 @@ import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
 export default function TodosByCategory({
   category,
   children,
-  isReadOnly,
   isEmpty = false,
 }: {
   category: CategoryType;
   children: React.ReactNode;
-  isReadOnly?: boolean;
   isEmpty?: boolean;
 }) {
   const categoryName = category.category_name.trim() || "이름 없음";
@@ -23,7 +21,7 @@ export default function TodosByCategory({
         <h2 key={category.id} className="py-2 text-2xl font-bold text-zinc-700">
           {categoryName}
         </h2>
-        {!isReadOnly && <DeleteCategoryButton categoryId={category.id} />}
+        <DeleteCategoryButton categoryId={category.id} />
       </div>
       {isEmpty ? (
         <TodoEmptyCard message="이 카테고리에 할 일이 없습니다." />

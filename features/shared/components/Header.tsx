@@ -3,7 +3,11 @@ import Image from "next/image";
 import Thumbnail from "@/assets/images/binchaIcon.png";
 import LoginButton from "@/features/auth/components/LoginButton";
 import Profile from "@/features/auth/components/Profile";
-export default function Header({ isReadOnly }: { isReadOnly?: boolean }) {
+import { getCurrentUserId } from "@/lib/auth/session";
+
+export default async function Header() {
+  const isLoggedIn = (await getCurrentUserId()) !== null;
+
   return (
     <div className="flex w-full flex-row border-b border-zinc-200 py-6 whitespace-nowrap md:justify-center">
       <div className="flex w-full flex-col items-center justify-center md:flex-row md:items-end">
@@ -18,7 +22,7 @@ export default function Header({ isReadOnly }: { isReadOnly?: boolean }) {
       </div>
 
       <div className="flex w-full flex-row justify-end">
-        {!isReadOnly ? (
+        {isLoggedIn ? (
           <div className="flex items-center gap-4">
             <Link
               href="/results"
