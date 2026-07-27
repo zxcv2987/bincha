@@ -17,6 +17,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --env-file=.env --test tests/*.test.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {
