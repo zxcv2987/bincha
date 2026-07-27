@@ -14,6 +14,8 @@ const demoTodos: TodoType[] = [
     title: "로그인 E2E 테스트 작성",
     text: "로그인 주요 시나리오를 자동화한다.",
     category_id: 1,
+    completed: false,
+    completed_at: null,
     category: demoCategories[0],
   },
 ];

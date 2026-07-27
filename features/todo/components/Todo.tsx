@@ -3,6 +3,9 @@
 import { TodoType } from "@/features/todo/types";
 import Content from "@/features/shared/components/Content";
 import TodoMoreActionButton from "@/features/todo/components/TodoMoreActionButton";
+import { toggleTodoCompletedAction } from "@/features/todo/todo.actions";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 export default function Todo({
   todo,
@@ -11,11 +14,32 @@ export default function Todo({
   todo: TodoType;
   isReadOnly?: boolean;
 }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const toggleCompleted = () => {
+    startTransition(async () => {
+      const result = await toggleTodoCompletedAction(todo.id);
+      if (result.ok) router.refresh();
+      else alert(result.error);
+    });
+  };
+
   return (
     <div
       key={todo.id}
       className="flex h-auto w-full items-start rounded-xl bg-zinc-50 p-4 text-xl font-medium text-zinc-700"
     >
+      {!isReadOnly && (
+        <input
+          type="checkbox"
+          aria-label={`${todo.title || "제목 없음"} 완료 상태`}
+          checked={todo.completed}
+          disabled={isPending}
+          onChange={toggleCompleted}
+          className="mt-1 mr-3 size-5 shrink-0 accent-zinc-700"
+        />
+      )}
       <div className="flex w-full flex-row items-center bg-zinc-50">
         <div className="flex w-full flex-col gap-2">
           <h3 className="w-full truncate text-lg font-bold break-words">
@@ -26,7 +50,14 @@ export default function Todo({
               <Content content={todo.text} />
             </span>
           ) : (
-            <span className="w-full pl-1 text-base text-zinc-400">내용 없음</span>
+            <span className="w-full pl-1 text-base text-zinc-400">
+              내용 없음
+            </span>
+          )}
+          {todo.completed && todo.completed_at && (
+            <span className="w-full pl-1 text-sm text-zinc-500">
+              완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
+            </span>
           )}
         </div>
       </div>

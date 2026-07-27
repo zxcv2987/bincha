@@ -3,6 +3,7 @@ import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
 import { revalidatePath } from "next/cache";
 import { TodoType } from "./types";
 import { CategoryNotFoundError } from "@/features/category/category.errors";
+import { TodoNotFoundError } from "./todo.errors";
 
 async function requireOwnedCategory(categoryId: number, userId: bigint) {
   const category = await prisma.category.findFirst({
@@ -55,7 +56,7 @@ export async function updateTodo({
   const existing = await prisma.todos.findFirst({
     where: { id, user_id: userId },
   });
-  if (!existing) throw new Error("TODO_NOT_FOUND");
+  if (!existing) throw new TodoNotFoundError();
   await requireOwnedCategory(category_id, userId);
   const updateData: Record<string, unknown> = {};
   if (title !== undefined) updateData.title = title;
@@ -78,6 +79,34 @@ export async function deleteTodo(id: number, userId: bigint) {
   const deleted = await prisma.todos.deleteMany({
     where: { id, user_id: userId },
   });
-  if (deleted.count === 0) throw new Error("TODO_NOT_FOUND");
+  if (deleted.count === 0) throw new TodoNotFoundError();
   revalidatePath("/");
+}
+
+export async function toggleTodoCompleted({
+  todoId,
+  userId,
+}: {
+  todoId: number;
+  userId: bigint;
+}) {
+  const todo = await prisma.$transaction(async (tx) => {
+    const ownedTodo = await tx.todos.findFirst({
+      where: { id: todoId, user_id: userId },
+    });
+
+    if (!ownedTodo) throw new TodoNotFoundError();
+
+    const completed = !ownedTodo.completed;
+    return tx.todos.update({
+      where: { id: ownedTodo.id },
+      data: {
+        completed,
+        completed_at: completed ? new Date() : null,
+      },
+    });
+  });
+
+  revalidatePath("/");
+  return serializeBigInt(todo);
 }

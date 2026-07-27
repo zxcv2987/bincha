@@ -1,6 +1,11 @@
 "use server";
 
-import { createTodo, deleteTodo, updateTodo } from "./todo.service";
+import {
+  createTodo,
+  deleteTodo,
+  toggleTodoCompleted,
+  updateTodo,
+} from "./todo.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 
 export async function createTodoAction(_state: unknown, formData: FormData) {
@@ -65,5 +70,16 @@ export async function deleteTodoAction(_state: unknown, categoryId: number) {
   } catch (error) {
     console.error("할 일 삭제 중 오류 발생:", error);
     return { ok: false, error: "삭제 실패" };
+  }
+}
+
+export async function toggleTodoCompletedAction(todoId: number) {
+  try {
+    const userId = await requireCurrentUserId();
+    const todo = await toggleTodoCompleted({ todoId, userId });
+    return { ok: true, todo };
+  } catch (error) {
+    console.error("할 일 완료 상태 변경 중 오류 발생:", error);
+    return { ok: false, error: "완료 상태를 변경하지 못했습니다." };
   }
 }

@@ -6,5 +6,7 @@ export interface TodoType {
   text: string;
   category_id: number;
   title: string;
+  completed: boolean;
+  completed_at: Date | null;
   category: CategoryType;
 }
