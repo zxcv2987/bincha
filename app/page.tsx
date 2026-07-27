@@ -2,9 +2,21 @@ import { getTodoBoardData } from "@/features/shared/todo-board.queries";
 import Header from "@/features/shared/components/Header";
 import ListFetchError from "@/features/shared/components/ListFetchError";
 import TodoList from "@/features/todo/components/TodoList";
+import { requireCurrentUserId } from "@/lib/auth/session";
 
 export default async function Home() {
-  const result = await getTodoBoardData();
+  let userId: bigint;
+  try {
+    userId = await requireCurrentUserId();
+  } catch {
+    return (
+      <>
+        <Header />
+        <ListFetchError message="로그인 후 할 일을 확인할 수 있습니다." />
+      </>
+    );
+  }
+  const result = await getTodoBoardData(userId);
 
   return (
     <>

@@ -1,5 +1,5 @@
-import { getCachedCategories } from "@/features/category/category.queries";
-import { getCachedTodos } from "@/features/todo/todo.queries";
+import { getCategories } from "@/features/category/category.service";
+import { getTodos } from "@/features/todo/todo.service";
 import { CategoryType } from "@/features/category/types";
 import { TodoType } from "@/features/todo/types";
 
@@ -7,11 +7,13 @@ export type TodoBoardDataResult =
   | { ok: true; categories: CategoryType[]; todos: TodoType[] }
   | { ok: false; error: string };
 
-export async function getTodoBoardData(): Promise<TodoBoardDataResult> {
+export async function getTodoBoardData(
+  userId: bigint,
+): Promise<TodoBoardDataResult> {
   try {
     const [categories, todos] = await Promise.all([
-      getCachedCategories(),
-      getCachedTodos(),
+      getCategories(userId),
+      getTodos(userId),
     ]);
 
     return { ok: true, categories, todos };
