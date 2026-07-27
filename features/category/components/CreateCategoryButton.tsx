@@ -10,10 +10,10 @@ export default function CreateCategoryButton() {
   return (
     <>
       <button
-        className="btn btn-primary w-full px-3"
+        className="w-full rounded-lg px-3 py-1.5 text-left text-sm font-semibold text-brand-600 hover:bg-brand-50"
         onClick={() => setOpen(true)}
       >
-        카테고리 추가 +
+        + 카테고리 추가
       </button>
       <Dialog open={open} onClose={() => setOpen(false)} title="카테고리">
         <CategoryForm onClose={() => setOpen(false)} />

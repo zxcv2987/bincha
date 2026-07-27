@@ -19,7 +19,7 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
   }, [state.ok, onClose, router]);
 
   return (
-    <form action={formAction} className="flex w-xs flex-col gap-4 pt-2">
+    <form action={formAction} className="flex w-xs flex-col gap-4">
       <input
         className="input"
         placeholder="ex) 커리어, 연애, 기타 등"

@@ -78,7 +78,7 @@ export default function Dialog({
         onClick={(e) => e.stopPropagation()}
         className="relative max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl bg-white p-4 shadow-xl"
       >
-        <div className="flex w-full flex-row items-center justify-between py-2">
+        <div className="flex w-full flex-row items-center justify-between border-b border-zinc-100 pb-3">
           <h2 id="modal-title" className="text-2xl font-bold text-zinc-700">
             {title}
           </h2>
@@ -91,7 +91,7 @@ export default function Dialog({
             ✖
           </button>
         </div>
-        {children}
+        <div className="pt-4">{children}</div>
       </div>
     </div>,
     portalRoot,

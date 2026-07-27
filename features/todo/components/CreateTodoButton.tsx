@@ -28,9 +28,15 @@ export default function CreateTodoButton() {
   }, [state.ok, router]);
 
   return (
-    <div className="w-full py-2">
-      <button className="btn btn-primary" onClick={() => setOpen(true)}>
-        할 일 추가 +
+    <div className="pb-2">
+      <button
+        className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-brand-600 hover:bg-brand-50"
+        onClick={() => setOpen(true)}
+      >
+        <span aria-hidden="true" className="text-base leading-none">
+          +
+        </span>
+        할 일 추가
       </button>
       <Dialog
         open={open}

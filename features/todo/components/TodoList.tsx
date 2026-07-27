@@ -61,9 +61,7 @@ export default function TodoList({
             categories={categories}
             setCategory={setCategory}
           />
-          <div className="px-1 pt-1">
-            <CreateCategoryButton />
-          </div>
+          <CreateCategoryButton />
         </div>
 
         <div className="flex flex-col gap-1">

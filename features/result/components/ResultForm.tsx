@@ -40,13 +40,16 @@ export default function ResultForm({
   return (
     <form
       action={formAction}
-      className="flex w-[calc(100vw-4rem)] max-w-md flex-col gap-3 py-4"
+      className="flex w-[calc(100vw-4rem)] max-w-md flex-col gap-3"
     >
       <input type="hidden" name="todoId" value={todo.id} />
       {result && <input type="hidden" name="resultId" value={result.id} />}
       <p className="text-sm font-medium text-zinc-500">{todo.title}</p>
       <label className="flex flex-col gap-1 text-sm font-semibold text-zinc-600">
-        실제로 무엇을 했나요? <span className="text-red-400">필수</span>
+        <span>
+          실제로 무엇을 했나요?{" "}
+          <span className="font-normal text-red-400">필수</span>
+        </span>
         <textarea
           name="summary"
           rows={3}
