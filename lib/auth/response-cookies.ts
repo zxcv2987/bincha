@@ -16,18 +16,8 @@ export function setAuthTokensOnResponse(
   return response;
 }
 
-export function clearRefreshTokenOnResponse(response: NextResponse) {
+export function clearAuthCookiesOnResponse(response: NextResponse) {
+  response.cookies.delete("access_token");
   response.cookies.delete("refresh_token");
   return response;
-}
-
-export function forwardSetCookieHeaders(
-  target: NextResponse,
-  fetchResponse: Response,
-) {
-  const rawCookies = fetchResponse.headers.getSetCookie?.() ?? [];
-  for (const raw of rawCookies) {
-    target.headers.append("set-cookie", raw);
-  }
-  return target;
 }

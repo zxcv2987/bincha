@@ -8,13 +8,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
 
-export default function Todo({
-  todo,
-  isReadOnly,
-}: {
-  todo: TodoType;
-  isReadOnly?: boolean;
-}) {
+export default function Todo({ todo }: { todo: TodoType }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -31,16 +25,14 @@ export default function Todo({
       key={todo.id}
       className="flex h-auto w-full items-start rounded-xl bg-zinc-50 p-4 text-xl font-medium text-zinc-700"
     >
-      {!isReadOnly && (
-        <input
-          type="checkbox"
-          aria-label={`${todo.title || "제목 없음"} 완료 상태`}
-          checked={todo.completed}
-          disabled={isPending}
-          onChange={toggleCompleted}
-          className="mt-1 mr-3 size-5 shrink-0 accent-zinc-700"
-        />
-      )}
+      <input
+        type="checkbox"
+        aria-label={`${todo.title || "제목 없음"} 완료 상태`}
+        checked={todo.completed}
+        disabled={isPending}
+        onChange={toggleCompleted}
+        className="mt-1 mr-3 size-5 shrink-0 accent-zinc-700"
+      />
       <div className="flex w-full flex-row items-center bg-zinc-50">
         <div className="flex w-full flex-col gap-2">
           <h3 className="w-full truncate text-lg font-bold break-words">
@@ -60,7 +52,7 @@ export default function Todo({
               완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
             </span>
           )}
-          {todo.completed && !isReadOnly && (
+          {todo.completed && (
             <div className="flex items-center gap-2 pl-1 text-sm text-zinc-500">
               <span>{todo.result ? "결과 기록됨" : "결과 기록 대기"}</span>
               <ResultModalButton todo={todo} />
@@ -68,7 +60,7 @@ export default function Todo({
           )}
         </div>
       </div>
-      {!isReadOnly && <TodoMoreActionButton todo={todo} />}
+      <TodoMoreActionButton todo={todo} />
     </div>
   );
 }

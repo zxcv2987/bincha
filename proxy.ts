@@ -1,134 +1,84 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { refreshAccessToken } from "@/lib/auth/refresh";
 import {
-  clearRefreshTokenOnResponse,
-  forwardSetCookieHeaders,
+  clearAuthCookiesOnResponse,
+  setAuthTokensOnResponse,
 } from "@/lib/auth/response-cookies";
-import { updateSession } from "@/lib/supabase/middleware";
+import { verifyAccessToken } from "@/lib/auth/tokens";
 
-const publicPaths = ["/api/login", "/login", "/readonly"];
-
-function getAccessSecret(): Uint8Array | null {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) return null;
-  return new TextEncoder().encode(secret);
-}
-
-async function fetchNewAccessToken(
-  request: NextRequest,
-  refreshToken: string,
-): Promise<Response> {
-  const res = await fetch(new URL("/api/login/refresh", request.url), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to refresh access token");
-  }
-
-  return res;
-}
-
-function authExpiredResponse(request: NextRequest, pathname: string) {
-  const message = "인증이 만료되었습니다. 다시 로그인해주세요.";
-
+function authExpiredResponse(pathname: string) {
   if (pathname.startsWith("/api/")) {
-    const response = new NextResponse(JSON.stringify({ error: message }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-    return clearRefreshTokenOnResponse(response);
-  }
-
-  const response = NextResponse.rewrite(new URL("/readonly", request.url));
-  return clearRefreshTokenOnResponse(response);
-}
-
-function applySupabaseCookies(
-  response: NextResponse,
-  supabaseResponse: NextResponse,
-) {
-  supabaseResponse.cookies.getAll().forEach((cookie) => {
-    response.cookies.set(cookie);
-  });
-  return response;
-}
-
-function authRequiredResponse(request: NextRequest, pathname: string) {
-  if (pathname.startsWith("/api/")) {
-    return new NextResponse(
-      JSON.stringify({ error: "인증이 필요합니다." }),
-      {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      },
+    return clearAuthCookiesOnResponse(
+      NextResponse.json(
+        { error: "인증이 만료되었습니다. 다시 로그인해주세요." },
+        { status: 401 },
+      ),
     );
   }
-  return NextResponse.rewrite(new URL("/readonly", request.url));
+
+  // 페이지는 각자 requireCurrentUserId로 인증을 확인하므로 그대로 통과시킨다.
+  return clearAuthCookiesOnResponse(NextResponse.next());
+}
+
+function authRequiredResponse(pathname: string) {
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json(
+      { error: "인증이 필요합니다." },
+      { status: 401 },
+    );
+  }
+  return NextResponse.next();
 }
 
 export async function proxy(request: NextRequest) {
-  const supabaseResponse = await updateSession(request);
   const { pathname } = request.nextUrl;
 
-  if (publicPaths.some((path) => pathname.startsWith(path))) {
-    return supabaseResponse;
+  if (pathname.startsWith("/api/login")) {
+    return NextResponse.next();
   }
 
-  const accessSecret = getAccessSecret();
-  if (!accessSecret) {
-    console.error("JWT_SECRET is not set");
-    return applySupabaseCookies(
-      NextResponse.rewrite(new URL("/readonly", request.url)),
-      supabaseResponse,
-    );
-  }
-
-  const accessToken =
-    request.headers.get("Authorization")?.split(" ")[1] ||
-    request.cookies.get("access_token")?.value;
+  const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
   if (accessToken) {
     try {
-      await jwtVerify(accessToken, accessSecret);
-      return supabaseResponse;
+      await verifyAccessToken(accessToken);
+      return NextResponse.next();
     } catch (error) {
       console.error("액세스 토큰 검증 실패:", error);
 
       if (refreshToken) {
         try {
-          const refreshResponse = await fetchNewAccessToken(
-            request,
-            refreshToken,
-          );
-
-          const response = NextResponse.next();
-          forwardSetCookieHeaders(response, refreshResponse);
-          return applySupabaseCookies(response, supabaseResponse);
+          const tokens = await refreshAccessToken(refreshToken);
+          request.cookies.set("access_token", tokens.accessToken);
+          request.cookies.set("refresh_token", tokens.refreshToken);
+          const response = NextResponse.next({ request });
+          return setAuthTokensOnResponse(response, tokens);
         } catch (refreshError) {
           console.error("리프레시 토큰 검증 실패:", refreshError);
-          return applySupabaseCookies(
-            authExpiredResponse(request, pathname),
-            supabaseResponse,
-          );
+          return authExpiredResponse(pathname);
         }
       }
 
-      return applySupabaseCookies(
-        authRequiredResponse(request, pathname),
-        supabaseResponse,
-      );
+      return clearAuthCookiesOnResponse(authRequiredResponse(pathname));
     }
   }
 
-  return applySupabaseCookies(
-    authRequiredResponse(request, pathname),
-    supabaseResponse,
-  );
+  if (refreshToken) {
+    try {
+      const tokens = await refreshAccessToken(refreshToken);
+      request.cookies.set("access_token", tokens.accessToken);
+      request.cookies.set("refresh_token", tokens.refreshToken);
+      const response = NextResponse.next({ request });
+      return setAuthTokensOnResponse(response, tokens);
+    } catch (refreshError) {
+      console.error("리프레시 토큰 검증 실패:", refreshError);
+      return authExpiredResponse(pathname);
+    }
+  }
+
+  return authRequiredResponse(pathname);
 }
 
 export const config = {

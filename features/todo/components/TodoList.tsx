@@ -15,11 +15,9 @@ import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
 export default function TodoList({
   todos,
   categories,
-  isReadOnly = false,
 }: {
   todos: TodoType[];
   categories: CategoryType[];
-  isReadOnly?: boolean;
 }) {
   const [completionFilter, setCompletionFilter] = useState<
     "all" | "active" | "completed"
@@ -44,61 +42,45 @@ export default function TodoList({
   });
 
   return (
-    <div
-      className={
-        isReadOnly
-          ? "flex w-full flex-col items-start justify-center"
-          : "flex w-full flex-col"
-      }
-    >
-      <div
-        className={
-          isReadOnly
-            ? undefined
-            : "flex flex-col items-center justify-between gap-2 border-t border-zinc-200 md:w-full md:flex-row"
-        }
-      >
+    <div className="flex w-full flex-col">
+      <div className="flex flex-col items-center justify-between gap-2 border-t border-zinc-200 md:w-full md:flex-row">
         <CategoryList
           categoryState={categoryState}
           resetCategory={resetCategory}
           categories={categories}
           setCategory={setCategory}
         />
-        {!isReadOnly && (
-          <div className="flex gap-1" aria-label="완료 상태 필터">
-            {(
-              [
-                ["all", "전체"],
-                ["active", "진행 중"],
-                ["completed", "완료"],
-              ] as const
-            ).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                className={clsx(
-                  "rounded-lg p-2 text-sm text-zinc-400 hover:text-zinc-700",
-                  completionFilter === value && "font-semibold text-zinc-700",
-                )}
-                onClick={() => setCompletionFilter(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-        {!isReadOnly && <CreateCategoryButton />}
+        <div className="flex gap-1" aria-label="완료 상태 필터">
+          {(
+            [
+              ["all", "전체"],
+              ["active", "진행 중"],
+              ["completed", "완료"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={clsx(
+                "rounded-lg p-2 text-sm text-zinc-400 hover:text-zinc-700",
+                completionFilter === value && "font-semibold text-zinc-700",
+              )}
+              onClick={() => setCompletionFilter(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <CreateCategoryButton />
       </div>
-      {!isReadOnly && <CreateTodoButton />}
+      <CreateTodoButton />
 
       {filteredTodos.length === 0 ? (
         <TodoEmptyCard
           message={
-            isReadOnly
-              ? "표시할 할 일이 없습니다."
-              : todos.length === 0
-                ? "할 일을 추가해 보세요."
-                : "선택한 상태의 할 일이 없습니다."
+            todos.length === 0
+              ? "할 일을 추가해 보세요."
+              : "선택한 상태의 할 일이 없습니다."
           }
         />
       ) : visibleCategories.length === 0 ? (
@@ -113,11 +95,10 @@ export default function TodoList({
             <TodosByCategory
               key={category.id}
               category={category}
-              isReadOnly={isReadOnly}
               isEmpty={categoryTodos.length === 0}
             >
               {categoryTodos.map((todo) => (
-                <Todo key={todo.id} todo={todo} isReadOnly={isReadOnly} />
+                <Todo key={todo.id} todo={todo} />
               ))}
             </TodosByCategory>
           );
