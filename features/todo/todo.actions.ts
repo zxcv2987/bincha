@@ -1,23 +1,25 @@
 "use server";
 
 import { createTodo, deleteTodo, updateTodo } from "./todo.service";
+import { requireCurrentUserId } from "@/lib/auth/session";
 
-export async function createTodoAction(
-  _state: unknown,
-  formData: FormData,
-) {
+export async function createTodoAction(_state: unknown, formData: FormData) {
   const title = formData.get("title");
   if (title === null || title === "")
     return { ok: false, error: { title: "할 일을 입력해 주세요." } };
   const text = formData.get("text");
-  if (text === null || text === "")
-    return { ok: false, error: { text: "내용을 입력해 주세요." } };
   const categoryId = formData.get("category");
   if (categoryId === null)
     return { ok: false, error: { categoryId: "카테고리를 선택해 주세요." } };
 
   try {
-    await createTodo(title as string, text as string, Number(categoryId));
+    const userId = await requireCurrentUserId();
+    await createTodo(
+      title as string,
+      (text as string | null) ?? "",
+      Number(categoryId),
+      userId,
+    );
   } catch (error) {
     console.error("할 일 추가 중 오류 발생:", error);
     return { ok: false };
@@ -26,10 +28,7 @@ export async function createTodoAction(
   return { ok: true };
 }
 
-export async function updateTodoAction(
-  _state: unknown,
-  formData: FormData,
-) {
+export async function updateTodoAction(_state: unknown, formData: FormData) {
   const id = formData.get("id");
   if (id === null || id === "")
     return { ok: false, error: { id: "id가 잘못되었습니다." } };
@@ -37,18 +36,18 @@ export async function updateTodoAction(
   if (title === null || title === "")
     return { ok: false, error: { title: "할 일을 입력해 주세요." } };
   const text = formData.get("text");
-  if (text === null || text === "")
-    return { ok: false, error: { text: "내용을 입력해 주세요." } };
   const categoryId = formData.get("category");
   if (categoryId === null)
     return { ok: false, error: { categoryId: "카테고리를 선택해 주세요." } };
 
   try {
+    const userId = await requireCurrentUserId();
     await updateTodo({
       id: Number(id),
       title: title as string,
-      text: text as string,
+      text: (text as string | null) ?? "",
       category_id: Number(categoryId),
+      userId,
     });
   } catch (error) {
     console.error("할 일 수정 중 오류 발생:", error);
@@ -58,12 +57,10 @@ export async function updateTodoAction(
   return { ok: true };
 }
 
-export async function deleteTodoAction(
-  _state: unknown,
-  categoryId: number,
-) {
+export async function deleteTodoAction(_state: unknown, categoryId: number) {
   try {
-    await deleteTodo(categoryId);
+    const userId = await requireCurrentUserId();
+    await deleteTodo(categoryId, userId);
     return { ok: true };
   } catch (error) {
     console.error("할 일 삭제 중 오류 발생:", error);

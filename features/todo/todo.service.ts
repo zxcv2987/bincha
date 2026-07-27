@@ -1,10 +1,19 @@
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { TodoType } from "./types";
+import { CategoryNotFoundError } from "@/features/category/category.errors";
 
-export async function getTodos(): Promise<TodoType[]> {
+async function requireOwnedCategory(categoryId: number, userId: bigint) {
+  const category = await prisma.category.findFirst({
+    where: { id: categoryId, user_id: userId },
+  });
+  if (!category) throw new CategoryNotFoundError();
+}
+
+export async function getTodos(userId: bigint): Promise<TodoType[]> {
   const todos = await prisma.todos.findMany({
+    where: { user_id: userId },
     include: { category: true },
     orderBy: [{ id: "asc" }, { category_id: "asc" }],
   });
@@ -15,15 +24,18 @@ export async function createTodo(
   title: string,
   text: string,
   category_id: number,
+  userId: bigint,
 ) {
-  if (!title || !text || !category_id) {
+  if (!title || !category_id) {
     throw new Error("Missing required fields");
   }
 
+  await requireOwnedCategory(category_id, userId);
+
   const todo = await prisma.todos.create({
-    data: { title, text, category_id },
+    data: { title, text, category_id, user_id: userId },
   });
-  revalidateTag("todos", "max");
+  revalidatePath("/");
   return serializeBigInt(todo);
 }
 
@@ -32,12 +44,19 @@ export async function updateTodo({
   title,
   text,
   category_id,
+  userId,
 }: {
   id: number;
   title: string;
   text: string;
   category_id: number;
+  userId: bigint;
 }) {
+  const existing = await prisma.todos.findFirst({
+    where: { id, user_id: userId },
+  });
+  if (!existing) throw new Error("TODO_NOT_FOUND");
+  await requireOwnedCategory(category_id, userId);
   const updateData: Record<string, unknown> = {};
   if (title !== undefined) updateData.title = title;
   if (text !== undefined) updateData.text = text;
@@ -51,14 +70,14 @@ export async function updateTodo({
     where: { id },
     data: updateData,
   });
-  revalidateTag("todos", "max");
+  revalidatePath("/");
   return serializeBigInt(todo);
 }
 
-export async function deleteTodo(id: number) {
-  const todo = await prisma.todos.delete({
-    where: { id },
+export async function deleteTodo(id: number, userId: bigint) {
+  const deleted = await prisma.todos.deleteMany({
+    where: { id, user_id: userId },
   });
-  revalidateTag("todos", "max");
-  return serializeBigInt(todo);
+  if (deleted.count === 0) throw new Error("TODO_NOT_FOUND");
+  revalidatePath("/");
 }

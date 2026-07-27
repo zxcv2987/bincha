@@ -15,25 +15,39 @@ model category {
   id            BigInt   @id @default(autoincrement())
   created_at    DateTime @default(now()) @db.Timestamptz(6)
   category_name String   @default("")
+  user_id       BigInt
+  user          user     @relation(fields: [user_id], references: [id])
   todos         todos[]
+
+  @@unique([user_id, category_name])
+  @@index([user_id])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model todos {
-  id          BigInt   @id @default(autoincrement())
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  text        String   @default("")
-  category_id BigInt
-  title       String   @default("")
-  completed   Boolean  @default(false)
-  category    category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  id           BigInt    @id @default(autoincrement())
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @updatedAt @db.Timestamptz(6)
+  text         String    @default("")
+  category_id  BigInt
+  user_id      BigInt
+  title        String    @default("")
+  completed    Boolean   @default(false)
+  completed_at DateTime? @db.Timestamptz(6)
+  category     category  @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  user         user      @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, completed])
+  @@index([category_id])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model user {
-  id            BigInt   @id @default(autoincrement())
-  created_at    DateTime @default(now()) @db.Timestamptz(6)
-  password      String   @db.VarChar
-  username      String   @unique @default("")
-  refresh_token String   @default("")
+  id            BigInt     @id @default(autoincrement())
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  password      String     @db.VarChar
+  username      String     @unique @default("")
+  refresh_token String     @default("")
+  categories    category[]
+  todos         todos[]
 }
