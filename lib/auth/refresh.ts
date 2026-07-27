@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/db/prisma";
 import { AuthError } from "./errors";
-import { createAccessToken, verifyRefreshToken } from "./tokens";
+import {
+  createAccessToken,
+  createRefreshToken,
+  verifyRefreshToken,
+} from "./tokens";
 
 export async function refreshAccessToken(refreshToken: string) {
   if (!refreshToken) {
@@ -39,7 +43,14 @@ export async function refreshAccessToken(refreshToken: string) {
   }
 
   const accessToken = await createAccessToken(user);
-  return { accessToken };
+  const newRefreshToken = await createRefreshToken(Number(user.id));
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { refresh_token: newRefreshToken },
+  });
+
+  return { accessToken, refreshToken: newRefreshToken };
 }
 
 export async function revokeRefreshToken(userId: bigint) {
