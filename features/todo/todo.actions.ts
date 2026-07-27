@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import {
   createTodo,
   deleteTodo,
@@ -25,6 +26,7 @@ export async function createTodoAction(_state: unknown, formData: FormData) {
       Number(categoryId),
       userId,
     );
+    revalidatePath("/");
   } catch (error) {
     console.error("할 일 추가 중 오류 발생:", error);
     return { ok: false };
@@ -54,6 +56,7 @@ export async function updateTodoAction(_state: unknown, formData: FormData) {
       category_id: Number(categoryId),
       userId,
     });
+    revalidatePath("/");
   } catch (error) {
     console.error("할 일 수정 중 오류 발생:", error);
     return { ok: false };
@@ -62,10 +65,11 @@ export async function updateTodoAction(_state: unknown, formData: FormData) {
   return { ok: true };
 }
 
-export async function deleteTodoAction(_state: unknown, categoryId: number) {
+export async function deleteTodoAction(_state: unknown, todoId: number) {
   try {
     const userId = await requireCurrentUserId();
-    await deleteTodo(categoryId, userId);
+    await deleteTodo(todoId, userId);
+    revalidatePath("/");
     return { ok: true };
   } catch (error) {
     console.error("할 일 삭제 중 오류 발생:", error);
@@ -77,6 +81,7 @@ export async function toggleTodoCompletedAction(todoId: number) {
   try {
     const userId = await requireCurrentUserId();
     const todo = await toggleTodoCompleted({ todoId, userId });
+    revalidatePath("/");
     return { ok: true, todo };
   } catch (error) {
     console.error("할 일 완료 상태 변경 중 오류 발생:", error);

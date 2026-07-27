@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { requireCurrentUserId } from "@/lib/auth/session";
 import {
   createTaskResult,
@@ -43,6 +44,11 @@ function parseResultForm(formData: FormData) {
   };
 }
 
+function revalidateResultPaths() {
+  revalidatePath("/");
+  revalidatePath("/results");
+}
+
 export async function createTaskResultAction(
   _state: unknown,
   formData: FormData,
@@ -57,6 +63,7 @@ export async function createTaskResultAction(
   try {
     const userId = await requireCurrentUserId();
     await createTaskResult({ todoId, userId, ...parsed.input });
+    revalidateResultPaths();
     return { ok: true };
   } catch (error) {
     if (error instanceof CompletedTodoRequiredError) {
@@ -87,6 +94,7 @@ export async function updateTaskResultAction(
   try {
     const userId = await requireCurrentUserId();
     await updateTaskResult({ resultId, userId, ...parsed.input });
+    revalidateResultPaths();
     return { ok: true };
   } catch (error) {
     if (error instanceof ResultNotFoundError) {
@@ -101,6 +109,7 @@ export async function deleteTaskResultAction(resultId: number) {
   try {
     const userId = await requireCurrentUserId();
     await deleteTaskResult(resultId, userId);
+    revalidateResultPaths();
     return { ok: true };
   } catch (error) {
     console.error("결과 삭제 중 오류 발생:", error);
