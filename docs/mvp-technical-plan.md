@@ -482,7 +482,24 @@ user_id BigInt
 
 ## 17. 테스트
 
-프레임워크가 아직 없다. MVP 범위에서는 최소한으로 다음만 커버한다.
+`node --test` + `tsx`로 서비스 계층을 직접 호출한다. 프로덕션 DB와 분리하기 위해 같은 Supabase 프로젝트의 `test` schema를 쓴다.
+
+### 셋업
+
+1. `.env`를 복사해 `.env.test`를 만든다 (gitignore 대상, 커밋하지 않음)
+2. `.env.test`의 연결 문자열에 schema를 붙인다
+   - `DATABASE_URL`: 기존 `?pgbouncer=true` 뒤에 `&schema=test`
+   - `DIRECT_URL`: `?schema=test` (이미 쿼리가 있으면 `&schema=test`)
+3. 테스트 스키마에 마이그레이션 배포:
+   ```bash
+   # dotenv-cli가 있으면
+   pnpm exec dotenv -e .env.test -- prisma migrate deploy
+   # 없으면 환경변수로 직접 로드
+   set -a && source .env.test && set +a && pnpm exec prisma migrate deploy
+   ```
+4. 테스트 실행: `pnpm test`
+
+### 커버 범위
 
 - Todo 완료/완료 취소 상태 변경
 - Result 생성 조건(완료 안 된 Todo 거부, 중복 생성 거부)
