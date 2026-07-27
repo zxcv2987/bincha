@@ -1,7 +1,6 @@
 "use client";
 
 import { CategoryType } from "@/features/category/types";
-import DeleteCategoryButton from "@/features/category/components/DeleteCategoryButton";
 import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
 
 export default function TodosByCategory({
@@ -17,12 +16,9 @@ export default function TodosByCategory({
 
   return (
     <div className="flex w-full flex-col border-y border-zinc-200 py-2">
-      <div className="relative flex flex-row items-center justify-between px-1">
-        <h2 key={category.id} className="py-1.5 text-base font-bold text-zinc-700">
-          {categoryName}
-        </h2>
-        <DeleteCategoryButton categoryId={category.id} />
-      </div>
+      <h2 className="px-1 py-1.5 text-base font-bold text-zinc-700">
+        {categoryName}
+      </h2>
       {isEmpty ? (
         <TodoEmptyCard message="이 카테고리에 할 일이 없습니다." />
       ) : (
