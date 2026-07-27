@@ -1,12 +1,11 @@
 import Header from "@/features/shared/components/Header";
 import ListFetchError from "@/features/shared/components/ListFetchError";
-import ResultModalButton from "@/features/result/components/ResultModalButton";
+import PendingTodoCard from "@/features/result/components/PendingTodoCard";
+import CompletedResultCard from "@/features/result/components/CompletedResultCard";
 import { getPendingTodos, getResults } from "@/features/result/result.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 import { TodoType } from "@/features/todo/types";
-import { TaskResultType } from "@/features/result/types";
-
-type ResultWithTodo = TaskResultType & { todo: TodoType };
+import { ResultWithTodo } from "@/features/result/types";
 
 export default async function ResultsPage() {
   let userId: bigint;
@@ -38,21 +37,7 @@ export default async function ResultsPage() {
             </p>
           ) : (
             pendingTodos.map((todo) => (
-              <article
-                key={todo.id}
-                className="flex items-center justify-between gap-4 rounded-xl bg-zinc-50 p-4"
-              >
-                <div>
-                  <h3 className="font-semibold text-zinc-700">{todo.title}</h3>
-                  {todo.completed_at && (
-                    <p className="text-sm text-zinc-400">
-                      완료일:{" "}
-                      {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
-                    </p>
-                  )}
-                </div>
-                <ResultModalButton todo={todo} />
-              </article>
+              <PendingTodoCard key={todo.id} todo={todo} />
             ))
           )}
         </section>
@@ -65,19 +50,7 @@ export default async function ResultsPage() {
             </p>
           ) : (
             completedResults.map((result) => (
-              <article key={result.id} className="rounded-xl bg-zinc-50 p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-semibold text-zinc-700">
-                      {result.summary}
-                    </h3>
-                    <p className="text-sm text-zinc-400">
-                      연결된 할 일: {result.todo.title}
-                    </p>
-                  </div>
-                  <ResultModalButton todo={result.todo} />
-                </div>
-              </article>
+              <CompletedResultCard key={result.id} result={result} />
             ))
           )}
         </section>

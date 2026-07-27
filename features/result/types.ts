@@ -1,3 +1,5 @@
+import type { TodoType } from "@/features/todo/types";
+
 export interface TaskResultType {
   id: number;
   created_at: Date;
@@ -11,3 +13,5 @@ export interface TaskResultType {
   evidence_url: string;
   needs_measurement: boolean;
 }
+
+export type ResultWithTodo = TaskResultType & { todo: TodoType };
