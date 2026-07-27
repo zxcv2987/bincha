@@ -4,21 +4,21 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { TodoType } from "@/features/todo/types";
 import { deleteTaskResultAction } from "@/features/result/result.actions";
-import { useModalStore } from "@/features/modal/provider";
 
 export default function ResultForm({
   todo,
   state,
   formAction,
   pending,
+  onClose,
 }: {
   todo: TodoType;
   state: { ok: boolean; error?: string };
   formAction: (formData: FormData) => void;
   pending: boolean;
+  onClose: () => void;
 }) {
   const router = useRouter();
-  const close = useModalStore((store) => store.close);
   const [deleting, startDeleteTransition] = useTransition();
   const [deleteError, setDeleteError] = useState<string | undefined>();
   const result = todo.result;
@@ -29,7 +29,7 @@ export default function ResultForm({
     startDeleteTransition(async () => {
       const response = await deleteTaskResultAction(result.id);
       if (response.ok) {
-        close();
+        onClose();
         router.refresh();
       } else {
         setDeleteError(response.error);

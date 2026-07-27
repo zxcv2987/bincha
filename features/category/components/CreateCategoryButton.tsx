@@ -1,16 +1,23 @@
 "use client";
 
-import { useModalStore } from "@/features/modal/provider";
+import { useState } from "react";
+import Dialog from "@/features/shared/components/Dialog";
+import CategoryForm from "@/features/category/components/CategoryForm";
 
 export default function CreateCategoryButton() {
-  const open = useModalStore((s) => s.open);
+  const [open, setOpen] = useState(false);
 
   return (
-    <button
-      className="btn btn-primary max-h-[50px] w-full md:max-w-[200px]"
-      onClick={() => open("category")}
-    >
-      카테고리 추가 +
-    </button>
+    <>
+      <button
+        className="btn btn-primary max-h-[50px] w-full md:max-w-[200px]"
+        onClick={() => setOpen(true)}
+      >
+        카테고리 추가 +
+      </button>
+      <Dialog open={open} onClose={() => setOpen(false)} title="카테고리">
+        <CategoryForm onClose={() => setOpen(false)} />
+      </Dialog>
+    </>
   );
 }
