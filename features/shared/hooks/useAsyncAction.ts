@@ -33,7 +33,9 @@ export default function useAsyncAction<Args extends unknown[], Data>(
       setResult(result);
       if (result.ok) {
         options.onSuccess?.(result.data);
-        if (options.refresh ?? true) router.refresh();
+        // ponytail: 서버 액션이 이미 revalidatePath로 무효화하므로 기본은 refresh 안 함.
+        // 서버가 무효화하지 않는 예외적인 케이스만 refresh: true로 명시한다.
+        if (options.refresh) router.refresh();
       }
       return result;
     } catch (error) {
