@@ -1,6 +1,5 @@
-import test, { after, before } from "node:test";
-import assert from "node:assert/strict";
 import { PrismaClient } from "@prisma/client";
+import { afterAll, beforeAll, expect, test } from "vitest";
 import {
   toggleTodoCompleted,
   updateTodo,
@@ -23,27 +22,33 @@ let otherCategory: { id: number };
 let activeTodo: { id: number };
 let completedTodo: { id: number };
 
-before(async () => {
+beforeAll(async () => {
   owner = await prisma.user.create({
     data: { username: `mvp-owner-${runId}`, password: "test-only" },
   });
   otherUser = await prisma.user.create({
     data: { username: `mvp-other-${runId}`, password: "test-only" },
   });
-  category = await prisma.category.create({
+  const createdCategory = await prisma.category.create({
     data: { category_name: "검증", user_id: owner.id },
   });
-  otherCategory = await prisma.category.create({
+  category = { id: Number(createdCategory.id) };
+
+  const createdOtherCategory = await prisma.category.create({
     data: { category_name: "침범용", user_id: otherUser.id },
   });
-  activeTodo = await prisma.todos.create({
+  otherCategory = { id: Number(createdOtherCategory.id) };
+
+  const createdActiveTodo = await prisma.todos.create({
     data: {
       title: "완료 토글 검증",
       category_id: category.id,
       user_id: owner.id,
     },
   });
-  completedTodo = await prisma.todos.create({
+  activeTodo = { id: Number(createdActiveTodo.id) };
+
+  const createdCompletedTodo = await prisma.todos.create({
     data: {
       title: "결과 검증",
       category_id: category.id,
@@ -52,9 +57,10 @@ before(async () => {
       completed_at: new Date(),
     },
   });
+  completedTodo = { id: Number(createdCompletedTodo.id) };
 });
 
-after(async () => {
+afterAll(async () => {
   if (owner) {
     await prisma.task_result.deleteMany({ where: { user_id: owner.id } });
     await prisma.todos.deleteMany({ where: { user_id: owner.id } });
@@ -86,40 +92,35 @@ test("완료 토글은 completed와 completed_at을 함께 설정하고 해제�
     todoId: activeTodo.id,
     userId: owner.id,
   });
-  assert.equal(completed.completed, true);
-  assert.ok(completed.completed_at);
+  expect(completed.completed).toBe(true);
+  expect(completed.completed_at).toBeTruthy();
 
   const reopened = await toggleTodoCompleted({
     todoId: activeTodo.id,
     userId: owner.id,
   });
-  assert.equal(reopened.completed, false);
-  assert.equal(reopened.completed_at, null);
+  expect(reopened.completed).toBe(false);
+  expect(reopened.completed_at).toBeNull();
 });
 
 test("미완료 Todo에는 결과를 만들 수 없다", async () => {
-  await assert.rejects(
-    createResult(activeTodo.id, owner.id),
+  await expect(createResult(activeTodo.id, owner.id)).rejects.toBeInstanceOf(
     CompletedTodoRequiredError,
   );
 });
 
 test("같은 Todo에는 결과를 두 번 만들 수 없다", async () => {
   await createResult(completedTodo.id, owner.id);
-  await assert.rejects(
-    createResult(completedTodo.id, owner.id),
+  await expect(createResult(completedTodo.id, owner.id)).rejects.toBeInstanceOf(
     ResultAlreadyExistsError,
   );
 });
 
 test("다른 사용자는 Todo를 조회, 수정, 삭제할 수 없다", async () => {
   const found = await getTodos(otherUser.id);
-  assert.equal(
-    found.some((todo) => todo.id === completedTodo.id),
-    false,
-  );
+  expect(found.some((todo) => todo.id === completedTodo.id)).toBe(false);
 
-  await assert.rejects(
+  await expect(
     updateTodo({
       id: completedTodo.id,
       title: "침범",
@@ -127,12 +128,12 @@ test("다른 사용자는 Todo를 조회, 수정, 삭제할 수 없다", async (
       category_id: otherCategory.id,
       userId: otherUser.id,
     }),
-    TodoNotFoundError,
-  );
+  ).rejects.toBeInstanceOf(TodoNotFoundError);
 
-  await assert.rejects(
+  await expect(
     deleteTodo(completedTodo.id, otherUser.id),
-    TodoNotFoundError,
-  );
-  assert.ok(await prisma.todos.findUnique({ where: { id: completedTodo.id } }));
+  ).rejects.toBeInstanceOf(TodoNotFoundError);
+  expect(
+    await prisma.todos.findUnique({ where: { id: completedTodo.id } }),
+  ).toBeTruthy();
 });

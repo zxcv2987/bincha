@@ -480,7 +480,7 @@ user_id BigInt
 
 ## 17. 테스트
 
-`node --test` + `tsx`로 서비스 계층을 직접 호출한다. 프로덕션 DB와 분리하기 위해 같은 Supabase 프로젝트의 `test` schema를 쓴다.
+Vitest로 서비스 계층을 직접 호출한다. 프로덕션 DB와 분리하기 위해 같은 Supabase 프로젝트의 `test` schema를 쓴다. 현재 테스트는 브라우저 DOM이 필요 없는 Prisma 통합 테스트이므로 Vitest의 Node 환경에서 실행한다.
 
 ### 셋업
 
@@ -503,7 +503,7 @@ user_id BigInt
 - Result 생성 조건(완료 안 된 Todo 거부, 중복 생성 거부)
 - 소유권 검증: 다른 사용자 Todo 조회/수정/삭제 불가
 
-프레임워크 선택과 통합/E2E 테스트는 MVP 이후 검토([[technical-proposal]] 22장 참고).
+컴포넌트 테스트와 E2E 테스트는 MVP 이후 검토한다([[technical-proposal]] 22장 참고).
 
 ---
 
