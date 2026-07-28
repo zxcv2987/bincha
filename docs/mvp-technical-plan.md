@@ -53,15 +53,18 @@ model category {
   id            BigInt   @id @default(autoincrement())
   created_at    DateTime @default(now()) @db.Timestamptz(6)
   category_name String   @default("")
+  sort_order    Int      @default(0)
   user_id       BigInt
 
   user          user     @relation(fields: [user_id], references: [id])
   todos         todos[]
 
-  @@index([user_id])
+  @@index([user_id, sort_order])
   @@unique([user_id, category_name])
 }
 ```
+
+카테고리는 `sort_order ASC, id ASC` 순으로 조회한다. `sort_order`에는 unique 제약을 두지 않고 서비스에서 사용자별 전체 ID 집합을 검증한 뒤 `0...n-1`로 정규화한다.
 
 ### 3.3 Todo
 
@@ -441,6 +444,10 @@ try {
 
 ## 15. UI 상태 관리
 
+선택된 카테고리는 이름이 아니라 ID로 저장한다. 이름 수정 후에도 선택 상태가 유지되고, 삭제된 카테고리가 선택되어 있었다면 전체 보기로 초기화한다.
+
+카테고리 관리 모달은 이름 수정·삭제·순서 변경을 제공한다. 각 작업은 개별 저장하며, 순서 변경 실패 시 클라이언트 목록을 직전 순서로 되돌린다.
+
 Zustand는 Category 필터, 전역 Modal 용도로만 제한 사용한다. 서버 데이터는 Zustand에 복제하지 않는다. Result 다중 선택 상태(Achievement 연결용)는 MVP 범위가 아니므로 만들지 않는다.
 
 ---
@@ -502,6 +509,9 @@ Vitest로 서비스 계층을 직접 호출한다. 프로덕션 DB와 분리하�
 - Todo 완료/완료 취소 상태 변경
 - Result 생성 조건(완료 안 된 Todo 거부, 중복 생성 거부)
 - 소유권 검증: 다른 사용자 Todo 조회/수정/삭제 불가
+- 카테고리 이름 수정: 변경 내용 저장·다른 사용자 데이터 거부
+- 카테고리 순서 변경: 사용자별 순서 저장·전체 소유 ID 검증·다른 사용자 데이터 거부
+- 카테고리 동시 생성: 사용자 안에서 서로 다른 순서 저장
 
 컴포넌트 테스트와 E2E 테스트는 MVP 이후 검토한다([[technical-proposal]] 22장 참고).
 
