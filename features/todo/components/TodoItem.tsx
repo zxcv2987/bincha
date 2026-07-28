@@ -140,13 +140,13 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
         aria-label={`${todo.title || "제목 없음"} 삭제`}
         onClick={handleDelete}
         disabled={deletePending}
-        className="shrink-0 rounded-lg p-1.5 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 disabled:opacity-50 group-hover:opacity-100"
+        className="shrink-0 self-center rounded-lg p-2 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 disabled:opacity-50 group-hover:opacity-100"
       >
         <svg
           viewBox="0 0 20 20"
           fill="none"
           aria-hidden="true"
-          className="size-4"
+          className="size-5"
         >
           <path
             d="M4 6h12M8 6V4.5A1.5 1.5 0 0 1 9.5 3h1A1.5 1.5 0 0 1 12 4.5V6m2 0-.6 9.6a2 2 0 0 1-2 1.9H8.6a2 2 0 0 1-2-1.9L6 6h8Z"
