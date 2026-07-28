@@ -9,12 +9,15 @@ export default function CategoryItem({
   categoryState: string | null;
   setCategory: (category: string) => void;
 }) {
+  const selected = categoryState === category.category_name;
+
   return (
     <button
       className={clsx(
-        "min-w-0 flex-1 cursor-pointer truncate rounded-lg px-3 py-1.5 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
-        categoryState === category.category_name &&
-          "bg-brand-50 font-semibold text-brand-700 hover:bg-brand-50",
+        "min-w-0 flex-1 cursor-pointer truncate rounded-lg px-3 py-1.5 text-left text-sm",
+        selected
+          ? "bg-brand-50 font-semibold text-brand-700"
+          : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
       )}
       onClick={() => setCategory(category.category_name)}
     >

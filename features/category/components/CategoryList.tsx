@@ -19,9 +19,10 @@ export default function CategoryList({
       <button
         type="button"
         className={clsx(
-          "w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
-          categoryState === null &&
-            "bg-brand-50 font-semibold text-brand-700 hover:bg-brand-50",
+          "w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-sm",
+          categoryState === null
+            ? "bg-brand-50 font-semibold text-brand-700"
+            : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
         )}
         onClick={resetCategory}
       >
