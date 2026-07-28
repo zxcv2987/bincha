@@ -2,9 +2,6 @@
 
 import { useEffect, useRef } from "react";
 
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
 export default function Dialog({
   open,
   onClose,
@@ -34,8 +31,10 @@ export default function Dialog({
     if (!dialog) return;
     if (open && !dialog.open) {
       dirtyRef.current = false;
+      // showModal()은 자체적으로 dialog 안의 autofocus 요소를 찾아 포커스하고,
+      // 없으면 dialog 자신에 포커스한다 (헤더의 닫기 버튼으로 새지 않음) —
+      // 특정 필드를 먼저 포커스하고 싶으면 각 폼에서 autoFocus를 선언한다.
       dialog.showModal();
-      dialog.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
     }
     if (!open && dialog.open) dialog.close();
   }, [open]);
