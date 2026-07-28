@@ -55,6 +55,7 @@ export default function ResultForm({
           rows={3}
           className="input font-normal"
           defaultValue={result?.summary}
+          spellCheck={false}
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-semibold text-zinc-600">
@@ -64,6 +65,7 @@ export default function ResultForm({
           rows={2}
           className="input font-normal"
           defaultValue={result?.change_summary}
+          spellCheck={false}
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-semibold text-zinc-600">
@@ -73,6 +75,7 @@ export default function ResultForm({
           rows={2}
           className="input font-normal"
           defaultValue={result?.unexpected}
+          spellCheck={false}
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-semibold text-zinc-600">
@@ -82,6 +85,7 @@ export default function ResultForm({
           rows={2}
           className="input font-normal"
           defaultValue={result?.next_action}
+          spellCheck={false}
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-semibold text-zinc-600">

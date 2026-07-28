@@ -18,9 +18,9 @@ export async function createCategoryAction(
 
   try {
     const userId = await requireCurrentUserId();
-    await createCategory(category as string, userId);
+    const created = await createCategory(category as string, userId);
     revalidatePath("/");
-    return { ok: true };
+    return { ok: true, category: created };
   } catch (error) {
     if (error instanceof CategoryAlreadyExistsError) {
       return { ok: false, error: "이미 사용 중인 카테고리 이름입니다." };

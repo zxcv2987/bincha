@@ -24,6 +24,7 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
         className="input"
         placeholder="ex) 커리어, 연애, 기타 등"
         name="category"
+        spellCheck={false}
       />
       {state?.error && (
         <span className="text-xs text-red-400">{state.error}</span>

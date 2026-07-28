@@ -1,5 +1,5 @@
 import { TodoType } from "@/features/todo/types";
-import { useCategoryStore } from "@/features/category/provider";
+import CategoryPicker from "@/features/category/components/CategoryPicker";
 import { useId, useTransition } from "react";
 
 type TodoFormState = {
@@ -21,7 +21,6 @@ export default function TodoForm({
   formAction: (formData: FormData) => void;
   todo?: TodoType;
 }) {
-  const categories = useCategoryStore((set) => set.categories);
   const [isPending, startTransition] = useTransition();
   const titleId = useId();
   const textId = useId();
@@ -52,6 +51,7 @@ export default function TodoForm({
           placeholder="할 일"
           className="input"
           defaultValue={todo && todo.title}
+          spellCheck={false}
         />
         {state.error?.title && (
           <span className="text-xs text-red-400">{state.error.title}</span>
@@ -69,41 +69,17 @@ export default function TodoForm({
           rows={5}
           className="input"
           defaultValue={todo && todo.text}
+          spellCheck={false}
         />
         {state.error?.text && (
           <span className="text-xs text-red-400">{state.error.text}</span>
         )}
       </div>
 
-      <fieldset className="m-0 flex flex-col gap-1.5 border-0 p-0">
-        <legend className="p-0 text-sm font-semibold text-zinc-600">
-          카테고리
-        </legend>
-        <ul className="flex flex-row flex-wrap gap-2 pt-1">
-          {categories.map((category) => (
-            <label
-              key={category.id}
-              className="flex cursor-pointer items-center gap-3"
-            >
-              <input
-                type="radio"
-                name="category"
-                className="peer hidden"
-                value={category.id}
-                defaultChecked={
-                  todo && todo.category.category_name === category.category_name
-                }
-              />
-              <span className="text-base text-zinc-400 peer-checked:font-semibold peer-checked:text-zinc-700">
-                {category.category_name}
-              </span>
-            </label>
-          ))}
-        </ul>
-        {state.error?.categoryId && (
-          <span className="text-xs text-red-400">{state.error.categoryId}</span>
-        )}
-      </fieldset>
+      <CategoryPicker
+        defaultCategoryId={todo?.category_id}
+        error={state.error?.categoryId}
+      />
 
       <button className="btn btn-primary" disabled={isPending} type="submit">
         {isPending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
