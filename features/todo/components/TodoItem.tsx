@@ -2,26 +2,13 @@
 
 import { TodoType } from "@/features/todo/types";
 import Content from "@/features/shared/components/Content";
-import TodoMoreActionButton from "@/features/todo/components/TodoMoreActionButton";
-import { toggleTodoCompletedAction } from "@/features/todo/todo.actions";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import TodoActionsMenu from "@/features/todo/components/TodoActionsMenu";
+import useToggleTodo from "@/features/todo/hooks/useToggleTodo";
 import clsx from "clsx";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
 
-export default function Todo({ todo }: { todo: TodoType }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | undefined>();
-
-  const toggleCompleted = () => {
-    setError(undefined);
-    startTransition(async () => {
-      const result = await toggleTodoCompletedAction(todo.id);
-      if (result.ok) router.refresh();
-      else setError(result.error);
-    });
-  };
+export default function TodoItem({ todo }: { todo: TodoType }) {
+  const { submit, pending, error } = useToggleTodo();
 
   return (
     <div
@@ -33,8 +20,8 @@ export default function Todo({ todo }: { todo: TodoType }) {
           type="checkbox"
           aria-label={`${todo.title || "제목 없음"} 완료 상태`}
           checked={todo.completed}
-          disabled={isPending}
-          onChange={toggleCompleted}
+          disabled={pending}
+          onChange={() => submit(todo.id)}
           className="peer sr-only"
         />
         <span
@@ -92,7 +79,7 @@ export default function Todo({ todo }: { todo: TodoType }) {
         )}
       </div>
 
-      <TodoMoreActionButton todo={todo} />
+      <TodoActionsMenu todo={todo} />
     </div>
   );
 }

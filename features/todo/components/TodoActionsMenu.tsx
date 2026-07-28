@@ -8,7 +8,7 @@ import TodoForm from "@/features/todo/components/TodoForm";
 import useUpdateTodo from "@/features/todo/hooks/useUpdateTodo";
 import { TodoType } from "@/features/todo/types";
 
-export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
+export default function TodoActionsMenu({ todo }: { todo: TodoType }) {
   const { isOpen, setIsOpen, modalRef, setIsLoading } = useModal();
   const [editOpen, setEditOpen] = useState(false);
   const { submit, pending, error } = useUpdateTodo(todo.id, () =>

@@ -1,7 +1,7 @@
 import { CategoryType } from "@/features/category/types";
 import clsx from "clsx";
 import CategoryItem from "@/features/category/components/CategoryItem";
-import DeleteCategoryButton from "@/features/category/components/DeleteCategoryButton";
+import CategoryMenu from "@/features/category/components/CategoryMenu";
 
 export default function CategoryList({
   categoryState,
@@ -34,7 +34,7 @@ export default function CategoryList({
             categoryState={categoryState}
             setCategory={setCategory}
           />
-          <DeleteCategoryButton categoryId={category.id} />
+          <CategoryMenu categoryId={category.id} />
         </div>
       ))}
     </div>

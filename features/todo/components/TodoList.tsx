@@ -7,7 +7,7 @@ import clsx from "clsx";
 import Sidebar from "@/features/shared/components/Sidebar";
 import TodosByCategory from "@/features/shared/components/TodosByCategory";
 import CreateTodoButton from "@/features/todo/components/CreateTodoButton";
-import Todo from "@/features/todo/components/Todo";
+import TodoItem from "@/features/todo/components/TodoItem";
 import { useCategoryStore } from "@/features/category/provider";
 import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
@@ -116,7 +116,7 @@ export default function TodoList({
                 isEmpty={categoryTodos.length === 0}
               >
                 {categoryTodos.map((todo) => (
-                  <Todo key={todo.id} todo={todo} />
+                  <TodoItem key={todo.id} todo={todo} />
                 ))}
               </TodosByCategory>
             );

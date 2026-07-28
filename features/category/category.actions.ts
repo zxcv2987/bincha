@@ -39,10 +39,7 @@ export async function createCategoryAction(
   return createCategoryByName(typeof category === "string" ? category : "");
 }
 
-export async function deleteCategoryAction(
-  _state: unknown,
-  categoryId: number,
-) {
+export async function deleteCategoryAction(categoryId: number) {
   try {
     const userId = await requireCurrentUserId();
     await deleteCategory(categoryId, userId);

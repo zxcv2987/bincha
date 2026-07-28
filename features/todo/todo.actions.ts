@@ -57,7 +57,7 @@ export async function updateTodoAction(id: number, input: TodoInput) {
   return { ok: true };
 }
 
-export async function deleteTodoAction(_state: unknown, todoId: number) {
+export async function deleteTodoAction(todoId: number) {
   try {
     const userId = await requireCurrentUserId();
     await deleteTodo(todoId, userId);

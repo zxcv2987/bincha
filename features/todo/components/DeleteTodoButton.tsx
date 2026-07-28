@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { deleteTodoAction } from "@/features/todo/todo.actions";
+import useDeleteTodo from "@/features/todo/hooks/useDeleteTodo";
 
 export default function DeleteTodoButton({
   todoId,
@@ -14,9 +12,7 @@ export default function DeleteTodoButton({
   setIsLoading: (isLoading: boolean) => void;
   hasResult?: boolean;
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | undefined>();
+  const { submit, pending, error } = useDeleteTodo();
 
   return (
     <>
@@ -24,34 +20,22 @@ export default function DeleteTodoButton({
         className={clsx(
           "btn",
           "text-red-500",
-          isPending ? "cursor-not-allowed opacity-50" : "",
+          pending ? "cursor-not-allowed opacity-50" : "",
         )}
-        disabled={isPending}
-        onClick={() => {
+        disabled={pending}
+        onClick={async () => {
           if (
             hasResult &&
             !confirm("이 할 일과 연결된 결과 기록도 함께 삭제됩니다. 계속할까요?")
           ) {
             return;
           }
-          setError(undefined);
           setIsLoading(true);
-
-          startTransition(async () => {
-            try {
-              const res = await deleteTodoAction({ ok: false }, todoId);
-              if (res.ok) {
-                router.refresh();
-              } else {
-                setError("삭제에 실패했습니다. 다시 시도해 주세요.");
-              }
-            } finally {
-              setIsLoading(false);
-            }
-          });
+          await submit(todoId);
+          setIsLoading(false);
         }}
       >
-        {isPending ? "삭제 중..." : "할 일 삭제"}
+        {pending ? "삭제 중..." : "할 일 삭제"}
       </button>
       {error && <span className="text-xs text-red-400">{error}</span>}
     </>

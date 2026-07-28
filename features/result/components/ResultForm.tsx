@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { TodoType } from "@/features/todo/types";
-import { deleteTaskResultAction } from "@/features/result/result.actions";
+import useDeleteResult from "@/features/result/hooks/useDeleteResult";
 
 export default function ResultForm({
   todo,
@@ -18,23 +16,16 @@ export default function ResultForm({
   pending: boolean;
   onClose: () => void;
 }) {
-  const router = useRouter();
-  const [deleting, startDeleteTransition] = useTransition();
-  const [deleteError, setDeleteError] = useState<string | undefined>();
   const result = todo.result;
+  const {
+    submit: deleteResultSubmit,
+    pending: deleting,
+    error: deleteError,
+  } = useDeleteResult(onClose);
 
   const deleteResult = () => {
     if (!result || !confirm("이 결과 기록을 삭제할까요?")) return;
-    setDeleteError(undefined);
-    startDeleteTransition(async () => {
-      const response = await deleteTaskResultAction(result.id);
-      if (response.ok) {
-        onClose();
-        router.refresh();
-      } else {
-        setDeleteError(response.error);
-      }
-    });
+    deleteResultSubmit(result.id);
   };
 
   return (
