@@ -11,6 +11,7 @@ export default function TodoForm({
   fieldErrors,
   onSubmit,
   onCancel,
+  compact = false,
   className = "w-xs md:w-md",
   textRows = 5,
 }: {
@@ -19,6 +20,7 @@ export default function TodoForm({
   fieldErrors?: Record<string, string>;
   onSubmit: (input: TodoInput) => void;
   onCancel?: () => void;
+  compact?: boolean;
   className?: string;
   textRows?: number;
 }) {
@@ -41,14 +43,19 @@ export default function TodoForm({
       className={clsx("flex flex-col gap-5", className)}
     >
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={titleId} className="text-sm font-semibold text-zinc-600">
-          할 일
-        </label>
+        {!compact && (
+          <label htmlFor={titleId} className="text-sm font-semibold text-zinc-600">
+            할 일
+          </label>
+        )}
         <input
           id={titleId}
           name="title"
           placeholder="할 일"
-          className="input"
+          className={clsx(
+            "input",
+            compact && "px-2 py-1 text-sm font-semibold text-zinc-700",
+          )}
           defaultValue={todo && todo.title}
           spellCheck={false}
         />
@@ -58,15 +65,17 @@ export default function TodoForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={textId} className="text-sm font-semibold text-zinc-600">
-          내용
-        </label>
+        {!compact && (
+          <label htmlFor={textId} className="text-sm font-semibold text-zinc-600">
+            내용
+          </label>
+        )}
         <textarea
           id={textId}
           name="text"
           placeholder="내용"
           rows={textRows}
-          className="input"
+          className={clsx("input", compact && "px-2 py-1 text-sm text-zinc-500")}
           defaultValue={todo && todo.text}
           spellCheck={false}
         />

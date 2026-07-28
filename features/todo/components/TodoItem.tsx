@@ -40,6 +40,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
           fieldErrors={fieldErrors}
           onSubmit={updateTodo}
           onCancel={() => setEditing(false)}
+          compact
           className="w-full"
           textRows={3}
         />
