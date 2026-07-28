@@ -1,4 +1,4 @@
-import type { TodoType } from "@/features/todo/types";
+import type { TodoType } from "@/features/todo/todo.types";
 
 export interface TaskResultType {
   id: number;

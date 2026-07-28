@@ -1,7 +1,7 @@
 "use client";
 
-import { CategoryType } from "@/features/category/types";
-import { TodoType } from "@/features/todo/types";
+import { CategoryType } from "@/features/category/category.types";
+import { TodoType } from "@/features/todo/todo.types";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import Sidebar from "@/features/shared/components/Sidebar";

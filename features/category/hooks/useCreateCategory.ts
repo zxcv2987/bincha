@@ -2,7 +2,7 @@
 
 import useAsyncAction from "@/features/shared/hooks/useAsyncAction";
 import { createCategoryByName } from "@/features/category/category.actions";
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "@/features/category/category.types";
 
 export default function useCreateCategory(
   onSuccess: (category: CategoryType) => void,

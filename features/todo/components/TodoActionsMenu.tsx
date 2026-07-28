@@ -6,7 +6,7 @@ import Dialog from "@/features/shared/components/Dialog";
 import DeleteTodoButton from "@/features/todo/components/DeleteTodoButton";
 import TodoForm from "@/features/todo/components/TodoForm";
 import useUpdateTodo from "@/features/todo/hooks/useUpdateTodo";
-import { TodoType } from "@/features/todo/types";
+import { TodoType } from "@/features/todo/todo.types";
 
 export default function TodoActionsMenu({ todo }: { todo: TodoType }) {
   const { isOpen, setIsOpen, modalRef, setIsLoading } = useModal();
@@ -40,10 +40,10 @@ export default function TodoActionsMenu({ todo }: { todo: TodoType }) {
             <button
               className="btn"
               onClick={() => {
-                // Why: Dialog portals outside modalRef's DOM subtree, so the
-                // dropdown's outside-click handler would treat clicks inside
-                // the edit form as "outside" and close this block mid-edit
-                // unless the dropdown is closed first.
+                // Why: 드롭다운(isOpen)과 수정 모달(editOpen)은 서로 독립된
+                // 상태라, 여기서 드롭다운을 안 닫으면 모달을 여는 동안
+                // 드롭다운이 뒤에 계속 떠 있다가 모달 안쪽 첫 클릭에 가서야
+                // (바깥 클릭 감지로) 닫히며 화면이 튄다.
                 setIsOpen(false);
                 setEditOpen(true);
               }}

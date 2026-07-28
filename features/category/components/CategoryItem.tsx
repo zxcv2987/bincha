@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "@/features/category/category.types";
 export default function CategoryItem({
   category,
   categoryState,

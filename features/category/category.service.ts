@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
 import { Prisma } from "@prisma/client";
-import { CategoryType } from "./types";
+import { CategoryType } from "./category.types";
 import {
   CategoryAlreadyExistsError,
   CategoryHasTodosError,

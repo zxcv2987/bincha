@@ -1,12 +1,12 @@
 import Header from "@/features/shared/components/Header";
 import Sidebar from "@/features/shared/components/Sidebar";
 import ListFetchError from "@/features/shared/components/ListFetchError";
-import PendingTodoCard from "@/features/result/components/PendingTodoCard";
+import PendingResultCard from "@/features/result/components/PendingResultCard";
 import CompletedResultCard from "@/features/result/components/CompletedResultCard";
 import { getPendingTodos, getResults } from "@/features/result/result.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
-import { TodoType } from "@/features/todo/types";
-import { ResultWithTodo } from "@/features/result/types";
+import { TodoType } from "@/features/todo/todo.types";
+import { ResultWithTodo } from "@/features/result/result.types";
 
 export default async function ResultsPage() {
   let userId: bigint;
@@ -42,7 +42,7 @@ export default async function ResultsPage() {
               </p>
             ) : (
               pendingTodos.map((todo) => (
-                <PendingTodoCard key={todo.id} todo={todo} />
+                <PendingResultCard key={todo.id} todo={todo} />
               ))
             )}
           </section>

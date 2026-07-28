@@ -1,7 +1,7 @@
 "use client";
 
-import { TodoType } from "@/features/todo/types";
-import Content from "@/features/shared/components/Content";
+import { TodoType } from "@/features/todo/todo.types";
+import LinkifiedText from "@/features/shared/components/LinkifiedText";
 import TodoActionsMenu from "@/features/todo/components/TodoActionsMenu";
 import useToggleTodo from "@/features/todo/hooks/useToggleTodo";
 import clsx from "clsx";
@@ -60,7 +60,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
         </h3>
         {todo.text.trim() ? (
           <span className="w-full text-sm break-words text-zinc-500">
-            <Content content={todo.text} />
+            <LinkifiedText content={todo.text} />
           </span>
         ) : (
           <span className="w-full text-sm text-zinc-400">내용 없음</span>

@@ -1,4 +1,4 @@
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "@/features/category/category.types";
 import clsx from "clsx";
 import CategoryItem from "@/features/category/components/CategoryItem";
 import CategoryMenu from "@/features/category/components/CategoryMenu";

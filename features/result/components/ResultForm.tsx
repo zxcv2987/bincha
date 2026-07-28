@@ -1,6 +1,6 @@
 "use client";
 
-import { TodoType } from "@/features/todo/types";
+import { TodoType } from "@/features/todo/todo.types";
 import { ResultInput } from "@/features/result/result.actions";
 import useDeleteResult from "@/features/result/hooks/useDeleteResult";
 

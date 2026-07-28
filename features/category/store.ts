@@ -1,4 +1,4 @@
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "@/features/category/category.types";
 import { createStore } from "zustand/vanilla";
 
 export type CategoryState = {

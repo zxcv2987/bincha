@@ -1,4 +1,4 @@
-import { getTodoBoardData } from "@/features/shared/todo-board.queries";
+import { getTodoBoardData } from "@/app/page.data";
 import Header from "@/features/shared/components/Header";
 import ListFetchError from "@/features/shared/components/ListFetchError";
 import TodoList from "@/features/todo/components/TodoList";

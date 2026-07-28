@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { serializeBigInt } from "@/lib/serialize/serializeBigInt";
-import { TodoType } from "./types";
+import { TodoType } from "./todo.types";
 import { CategoryNotFoundError } from "@/features/category/category.errors";
 import { TodoNotFoundError } from "./todo.errors";
 

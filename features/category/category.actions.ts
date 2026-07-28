@@ -8,7 +8,7 @@ import {
   CategoryHasTodosError,
 } from "./category.errors";
 import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
-import { CategoryType } from "./types";
+import { CategoryType } from "./category.types";
 
 export async function createCategoryByName(
   name: string,

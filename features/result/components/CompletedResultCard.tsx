@@ -1,4 +1,4 @@
-import { ResultWithTodo } from "@/features/result/types";
+import { ResultWithTodo } from "@/features/result/result.types";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
 
 export default function CompletedResultCard({
