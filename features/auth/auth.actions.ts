@@ -1,39 +1,11 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { changePassword } from "@/lib/auth/password";
 import { revokeRefreshToken } from "@/lib/auth/refresh";
 import { clearAuthCookies } from "@/lib/auth/cookies";
-import { verifyAccessToken } from "@/lib/auth/tokens";
 import { AuthError } from "@/lib/auth/errors";
-
-export async function getAuthenticatedUsername() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-  if (!accessToken) return null;
-
-  try {
-    const payload = await verifyAccessToken(accessToken);
-    return payload.username as string;
-  } catch (error) {
-    console.error("토큰 검증 실패:", error);
-    return null;
-  }
-}
-
-async function getAuthenticatedUserId() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-  if (!accessToken) return null;
-
-  try {
-    const payload = await verifyAccessToken(accessToken);
-    return BigInt(payload.id as number);
-  } catch {
-    return null;
-  }
-}
+import { getCurrentUserId } from "@/lib/auth/session";
 
 export async function changePasswordAction(
   _state: unknown,
@@ -43,7 +15,7 @@ export async function changePasswordAction(
   error?: string;
   message?: string;
 }> {
-  const userId = await getAuthenticatedUserId();
+  const userId = await getCurrentUserId();
   if (!userId) {
     return { ok: false, error: "로그인이 필요합니다" };
   }
@@ -67,7 +39,7 @@ export async function changePasswordAction(
 
 export async function logoutAction() {
   try {
-    const userId = await getAuthenticatedUserId();
+    const userId = await getCurrentUserId();
     if (userId) {
       await revokeRefreshToken(userId);
     }

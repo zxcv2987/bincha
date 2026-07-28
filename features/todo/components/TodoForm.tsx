@@ -1,39 +1,53 @@
 import { TodoType } from "@/features/todo/types";
 import { useCategoryStore } from "@/features/category/provider";
-import { useTransition } from "react";
+import { useId, useTransition } from "react";
+
+type TodoFormState = {
+  ok: boolean;
+  error?: {
+    id?: string;
+    title?: string;
+    text?: string;
+    categoryId?: string;
+  };
+};
 
 export default function TodoForm({
   state,
   formAction,
   todo,
 }: {
-  // eslint-disable-next-line
-  state: any;
+  state: TodoFormState;
   formAction: (formData: FormData) => void;
   todo?: TodoType;
 }) {
   const categories = useCategoryStore((set) => set.categories);
   const [isPending, startTransition] = useTransition();
+  const titleId = useId();
+  const textId = useId();
 
   return (
-    <>
-      <form
-        onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-          startTransition(() => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
+    <form
+      onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+        startTransition(() => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
 
-            if (todo) {
-              formData.append("id", todo.id.toString());
-            }
+          if (todo) {
+            formData.append("id", todo.id.toString());
+          }
 
-            formAction(formData);
-          });
-        }}
-        className="flex w-xs flex-col gap-4 py-4 md:w-md"
-      >
-        <h3 className="text-xl font-semibold text-zinc-600">할 일</h3>
+          formAction(formData);
+        });
+      }}
+      className="flex w-xs flex-col gap-5 md:w-md"
+    >
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={titleId} className="text-sm font-semibold text-zinc-600">
+          할 일
+        </label>
         <input
+          id={titleId}
           name="title"
           placeholder="할 일"
           className="input"
@@ -42,8 +56,14 @@ export default function TodoForm({
         {state.error?.title && (
           <span className="text-xs text-red-400">{state.error.title}</span>
         )}
-        <h3 className="text-xl font-semibold text-zinc-600">내용</h3>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={textId} className="text-sm font-semibold text-zinc-600">
+          내용
+        </label>
         <textarea
+          id={textId}
           name="text"
           placeholder="내용"
           rows={5}
@@ -53,8 +73,13 @@ export default function TodoForm({
         {state.error?.text && (
           <span className="text-xs text-red-400">{state.error.text}</span>
         )}
-        <h3 className="text-xl font-semibold text-zinc-600">카테고리</h3>
-        <ul className="flex flex-row flex-wrap gap-2">
+      </div>
+
+      <fieldset className="m-0 flex flex-col gap-1.5 border-0 p-0">
+        <legend className="p-0 text-sm font-semibold text-zinc-600">
+          카테고리
+        </legend>
+        <ul className="flex flex-row flex-wrap gap-2 pt-1">
           {categories.map((category) => (
             <label
               key={category.id}
@@ -78,10 +103,11 @@ export default function TodoForm({
         {state.error?.categoryId && (
           <span className="text-xs text-red-400">{state.error.categoryId}</span>
         )}
-        <button className="btn" disabled={isPending} type="submit">
-          {isPending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
-        </button>
-      </form>
-    </>
+      </fieldset>
+
+      <button className="btn btn-primary" disabled={isPending} type="submit">
+        {isPending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
+      </button>
+    </form>
   );
 }

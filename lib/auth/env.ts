@@ -10,10 +10,6 @@ function encodeSecret(envName: string): Uint8Array {
   return new TextEncoder().encode(readEnv(envName));
 }
 
-export function getAdminPassword(): string {
-  return readEnv("ADMIN_PASSWORD");
-}
-
 export function getAccessSecret(): Uint8Array {
   return encodeSecret("JWT_SECRET");
 }

@@ -2,20 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { refreshAccessToken } from "@/lib/auth/refresh";
 import { AuthError, getStatusForAuthError } from "@/lib/auth/errors";
 import {
-  clearRefreshTokenOnResponse,
+  clearAuthCookiesOnResponse,
   setAuthTokensOnResponse,
 } from "@/lib/auth/response-cookies";
 
 export async function POST(req: NextRequest) {
   try {
     const { refreshToken } = await req.json();
-    const { accessToken } = await refreshAccessToken(refreshToken);
+    const tokens = await refreshAccessToken(refreshToken);
 
     const response = NextResponse.json({
       success: true,
       message: "새 액세스 토큰 발급 성공",
     });
-    setAuthTokensOnResponse(response, { accessToken });
+    setAuthTokensOnResponse(response, tokens);
     return response;
   } catch (err) {
     if (err instanceof AuthError) {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       );
 
       if (err.code === "INVALID_TOKEN" || err.code === "MISSING_TOKEN") {
-        clearRefreshTokenOnResponse(response);
+        clearAuthCookiesOnResponse(response);
       }
 
       return response;

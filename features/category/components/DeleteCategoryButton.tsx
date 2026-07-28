@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCategoryAction } from "@/features/category/category.actions";
 import clsx from "clsx";
@@ -15,11 +15,15 @@ export default function DeleteCategoryButton({
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | undefined>();
 
   return (
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="카테고리 더보기"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
         className="rounded-lg px-3 py-1 text-lg hover:bg-zinc-100"
       >
         ⋮
@@ -27,7 +31,7 @@ export default function DeleteCategoryButton({
       {isOpen && (
         <div
           ref={modalRef}
-          className="absolute right-1 -bottom-14 z-10 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
+          className="absolute right-1 -bottom-14 z-10 w-64 rounded-lg border border-zinc-200 bg-white p-3 shadow-lg"
         >
           <button
             className={clsx(
@@ -36,6 +40,7 @@ export default function DeleteCategoryButton({
             )}
             disabled={isPending}
             onClick={() => {
+              setError(undefined);
               setIsLoading(true);
               startTransition(async () => {
                 const res = await deleteCategoryAction(
@@ -45,7 +50,7 @@ export default function DeleteCategoryButton({
                 if (res.ok) {
                   router.refresh();
                 } else {
-                  alert("삭제 실패");
+                  setError(res.error ?? "삭제에 실패했습니다. 다시 시도해 주세요.");
                 }
                 setIsLoading(false);
               });
@@ -53,6 +58,11 @@ export default function DeleteCategoryButton({
           >
             {isPending ? "삭제 중..." : "카테고리 삭제"}
           </button>
+          {error && (
+            <span className="block px-4 pt-1 text-xs text-red-400">
+              {error}
+            </span>
+          )}
         </div>
       )}
     </>

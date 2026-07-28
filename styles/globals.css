@@ -1,4 +1,20 @@
 @import "tailwindcss";
+@source not "../.agents";
+
+/*
+ * 빈차 택시 "빈차등"(vacancy light)에서 가져온 브랜드 포인트 컬러.
+ * WCAG AA 대비를 Chromium 캔버스 렌더링으로 실측해 정함:
+ * white on brand-600 = 5.45:1, brand-700 on white/brand-50 = 8.3:1 / 7.5:1,
+ * brand-500 on white = 3.6:1 (포커스 링·아이콘 등 3:1 기준 용도로만 사용).
+ */
+@theme {
+  --color-brand-50: oklch(97% 0.025 55);
+  --color-brand-100: oklch(93% 0.06 55);
+  --color-brand-400: oklch(74% 0.15 55);
+  --color-brand-500: oklch(64% 0.19 48);
+  --color-brand-600: oklch(54% 0.19 45);
+  --color-brand-700: oklch(44% 0.17 42);
+}
 
 @layer components {
   .btn {
@@ -15,6 +31,17 @@
     background-color: #f5f5f5; /* hover:bg-zinc-100 */
   }
 
+  .btn-primary {
+    background-color: var(--color-brand-600);
+    color: white;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-brand-700);
+  }
+  .btn-primary:disabled {
+    background-color: var(--color-brand-600);
+  }
+
   .input {
     display: flex; /* flex */
     width: 100%; /* w-full */
@@ -26,10 +53,13 @@
     word-break: break-word; /* break-words */
     white-space: pre-wrap; /* whitespace-pre-wrap */
     outline: none; /* outline-none */
-    transition: border-color 0.2s;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
   }
 
   .input:focus {
-    border-color: #a1a1aa; /* focus:border-zinc-400 */
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand-500) 25%, transparent);
   }
 }
