@@ -23,6 +23,7 @@
     background-color: #fafafa; /* bg-zinc-50 */
     padding: 0.75rem 2.5rem; /* p-3 */
     font-size: 0.875rem; /* text-sm */
+    font-weight: 600; /* font-semibold */
     white-space: nowrap; /* whitespace-nowrap */
     color: #475569; /* text-zinc-600 */
     transition: background-color 0.2s;

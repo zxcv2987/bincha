@@ -9,23 +9,21 @@ import {
 } from "./todo.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 
-export async function createTodoAction(_state: unknown, formData: FormData) {
-  const title = formData.get("title");
-  if (title === null || title === "")
+export type TodoInput = {
+  title: string;
+  text: string;
+  categoryId: string | null;
+};
+
+export async function createTodoAction(input: TodoInput) {
+  if (input.title === "")
     return { ok: false, error: { title: "할 일을 입력해 주세요." } };
-  const text = formData.get("text");
-  const categoryId = formData.get("category");
-  if (categoryId === null)
+  if (input.categoryId === null)
     return { ok: false, error: { categoryId: "카테고리를 선택해 주세요." } };
 
   try {
     const userId = await requireCurrentUserId();
-    await createTodo(
-      title as string,
-      (text as string | null) ?? "",
-      Number(categoryId),
-      userId,
-    );
+    await createTodo(input.title, input.text, Number(input.categoryId), userId);
     revalidatePath("/");
   } catch (error) {
     console.error("할 일 추가 중 오류 발생:", error);
@@ -35,25 +33,19 @@ export async function createTodoAction(_state: unknown, formData: FormData) {
   return { ok: true };
 }
 
-export async function updateTodoAction(_state: unknown, formData: FormData) {
-  const id = formData.get("id");
-  if (id === null || id === "")
-    return { ok: false, error: { id: "id가 잘못되었습니다." } };
-  const title = formData.get("title");
-  if (title === null || title === "")
+export async function updateTodoAction(id: number, input: TodoInput) {
+  if (input.title === "")
     return { ok: false, error: { title: "할 일을 입력해 주세요." } };
-  const text = formData.get("text");
-  const categoryId = formData.get("category");
-  if (categoryId === null)
+  if (input.categoryId === null)
     return { ok: false, error: { categoryId: "카테고리를 선택해 주세요." } };
 
   try {
     const userId = await requireCurrentUserId();
     await updateTodo({
-      id: Number(id),
-      title: title as string,
-      text: (text as string | null) ?? "",
-      category_id: Number(categoryId),
+      id,
+      title: input.title,
+      text: input.text,
+      category_id: Number(input.categoryId),
       userId,
     });
     revalidatePath("/");

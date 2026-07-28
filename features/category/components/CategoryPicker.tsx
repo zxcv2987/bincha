@@ -1,9 +1,9 @@
 "use client";
 
 import { useCategoryStore } from "@/features/category/provider";
-import { createCategoryAction } from "@/features/category/category.actions";
+import useCreateCategory from "@/features/category/hooks/useCreateCategory";
 import { CategoryType } from "@/features/category/types";
-import { useActionState, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 export default function CategoryPicker({
   defaultCategoryId,
@@ -26,14 +26,15 @@ export default function CategoryPicker({
       aria-labelledby={legendId}
     >
       <legend id={legendId} className="p-0 text-sm font-semibold text-zinc-600">
-        카테고리 <span className="font-normal text-red-400">필수</span>
+        카테고리 <span className="text-red-400" aria-hidden="true">*</span>
+        <span className="sr-only">필수</span>
       </legend>
 
       {categories.length > 0 && (
         <ul className="flex flex-row flex-wrap gap-2 pt-1">
           {categories.map((category) => (
             <li key={category.id}>
-              <label className="flex max-w-40 cursor-pointer items-center rounded-lg px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-800 peer-checked:bg-brand-50 peer-checked:font-semibold peer-checked:text-brand-700 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-1">
+              <label className="cursor-pointer">
                 <input
                   type="radio"
                   name="category"
@@ -42,7 +43,7 @@ export default function CategoryPicker({
                   checked={selectedId === String(category.id)}
                   onChange={() => setSelectedId(String(category.id))}
                 />
-                <span className="truncate">
+                <span className="flex max-w-40 items-center truncate rounded-lg px-3 py-1.5 text-sm text-zinc-500 transition-colors peer-checked:bg-brand-50 peer-checked:font-semibold peer-checked:text-brand-700 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-1 peer-not-checked:hover:bg-zinc-50 peer-not-checked:hover:text-zinc-800">
                   {category.category_name.trim() || "이름 없음"}
                 </span>
               </label>
@@ -93,25 +94,16 @@ function InlineCategoryCreate({
   onCreated: (category: CategoryType) => void;
   onCancel: () => void;
 }) {
-  const [state, formAction, pending] = useActionState(createCategoryAction, {
-    ok: false,
-    error: "",
-  });
+  const { submit, pending, error } = useCreateCategory(onCreated);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    if (state.ok && state.category) onCreated(state.category);
-  }, [state, onCreated]);
-
-  const submit = () => {
+  const handleSubmit = () => {
     if (!inputRef.current) return;
-    const formData = new FormData();
-    formData.set("category", inputRef.current.value);
-    formAction(formData);
+    submit(inputRef.current.value);
   };
 
   return (
@@ -126,14 +118,14 @@ function InlineCategoryCreate({
             if (e.key === "Escape") onCancel();
             if (e.key === "Enter") {
               e.preventDefault();
-              submit();
+              handleSubmit();
             }
           }}
         />
         <button
           type="button"
           disabled={pending}
-          onClick={submit}
+          onClick={handleSubmit}
           className="shrink-0 rounded-lg px-2 py-1.5 text-sm font-semibold text-brand-600 hover:bg-brand-50"
         >
           {pending ? "추가 중..." : "추가"}
@@ -146,7 +138,7 @@ function InlineCategoryCreate({
           취소
         </button>
       </div>
-      {state?.error && <span className="text-xs text-red-400">{state.error}</span>}
+      {error && <span className="text-xs text-red-400">{error}</span>}
     </div>
   );
 }

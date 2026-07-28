@@ -1,42 +1,33 @@
 import { TodoType } from "@/features/todo/types";
+import { TodoInput } from "@/features/todo/todo.actions";
 import CategoryPicker from "@/features/category/components/CategoryPicker";
-import { useId, useTransition } from "react";
-
-type TodoFormState = {
-  ok: boolean;
-  error?: {
-    id?: string;
-    title?: string;
-    text?: string;
-    categoryId?: string;
-  };
-};
+import { useId } from "react";
 
 export default function TodoForm({
-  state,
-  formAction,
   todo,
+  pending,
+  error,
+  onSubmit,
 }: {
-  state: TodoFormState;
-  formAction: (formData: FormData) => void;
   todo?: TodoType;
+  pending: boolean;
+  error?: { title?: string; text?: string; categoryId?: string };
+  onSubmit: (input: TodoInput) => void;
 }) {
-  const [isPending, startTransition] = useTransition();
   const titleId = useId();
   const textId = useId();
 
   return (
     <form
       onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-        startTransition(() => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const categoryId = formData.get("category");
 
-          if (todo) {
-            formData.append("id", todo.id.toString());
-          }
-
-          formAction(formData);
+        onSubmit({
+          title: String(formData.get("title") ?? ""),
+          text: String(formData.get("text") ?? ""),
+          categoryId: typeof categoryId === "string" ? categoryId : null,
         });
       }}
       className="flex w-xs flex-col gap-5 md:w-md"
@@ -53,8 +44,8 @@ export default function TodoForm({
           defaultValue={todo && todo.title}
           spellCheck={false}
         />
-        {state.error?.title && (
-          <span className="text-xs text-red-400">{state.error.title}</span>
+        {error?.title && (
+          <span className="text-xs text-red-400">{error.title}</span>
         )}
       </div>
 
@@ -71,18 +62,16 @@ export default function TodoForm({
           defaultValue={todo && todo.text}
           spellCheck={false}
         />
-        {state.error?.text && (
-          <span className="text-xs text-red-400">{state.error.text}</span>
-        )}
+        {error?.text && <span className="text-xs text-red-400">{error.text}</span>}
       </div>
 
       <CategoryPicker
         defaultCategoryId={todo?.category_id}
-        error={state.error?.categoryId}
+        error={error?.categoryId}
       />
 
-      <button className="btn btn-primary" disabled={isPending} type="submit">
-        {isPending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
+      <button className="btn btn-primary" disabled={pending} type="submit">
+        {pending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
       </button>
     </form>
   );
