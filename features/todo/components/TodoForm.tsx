@@ -54,7 +54,7 @@ export default function TodoForm({
           placeholder="할 일"
           className={clsx(
             "input",
-            compact && "px-2 py-1 text-sm font-semibold text-zinc-700",
+            compact && "px-2.5 py-1.5 text-sm font-semibold text-zinc-700",
           )}
           defaultValue={todo && todo.title}
           spellCheck={false}
@@ -75,7 +75,10 @@ export default function TodoForm({
           name="text"
           placeholder="내용"
           rows={textRows}
-          className={clsx("input", compact && "px-2 py-1 text-sm text-zinc-500")}
+          className={clsx(
+            "input",
+            compact && "px-2.5 py-1.5 text-sm text-zinc-500",
+          )}
           defaultValue={todo && todo.text}
           spellCheck={false}
         />
@@ -88,7 +91,11 @@ export default function TodoForm({
 
       <div className="flex gap-2">
         <button
-          className={clsx("btn btn-primary", onCancel && "w-auto")}
+          className={clsx(
+            "btn btn-primary",
+            onCancel && "w-auto",
+            compact && "px-4 py-1.5 text-xs",
+          )}
           disabled={pending}
           type="submit"
         >
@@ -99,7 +106,7 @@ export default function TodoForm({
         {onCancel && (
           <button
             type="button"
-            className="btn w-auto"
+            className={clsx("btn w-auto", compact && "px-4 py-1.5 text-xs")}
             disabled={pending}
             onClick={onCancel}
           >
