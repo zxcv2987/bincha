@@ -19,6 +19,16 @@ export default function CategoryPicker({
     defaultCategoryId ? String(defaultCategoryId) : "",
   );
   const [creating, setCreating] = useState(false);
+  const listRef = useRef<HTMLUListElement>(null);
+  const pendingFocusIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!pendingFocusIdRef.current) return;
+    listRef.current
+      ?.querySelector<HTMLInputElement>(`input[value="${pendingFocusIdRef.current}"]`)
+      ?.focus();
+    pendingFocusIdRef.current = null;
+  }, [categories]);
 
   return (
     <fieldset
@@ -31,7 +41,7 @@ export default function CategoryPicker({
       </legend>
 
       {categories.length > 0 && (
-        <ul className="flex flex-row flex-wrap gap-2 pt-1">
+        <ul ref={listRef} className="flex flex-row flex-wrap gap-2 pt-1">
           {categories.map((category) => (
             <li key={category.id}>
               <label className="cursor-pointer">
@@ -55,6 +65,7 @@ export default function CategoryPicker({
       {creating ? (
         <InlineCategoryCreate
           onCreated={(created) => {
+            pendingFocusIdRef.current = String(created.id);
             setCategories([...categories, created]);
             setSelectedId(String(created.id));
             setCreating(false);

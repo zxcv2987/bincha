@@ -151,7 +151,7 @@ export default function CategoryManagementDialog({
           onClick={onClose}
           className="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700"
         >
-          닫기
+          {mutationPending ? "저장 중..." : "닫기"}
         </button>
       </div>
     </div>

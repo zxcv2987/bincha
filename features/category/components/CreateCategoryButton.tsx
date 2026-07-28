@@ -15,7 +15,7 @@ export default function CreateCategoryButton() {
       >
         + 카테고리 추가
       </button>
-      <Dialog open={open} onClose={() => setOpen(false)} title="카테고리">
+      <Dialog open={open} onClose={() => setOpen(false)} title="카테고리 추가하기">
         <CategoryForm onClose={() => setOpen(false)} />
       </Dialog>
     </>
