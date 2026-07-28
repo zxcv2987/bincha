@@ -19,6 +19,10 @@ export default function Dialog({
   children: React.ReactNode;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  // 내부 폼에 입력이 있었는지 추적한다. input/select 어떤 필드든 change가 버블되면
+  // dirty로 표시하고, 닫기 직전(ESC/백드롭/X)에만 확인창을 띄운다 — 제출 성공 후
+  // 부모가 open을 false로 내려서 닫히는 경로는 이 가드를 타지 않는다.
+  const dirtyRef = useRef(false);
 
   // <dialog>는 open prop이 아니라 showModal()/close() 명령형 호출로 제어한다.
   // 실제로 닫히는 경로(ESC, 백드롭 클릭, X 버튼)는 전부 dialogRef.close()로
@@ -29,6 +33,7 @@ export default function Dialog({
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open && !dialog.open) {
+      dirtyRef.current = false;
       dialog.showModal();
       dialog.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
     }
@@ -37,12 +42,21 @@ export default function Dialog({
 
   if (!open) return null;
 
+  const confirmDiscard = () =>
+    !dirtyRef.current || window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?");
+
   return (
     <dialog
       ref={dialogRef}
       onClose={onClose}
+      onCancel={(e) => {
+        if (!confirmDiscard()) e.preventDefault();
+      }}
+      onChangeCapture={() => {
+        dirtyRef.current = true;
+      }}
       onClick={(e) => {
-        if (!disableBackdropClose && e.target === dialogRef.current) {
+        if (!disableBackdropClose && e.target === dialogRef.current && confirmDiscard()) {
           dialogRef.current?.close();
         }
       }}
@@ -58,7 +72,7 @@ export default function Dialog({
         <button
           type="button"
           aria-label="모달 닫기"
-          onClick={() => dialogRef.current?.close()}
+          onClick={() => confirmDiscard() && dialogRef.current?.close()}
           className="cursor-pointer px-1 text-sm font-thin text-zinc-700"
         >
           ✖
