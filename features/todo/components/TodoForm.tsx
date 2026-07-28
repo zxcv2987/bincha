@@ -2,6 +2,7 @@ import { TodoType } from "@/features/todo/todo.types";
 import { TodoInput } from "@/features/todo/todo.actions";
 import CategoryPicker from "@/features/category/components/CategoryPicker";
 import { useId } from "react";
+import clsx from "clsx";
 import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function TodoForm({
@@ -9,11 +10,17 @@ export default function TodoForm({
   pending,
   fieldErrors,
   onSubmit,
+  onCancel,
+  className = "w-xs md:w-md",
+  textRows = 5,
 }: {
   todo?: TodoType;
   pending: boolean;
   fieldErrors?: Record<string, string>;
   onSubmit: (input: TodoInput) => void;
+  onCancel?: () => void;
+  className?: string;
+  textRows?: number;
 }) {
   const titleId = useId();
   const textId = useId();
@@ -31,7 +38,7 @@ export default function TodoForm({
           categoryId: typeof categoryId === "string" ? categoryId : null,
         });
       }}
-      className="flex w-xs flex-col gap-5 md:w-md"
+      className={clsx("flex flex-col gap-5", className)}
     >
       <div className="flex flex-col gap-1.5">
         <label htmlFor={titleId} className="text-sm font-semibold text-zinc-600">
@@ -58,7 +65,7 @@ export default function TodoForm({
           id={textId}
           name="text"
           placeholder="내용"
-          rows={5}
+          rows={textRows}
           className="input"
           defaultValue={todo && todo.text}
           spellCheck={false}
@@ -70,11 +77,27 @@ export default function TodoForm({
         error={fieldErrors?.categoryId}
       />
 
-      <button className="btn btn-primary" disabled={pending} type="submit">
-        <ButtonLabel pending={pending} pendingText="로딩 중...">
-          {todo ? "할 일 수정" : "할 일 추가"}
-        </ButtonLabel>
-      </button>
+      <div className="flex gap-2">
+        <button
+          className={clsx("btn btn-primary", onCancel && "w-auto")}
+          disabled={pending}
+          type="submit"
+        >
+          <ButtonLabel pending={pending} pendingText="로딩 중...">
+            {todo ? "할 일 수정" : "할 일 추가"}
+          </ButtonLabel>
+        </button>
+        {onCancel && (
+          <button
+            type="button"
+            className="btn w-auto"
+            disabled={pending}
+            onClick={onCancel}
+          >
+            취소
+          </button>
+        )}
+      </div>
     </form>
   );
 }
