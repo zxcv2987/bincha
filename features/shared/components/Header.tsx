@@ -7,7 +7,7 @@ export default async function Header() {
   const isLoggedIn = (await getCurrentUserId()) !== null;
 
   return (
-    <header className="flex w-full items-center justify-between gap-4 border-b border-zinc-200 py-6">
+    <header className="flex w-full items-end justify-between gap-4 border-b border-zinc-200 py-6">
       <Link
         href="/"
         aria-label="내가 해야 할 일 홈"
@@ -21,7 +21,7 @@ export default async function Header() {
         </span>
       </Link>
 
-      <div className="flex shrink-0 items-center">
+      <div className="flex shrink-0 items-end">
         {isLoggedIn ? <Profile /> : <LoginButton />}
       </div>
     </header>
