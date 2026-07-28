@@ -6,13 +6,15 @@ import useLogin from "@/features/auth/hooks/useLogin";
 
 export default function LoginFormContent({
   onLoadingChange,
+  className = "w-xs",
 }: {
-  onLoadingChange: (loading: boolean) => void;
+  onLoadingChange?: (loading: boolean) => void;
+  className?: string;
 }) {
   const { submit, pending, error } = useLogin();
 
   useEffect(() => {
-    onLoadingChange(pending);
+    onLoadingChange?.(pending);
   }, [pending, onLoadingChange]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -22,7 +24,10 @@ export default function LoginFormContent({
   }
 
   return (
-    <form className="flex w-xs flex-col gap-4" onSubmit={handleSubmit}>
+    <form
+      className={clsx("flex flex-col gap-4", className)}
+      onSubmit={handleSubmit}
+    >
       <input
         type="password"
         name="password"

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Content({ content }: { content: string }) {
+export default function LinkifiedText({ content }: { content: string }) {
   if (!content.trim()) {
     return null;
   }

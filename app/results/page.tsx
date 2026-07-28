@@ -1,12 +1,12 @@
 import Header from "@/features/shared/components/Header";
+import LoginGate from "@/features/auth/components/LoginGate";
 import Sidebar from "@/features/shared/components/Sidebar";
-import ListFetchError from "@/features/shared/components/ListFetchError";
-import PendingTodoCard from "@/features/result/components/PendingTodoCard";
+import PendingResultCard from "@/features/result/components/PendingResultCard";
 import CompletedResultCard from "@/features/result/components/CompletedResultCard";
 import { getPendingTodos, getResults } from "@/features/result/result.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
-import { TodoType } from "@/features/todo/types";
-import { ResultWithTodo } from "@/features/result/types";
+import { TodoType } from "@/features/todo/todo.types";
+import { ResultWithTodo } from "@/features/result/result.types";
 
 export default async function ResultsPage() {
   let userId: bigint;
@@ -15,8 +15,8 @@ export default async function ResultsPage() {
   } catch {
     return (
       <>
-        <Header />
-        <ListFetchError message="로그인 후 결과함을 확인할 수 있습니다." />
+        <Header showLoginAction={false} />
+        <LoginGate />
       </>
     );
   }
@@ -42,7 +42,7 @@ export default async function ResultsPage() {
               </p>
             ) : (
               pendingTodos.map((todo) => (
-                <PendingTodoCard key={todo.id} todo={todo} />
+                <PendingResultCard key={todo.id} todo={todo} />
               ))
             )}
           </section>

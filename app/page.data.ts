@@ -1,7 +1,7 @@
 import { getCategories } from "@/features/category/category.service";
 import { getTodos } from "@/features/todo/todo.service";
-import { CategoryType } from "@/features/category/types";
-import { TodoType } from "@/features/todo/types";
+import { CategoryType } from "@/features/category/category.types";
+import { TodoType } from "@/features/todo/todo.types";
 
 export type TodoBoardDataResult =
   | { ok: true; categories: CategoryType[]; todos: TodoType[] }

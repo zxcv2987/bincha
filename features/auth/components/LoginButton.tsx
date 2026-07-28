@@ -11,7 +11,8 @@ export default function LoginButton() {
   return (
     <>
       <button
-        className="flex cursor-pointer flex-row items-end text-end text-zinc-500"
+        type="button"
+        className="inline-flex h-10 cursor-pointer items-end rounded-lg px-3 text-sm font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:outline-none"
         onClick={() => setOpen(true)}
       >
         로그인

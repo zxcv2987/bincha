@@ -1,6 +1,6 @@
 "use client";
 
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "@/features/category/category.types";
 import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
 
 export default function TodosByCategory({

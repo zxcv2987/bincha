@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // 모든 mutation 서버 액션이 따르는 공통 반환 계약. 필드별 에러가 필요하면
@@ -19,9 +19,13 @@ export default function useAsyncAction<Args extends unknown[], Data>(
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<ActionResult<Data>>();
+  // pending(state)는 클로저라 리렌더 전 짧은 틈에는 낡은 값일 수 있다.
+  // 재진입 체크는 항상 최신값을 동기적으로 보는 ref로 한다.
+  const pendingRef = useRef(false);
 
   const submit = async (...args: Args) => {
-    if (pending) return;
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     setPending(true);
 
     try {
@@ -41,6 +45,7 @@ export default function useAsyncAction<Args extends unknown[], Data>(
       setResult(result);
       return result;
     } finally {
+      pendingRef.current = false;
       setPending(false);
     }
   };

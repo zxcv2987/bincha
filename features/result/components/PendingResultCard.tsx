@@ -1,7 +1,7 @@
-import { TodoType } from "@/features/todo/types";
+import { TodoType } from "@/features/todo/todo.types";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
 
-export default function PendingTodoCard({ todo }: { todo: TodoType }) {
+export default function PendingResultCard({ todo }: { todo: TodoType }) {
   return (
     <article className="flex items-center justify-between gap-4 rounded-xl bg-zinc-50 p-4">
       <div>

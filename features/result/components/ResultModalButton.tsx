@@ -6,7 +6,7 @@ import ResultForm from "@/features/result/components/ResultForm";
 import useCreateResult from "@/features/result/hooks/useCreateResult";
 import useUpdateResult from "@/features/result/hooks/useUpdateResult";
 import { ResultInput } from "@/features/result/result.actions";
-import { TodoType } from "@/features/todo/types";
+import { TodoType } from "@/features/todo/todo.types";
 
 export default function ResultModalButton({ todo }: { todo: TodoType }) {
   const [open, setOpen] = useState(false);

@@ -1,4 +1,4 @@
-import { TodoType } from "@/features/todo/types";
+import { TodoType } from "@/features/todo/todo.types";
 import { TodoInput } from "@/features/todo/todo.actions";
 import CategoryPicker from "@/features/category/components/CategoryPicker";
 import { useId } from "react";

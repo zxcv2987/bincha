@@ -2,7 +2,7 @@
 
 import { useCategoryStore } from "@/features/category/provider";
 import useCreateCategory from "@/features/category/hooks/useCreateCategory";
-import { CategoryType } from "@/features/category/types";
+import { CategoryType } from "@/features/category/category.types";
 import { useEffect, useId, useRef, useState } from "react";
 
 export default function CategoryPicker({

@@ -1,7 +1,7 @@
 "use client";
 
-import { CategoryType } from "@/features/category/types";
-import { TodoType } from "@/features/todo/types";
+import { CategoryType } from "@/features/category/category.types";
+import { TodoType } from "@/features/todo/todo.types";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import Sidebar from "@/features/shared/components/Sidebar";
@@ -12,6 +12,7 @@ import { useCategoryStore } from "@/features/category/provider";
 import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
 import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
+import CategoryManagementButton from "@/features/category/components/CategoryManagementButton";
 
 const COMPLETION_FILTERS = [
   ["all", "전체"],
@@ -30,7 +31,7 @@ export default function TodoList({
     "all" | "active" | "completed"
   >("all");
   const setCategories = useCategoryStore((s) => s.setCategories);
-  const categoryState = useCategoryStore((s) => s.categoryState);
+  const selectedCategoryId = useCategoryStore((s) => s.selectedCategoryId);
   const resetCategory = useCategoryStore((s) => s.resetCategory);
   const setCategory = useCategoryStore((s) => s.setCategory);
 
@@ -40,7 +41,7 @@ export default function TodoList({
 
   const visibleCategories = categories.filter(
     (category) =>
-      categoryState === null || category.category_name === categoryState,
+      selectedCategoryId === null || category.id === selectedCategoryId,
   );
   const filteredTodos = todos.filter((todo) => {
     if (completionFilter === "active") return !todo.completed;
@@ -52,11 +53,14 @@ export default function TodoList({
     <div className="flex w-full flex-col gap-6 border-t border-zinc-200 pt-6 md:flex-row md:items-start">
       <Sidebar>
         <div className="flex flex-col gap-1">
-          <h2 className="px-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
-            카테고리
-          </h2>
+          <div className="flex items-center justify-between px-3">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+              카테고리
+            </h2>
+            <CategoryManagementButton categories={categories} />
+          </div>
           <CategoryList
-            categoryState={categoryState}
+            selectedCategoryId={selectedCategoryId}
             resetCategory={resetCategory}
             categories={categories}
             setCategory={setCategory}
@@ -76,9 +80,10 @@ export default function TodoList({
                 key={value}
                 type="button"
                 className={clsx(
-                  "w-full rounded-lg px-3 py-1.5 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
-                  completionFilter === value &&
-                    "bg-brand-50 font-semibold text-brand-700 hover:bg-brand-50",
+                  "w-full rounded-lg px-3 py-1.5 text-left text-sm",
+                  completionFilter === value
+                    ? "bg-brand-50 font-semibold text-brand-700"
+                    : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
                 )}
                 onClick={() => setCompletionFilter(value)}
               >
@@ -106,7 +111,7 @@ export default function TodoList({
           visibleCategories.map((category) => {
             const categoryTodos = filteredTodos.filter(
               (todo) =>
-                todo.category.category_name === category.category_name,
+                todo.category_id === category.id,
             );
 
             return (

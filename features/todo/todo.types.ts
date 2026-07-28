@@ -1,5 +1,5 @@
-import { CategoryType } from "@/features/category/types";
-import type { TaskResultType } from "@/features/result/types";
+import { CategoryType } from "@/features/category/category.types";
+import type { TaskResultType } from "@/features/result/result.types";
 
 export interface TodoType {
   id: number;
