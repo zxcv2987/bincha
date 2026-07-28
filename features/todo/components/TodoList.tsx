@@ -29,7 +29,7 @@ export default function TodoList({
 }) {
   const [completionFilter, setCompletionFilter] = useState<
     "all" | "active" | "completed"
-  >("all");
+  >("active");
   const setCategories = useCategoryStore((s) => s.setCategories);
   const selectedCategoryId = useCategoryStore((s) => s.selectedCategoryId);
   const resetCategory = useCategoryStore((s) => s.resetCategory);
