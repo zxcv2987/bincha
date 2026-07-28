@@ -6,7 +6,7 @@ export default async function AppHeader() {
   const isLoggedIn = (await getCurrentUserId()) !== null;
 
   return (
-    <header className="flex w-full items-end justify-between gap-4 border-b border-zinc-200 py-2">
+    <header className="flex w-full items-end justify-between gap-4 border-b border-zinc-200 py-4">
       <Link
         href="/"
         aria-label="내가 해야 할 일 홈"
