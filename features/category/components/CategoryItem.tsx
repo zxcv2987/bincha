@@ -2,14 +2,14 @@ import clsx from "clsx";
 import { CategoryType } from "@/features/category/category.types";
 export default function CategoryItem({
   category,
-  categoryState,
+  selectedCategoryId,
   setCategory,
 }: {
   category: CategoryType;
-  categoryState: string | null;
-  setCategory: (category: string) => void;
+  selectedCategoryId: number | null;
+  setCategory: (categoryId: number) => void;
 }) {
-  const selected = categoryState === category.category_name;
+  const selected = selectedCategoryId === category.id;
 
   return (
     <button
@@ -19,7 +19,7 @@ export default function CategoryItem({
           ? "bg-brand-50 font-semibold text-brand-700"
           : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
       )}
-      onClick={() => setCategory(category.category_name)}
+      onClick={() => setCategory(category.id)}
     >
       {category.category_name.trim() || "이름 없음"}
     </button>

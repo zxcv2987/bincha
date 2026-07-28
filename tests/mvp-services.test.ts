@@ -12,6 +12,16 @@ import {
   CompletedTodoRequiredError,
   ResultAlreadyExistsError,
 } from "@/features/result/result.errors";
+import {
+  getCategories,
+  createCategory,
+  renameCategory,
+  reorderCategories,
+} from "@/features/category/category.service";
+import {
+  CategoryNotFoundError,
+  CategoryOrderConflictError,
+} from "@/features/category/category.errors";
 
 const prisma = new PrismaClient();
 const runId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -21,6 +31,8 @@ let category: { id: number };
 let otherCategory: { id: number };
 let activeTodo: { id: number };
 let completedTodo: { id: number };
+let managedCategoryA: { id: number };
+let managedCategoryB: { id: number };
 
 beforeAll(async () => {
   owner = await prisma.user.create({
@@ -33,6 +45,16 @@ beforeAll(async () => {
     data: { category_name: "검증", user_id: owner.id },
   });
   category = { id: Number(createdCategory.id) };
+
+  const createdManagedCategoryA = await prisma.category.create({
+    data: { category_name: "관리 A", user_id: owner.id },
+  });
+  managedCategoryA = { id: Number(createdManagedCategoryA.id) };
+
+  const createdManagedCategoryB = await prisma.category.create({
+    data: { category_name: "관리 B", user_id: owner.id },
+  });
+  managedCategoryB = { id: Number(createdManagedCategoryB.id) };
 
   const createdOtherCategory = await prisma.category.create({
     data: { category_name: "침범용", user_id: otherUser.id },
@@ -136,4 +158,61 @@ test("다른 사용자는 Todo를 조회, 수정, 삭제할 수 없다", async (
   expect(
     await prisma.todos.findUnique({ where: { id: completedTodo.id } }),
   ).toBeTruthy();
+});
+
+test("카테고리 이름을 수정하면 변경된 이름이 저장된다", async () => {
+  const renamed = await renameCategory({
+    categoryId: managedCategoryA.id,
+    name: "관리 수정",
+    userId: owner.id,
+  });
+
+  expect(renamed.category_name).toBe("관리 수정");
+});
+
+test("다른 사용자의 카테고리 이름은 수정할 수 없다", async () => {
+  await expect(
+    renameCategory({
+      categoryId: category.id,
+      name: "침범",
+      userId: otherUser.id,
+    }),
+  ).rejects.toBeInstanceOf(CategoryNotFoundError);
+});
+
+test("카테고리 순서를 사용자별로 저장한다", async () => {
+  const orderedIds = [managedCategoryB.id, category.id, managedCategoryA.id];
+
+  await reorderCategories({ categoryIds: orderedIds, userId: owner.id });
+
+  const categories = await getCategories(owner.id);
+  expect(categories.map(({ id }) => id)).toEqual(orderedIds);
+  expect(categories.map(({ sort_order }) => sort_order)).toEqual([0, 1, 2]);
+});
+
+test("카테고리를 동시에 만들어도 서로 다른 순서가 저장된다", async () => {
+  const [first, second] = await Promise.all([
+    createCategory("동시 생성 A", owner.id),
+    createCategory("동시 생성 B", owner.id),
+  ]);
+
+  expect(first.sort_order).not.toBe(second.sort_order);
+});
+
+test("다른 사용자의 카테고리가 순서 목록에 섞이면 전체 변경을 거부한다", async () => {
+  const before = await getCategories(owner.id);
+
+  await expect(
+    reorderCategories({
+      categoryIds: [
+        managedCategoryA.id,
+        otherCategory.id,
+        managedCategoryB.id,
+      ],
+      userId: owner.id,
+    }),
+  ).rejects.toBeInstanceOf(CategoryOrderConflictError);
+
+  const after = await getCategories(owner.id);
+  expect(after).toEqual(before);
 });

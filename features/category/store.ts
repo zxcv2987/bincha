@@ -3,12 +3,12 @@ import { createStore } from "zustand/vanilla";
 
 export type CategoryState = {
   categories: CategoryType[];
-  categoryState: string | null;
+  selectedCategoryId: number | null;
 };
 
 export type CategoryAction = {
   setCategories: (categories: CategoryType[]) => void;
-  setCategory: (modalId: string) => void;
+  setCategory: (categoryId: number) => void;
   resetCategory: () => void;
 };
 
@@ -16,11 +16,11 @@ export type CategoryStore = CategoryState & CategoryAction;
 
 export const defaultInitState: CategoryState = {
   categories: [],
-  categoryState: null,
+  selectedCategoryId: null,
 };
 
 export const initCategoryStore = (): CategoryState => {
-  return { categories: [], categoryState: null };
+  return { categories: [], selectedCategoryId: null };
 };
 
 export const createCategoryStore = (
@@ -29,8 +29,7 @@ export const createCategoryStore = (
   return createStore<CategoryStore>()((set) => ({
     ...initState,
     setCategories: (categories) => set(() => ({ categories: categories })),
-    setCategory: (categoryState) =>
-      set(() => ({ categoryState: categoryState })),
-    resetCategory: () => set(() => ({ categoryState: null })),
+    setCategory: (selectedCategoryId) => set(() => ({ selectedCategoryId })),
+    resetCategory: () => set(() => ({ selectedCategoryId: null })),
   }));
 };
