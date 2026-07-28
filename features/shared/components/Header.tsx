@@ -1,7 +1,7 @@
-import Link from "next/link";
 import LoginButton from "@/features/auth/components/LoginButton";
 import Profile from "@/features/auth/components/Profile";
 import { getCurrentUserId } from "@/lib/auth/session";
+import Link from "next/link";
 
 export default async function Header({
   showLoginAction = true,
@@ -11,11 +11,11 @@ export default async function Header({
   const isLoggedIn = (await getCurrentUserId()) !== null;
 
   return (
-    <header className="flex w-full items-end justify-between gap-4 border-b border-zinc-200 py-6">
+    <header className="flex w-full items-end justify-between gap-4 border-b border-zinc-200 py-2">
       <Link
         href="/"
         aria-label="내가 해야 할 일 홈"
-        className="flex min-w-0 items-end gap-3 rounded-lg focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="focus-visible:ring-brand-500 flex min-w-0 items-end gap-3 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       >
         <h1 className="min-w-0 truncate text-2xl font-semibold text-zinc-700 sm:text-4xl">
           내가 해야 할 일
@@ -25,7 +25,7 @@ export default async function Header({
         </span>
       </Link>
 
-      <div className="flex shrink-0 items-end">
+      <div className="flex shrink-0">
         {isLoggedIn ? <Profile /> : showLoginAction ? <LoginButton /> : null}
       </div>
     </header>
