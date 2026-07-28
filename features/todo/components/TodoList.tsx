@@ -30,6 +30,7 @@ export default function TodoList({
   const [completionFilter, setCompletionFilter] = useState<
     "all" | "active" | "completed"
   >("active");
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const setCategories = useCategoryStore((s) => s.setCategories);
   const selectedCategoryId = useCategoryStore((s) => s.selectedCategoryId);
   const resetCategory = useCategoryStore((s) => s.resetCategory);
@@ -121,7 +122,13 @@ export default function TodoList({
                 isEmpty={categoryTodos.length === 0}
               >
                 {categoryTodos.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    isEditing={editingTodoId === todo.id}
+                    onEdit={() => setEditingTodoId(todo.id)}
+                    onCancelEdit={() => setEditingTodoId(null)}
+                  />
                 ))}
               </TodosByCategory>
             );

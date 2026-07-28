@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { TodoType } from "@/features/todo/todo.types";
 import LinkifiedText from "@/features/shared/components/LinkifiedText";
 import TodoForm from "@/features/todo/components/TodoForm";
@@ -10,12 +9,21 @@ import useDeleteTodo from "@/features/todo/hooks/useDeleteTodo";
 import clsx from "clsx";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
 
-export default function TodoItem({ todo }: { todo: TodoType }) {
+export default function TodoItem({
+  todo,
+  isEditing,
+  onEdit,
+  onCancelEdit,
+}: {
+  todo: TodoType;
+  isEditing: boolean;
+  onEdit: () => void;
+  onCancelEdit: () => void;
+}) {
   const { submit: toggleComplete, pending: togglePending, error: toggleError } =
     useToggleTodo();
-  const [editing, setEditing] = useState(false);
   const { submit: updateTodo, pending: updatePending, fieldErrors } =
-    useUpdateTodo(todo.id, () => setEditing(false));
+    useUpdateTodo(todo.id, onCancelEdit);
   const { submit: deleteTodo, pending: deletePending } = useDeleteTodo();
 
   const handleDelete = async () => {
@@ -26,12 +34,12 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
     await deleteTodo(todo.id);
   };
 
-  if (editing) {
+  if (isEditing) {
     return (
       <div
         className="w-full px-3 py-2.5"
         onKeyDown={(e) => {
-          if (e.key === "Escape") setEditing(false);
+          if (e.key === "Escape") onCancelEdit();
         }}
       >
         <TodoForm
@@ -39,7 +47,7 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
           pending={updatePending}
           fieldErrors={fieldErrors}
           onSubmit={updateTodo}
-          onCancel={() => setEditing(false)}
+          onCancel={onCancelEdit}
           compact
           className="w-full"
           textRows={3}
@@ -96,11 +104,11 @@ export default function TodoItem({ todo }: { todo: TodoType }) {
         role="button"
         tabIndex={0}
         aria-label={`${todo.title || "제목 없음"} 수정`}
-        onClick={() => setEditing(true)}
+        onClick={onEdit}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            setEditing(true);
+            onEdit();
           }
         }}
         className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
