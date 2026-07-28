@@ -1,35 +1,29 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Dialog from "@/features/shared/components/Dialog";
 import ResultForm from "@/features/result/components/ResultForm";
-import {
-  createTaskResultAction,
-  updateTaskResultAction,
-} from "@/features/result/result.actions";
+import useCreateResult from "@/features/result/hooks/useCreateResult";
+import useUpdateResult from "@/features/result/hooks/useUpdateResult";
+import { ResultInput } from "@/features/result/result.actions";
 import { TodoType } from "@/features/todo/types";
 
 export default function ResultModalButton({ todo }: { todo: TodoType }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const hasResult = Boolean(todo.result);
-  const action = hasResult ? updateTaskResultAction : createTaskResultAction;
-  const [state, formAction, pending] = useActionState(action, { ok: false });
+  const onSuccess = () => setOpen(false);
 
-  // Why: react-hooks/set-state-in-effect forbids setState in an Effect body
-  // and react-hooks/refs forbids ref mutation during render, so this follows
-  // React's documented render-phase state adjustment instead (state-based
-  // "previous value" comparison, not a ref).
-  const [prevOk, setPrevOk] = useState(state.ok);
-  if (state.ok !== prevOk) {
-    setPrevOk(state.ok);
-    if (state.ok) setOpen(false);
-  }
+  // hasResult는 같은 컴포넌트가 마운트된 채로(결과를 처음 기록한 직후)
+  // false→true로 바뀔 수 있어서, 어떤 훅을 부를지 조건부로 고르면 안 된다
+  // (Rules of Hooks 위반). 둘 다 항상 부르고 실제로 쓸 것만 고른다.
+  const createResult = useCreateResult(onSuccess);
+  const updateResult = useUpdateResult(onSuccess);
+  const { pending, error } = hasResult ? updateResult : createResult;
 
-  useEffect(() => {
-    if (state.ok) router.refresh();
-  }, [state.ok, router]);
+  const onSubmit = (input: ResultInput) => {
+    if (hasResult) updateResult.submit(todo.result!.id, input);
+    else createResult.submit(todo.id, input);
+  };
 
   return (
     <>
@@ -47,9 +41,9 @@ export default function ResultModalButton({ todo }: { todo: TodoType }) {
       >
         <ResultForm
           todo={todo}
-          state={state}
-          formAction={formAction}
+          error={error}
           pending={pending}
+          onSubmit={onSubmit}
           onClose={() => setOpen(false)}
         />
       </Dialog>

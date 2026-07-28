@@ -7,20 +7,19 @@ import {
   CategoryAlreadyExistsError,
   CategoryHasTodosError,
 } from "./category.errors";
+import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
+import { CategoryType } from "./types";
 
-export async function createCategoryAction(
-  _state: unknown,
-  formData: FormData,
-) {
-  const category = formData.get("category");
-  if (category === null || category === "")
-    return { ok: false, error: "카테고리를 입력해 주세요." };
+export async function createCategoryByName(
+  name: string,
+): Promise<ActionResult<CategoryType>> {
+  if (name === "") return { ok: false, error: "카테고리를 입력해 주세요." };
 
   try {
     const userId = await requireCurrentUserId();
-    await createCategory(category as string, userId);
+    const created = await createCategory(name, userId);
     revalidatePath("/");
-    return { ok: true };
+    return { ok: true, data: created };
   } catch (error) {
     if (error instanceof CategoryAlreadyExistsError) {
       return { ok: false, error: "이미 사용 중인 카테고리 이름입니다." };
@@ -31,9 +30,8 @@ export async function createCategoryAction(
 }
 
 export async function deleteCategoryAction(
-  _state: unknown,
   categoryId: number,
-) {
+): Promise<ActionResult> {
   try {
     const userId = await requireCurrentUserId();
     await deleteCategory(categoryId, userId);

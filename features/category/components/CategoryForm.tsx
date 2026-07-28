@@ -1,33 +1,30 @@
 "use client";
-import { createCategoryAction } from "@/features/category/category.actions";
+
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import useAsyncAction from "@/features/shared/hooks/useAsyncAction";
+import { createCategoryByName } from "@/features/category/category.actions";
 
 export default function CategoryForm({ onClose }: { onClose: () => void }) {
-  const router = useRouter();
-  const [state, formAction, pending] = useActionState(createCategoryAction, {
-    ok: false,
-    error: "",
+  const { submit, pending, error } = useAsyncAction(createCategoryByName, {
+    onSuccess: onClose,
   });
 
-  useEffect(() => {
-    if (state.ok) {
-      onClose();
-      router.refresh();
-    }
-  }, [state.ok, onClose, router]);
-
   return (
-    <form action={formAction} className="flex w-xs flex-col gap-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        submit(String(formData.get("category") ?? ""));
+      }}
+      className="flex w-xs flex-col gap-4"
+    >
       <input
         className="input"
         placeholder="ex) 커리어, 연애, 기타 등"
         name="category"
+        spellCheck={false}
       />
-      {state?.error && (
-        <span className="text-xs text-red-400">{state.error}</span>
-      )}
+      {error && <span className="text-xs text-red-400">{error}</span>}
       <button
         type="submit"
         disabled={pending}

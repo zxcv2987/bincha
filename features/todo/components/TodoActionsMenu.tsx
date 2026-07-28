@@ -1,35 +1,19 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import useModal from "@/features/shared/hooks/useModal";
 import Dialog from "@/features/shared/components/Dialog";
 import DeleteTodoButton from "@/features/todo/components/DeleteTodoButton";
 import TodoForm from "@/features/todo/components/TodoForm";
-import { updateTodoAction } from "@/features/todo/todo.actions";
+import useUpdateTodo from "@/features/todo/hooks/useUpdateTodo";
 import { TodoType } from "@/features/todo/types";
 
-export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
+export default function TodoActionsMenu({ todo }: { todo: TodoType }) {
   const { isOpen, setIsOpen, modalRef, setIsLoading } = useModal();
-  const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(updateTodoAction, {
-    ok: false,
-  });
-
-  // Why: react-hooks/set-state-in-effect forbids setState in an Effect body
-  // and react-hooks/refs forbids ref mutation during render, so this follows
-  // React's documented render-phase state adjustment instead (state-based
-  // "previous value" comparison, not a ref).
-  const [prevOk, setPrevOk] = useState(state.ok);
-  if (state.ok !== prevOk) {
-    setPrevOk(state.ok);
-    if (state.ok) setEditOpen(false);
-  }
-
-  useEffect(() => {
-    if (state.ok) router.refresh();
-  }, [state.ok, router]);
+  const { submit, pending, fieldErrors } = useUpdateTodo(todo.id, () =>
+    setEditOpen(false),
+  );
 
   return (
     <>
@@ -75,7 +59,12 @@ export default function TodoMoreActionButton({ todo }: { todo: TodoType }) {
         title="할 일 수정하기"
         disableBackdropClose={pending}
       >
-        <TodoForm formAction={formAction} state={state} todo={todo} />
+        <TodoForm
+          onSubmit={submit}
+          pending={pending}
+          fieldErrors={fieldErrors}
+          todo={todo}
+        />
       </Dialog>
     </>
   );
