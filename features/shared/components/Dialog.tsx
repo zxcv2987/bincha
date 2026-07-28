@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export default function Dialog({
   open,
   onClose,
@@ -16,6 +19,7 @@ export default function Dialog({
   children: React.ReactNode;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   // 내부 폼에 입력이 있었는지 추적한다. input/select 어떤 필드든 change가 버블되면
   // dirty로 표시하고, 닫기 직전(ESC/백드롭/X)에만 확인창을 띄운다 — 제출 성공 후
   // 부모가 open을 false로 내려서 닫히는 경로는 이 가드를 타지 않는다.
@@ -31,10 +35,12 @@ export default function Dialog({
     if (!dialog) return;
     if (open && !dialog.open) {
       dirtyRef.current = false;
-      // showModal()은 자체적으로 dialog 안의 autofocus 요소를 찾아 포커스하고,
-      // 없으면 dialog 자신에 포커스한다 (헤더의 닫기 버튼으로 새지 않음) —
-      // 특정 필드를 먼저 포커스하고 싶으면 각 폼에서 autoFocus를 선언한다.
       dialog.showModal();
+      // React의 autoFocus는 마운트 시점에 .focus()를 호출할 뿐 실제 autofocus
+      // 속성을 심지 않는데, 그 시점엔 dialog가 아직 열리기 전(display:none)이라
+      // 포커스가 먹히지 않는다. showModal() 이후 헤더(닫기 버튼)를 제외한
+      // content 영역에서 첫 포커스 가능 요소를 직접 찾아 포커스한다.
+      contentRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
     }
     if (!open && dialog.open) dialog.close();
   }, [open]);
@@ -85,7 +91,7 @@ export default function Dialog({
           ✖
         </button>
       </div>
-      <div className="pt-4">{children}</div>
+      <div ref={contentRef} className="pt-4">{children}</div>
     </dialog>
   );
 }

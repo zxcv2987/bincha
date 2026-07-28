@@ -30,7 +30,6 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
           placeholder="ex) 커리어, 연애, 기타 등"
           name="category"
           spellCheck={false}
-          autoFocus
         />
         {error && <span className="text-xs text-red-400">{error}</span>}
       </div>
