@@ -94,7 +94,7 @@ export default function TodoForm({
           className={clsx(
             "btn btn-primary",
             onCancel && "w-auto",
-            compact && "px-4 py-1.5 text-xs",
+            compact && "px-6 py-3 text-sm",
           )}
           disabled={pending}
           type="submit"
@@ -106,7 +106,7 @@ export default function TodoForm({
         {onCancel && (
           <button
             type="button"
-            className={clsx("btn w-auto", compact && "px-4 py-1.5 text-xs")}
+            className={clsx("btn w-auto", compact && "px-6 py-3 text-sm")}
             disabled={pending}
             onClick={onCancel}
           >
