@@ -1,5 +1,5 @@
 import { getTodoBoardData } from "@/app/page.data";
-import Header from "@/features/shared/components/Header";
+import AppHeader from "@/features/shared/components/AppHeader";
 import LoginGate from "@/features/auth/components/LoginGate";
 import ListFetchError from "@/features/shared/components/ListFetchError";
 import TodoList from "@/features/todo/components/TodoList";
@@ -12,7 +12,7 @@ export default async function Home() {
   } catch {
     return (
       <>
-        <Header showLoginAction={false} />
+        <AppHeader />
         <LoginGate />
       </>
     );
@@ -21,7 +21,7 @@ export default async function Home() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="flex w-full flex-col gap-4">
         {result.ok ? (
           <TodoList todos={result.todos} categories={result.categories} />

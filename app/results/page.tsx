@@ -1,4 +1,4 @@
-import Header from "@/features/shared/components/Header";
+import AppHeader from "@/features/shared/components/AppHeader";
 import LoginGate from "@/features/auth/components/LoginGate";
 import Sidebar from "@/features/shared/components/Sidebar";
 import PendingResultCard from "@/features/result/components/PendingResultCard";
@@ -15,7 +15,7 @@ export default async function ResultsPage() {
   } catch {
     return (
       <>
-        <Header showLoginAction={false} />
+        <AppHeader />
         <LoginGate />
       </>
     );
@@ -28,7 +28,7 @@ export default async function ResultsPage() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="flex w-full flex-col gap-6 border-t border-zinc-200 pt-6 md:flex-row md:items-start">
         <Sidebar />
         <main className="flex min-w-0 flex-1 flex-col gap-10">
