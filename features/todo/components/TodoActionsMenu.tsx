@@ -11,7 +11,7 @@ import { TodoType } from "@/features/todo/types";
 export default function TodoActionsMenu({ todo }: { todo: TodoType }) {
   const { isOpen, setIsOpen, modalRef, setIsLoading } = useModal();
   const [editOpen, setEditOpen] = useState(false);
-  const { submit, pending, error } = useUpdateTodo(todo.id, () =>
+  const { submit, pending, fieldErrors } = useUpdateTodo(todo.id, () =>
     setEditOpen(false),
   );
 
@@ -59,7 +59,12 @@ export default function TodoActionsMenu({ todo }: { todo: TodoType }) {
         title="할 일 수정하기"
         disableBackdropClose={pending}
       >
-        <TodoForm onSubmit={submit} pending={pending} error={error} todo={todo} />
+        <TodoForm
+          onSubmit={submit}
+          pending={pending}
+          fieldErrors={fieldErrors}
+          todo={todo}
+        />
       </Dialog>
     </>
   );

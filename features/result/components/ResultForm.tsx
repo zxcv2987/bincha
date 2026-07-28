@@ -1,19 +1,20 @@
 "use client";
 
 import { TodoType } from "@/features/todo/types";
+import { ResultInput } from "@/features/result/result.actions";
 import useDeleteResult from "@/features/result/hooks/useDeleteResult";
 
 export default function ResultForm({
   todo,
-  state,
-  formAction,
+  error,
   pending,
+  onSubmit,
   onClose,
 }: {
   todo: TodoType;
-  state: { ok: boolean; error?: string };
-  formAction: (formData: FormData) => void;
+  error?: string;
   pending: boolean;
+  onSubmit: (input: ResultInput) => void;
   onClose: () => void;
 }) {
   const result = todo.result;
@@ -28,13 +29,24 @@ export default function ResultForm({
     deleteResultSubmit(result.id);
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    onSubmit({
+      summary: String(formData.get("summary") ?? ""),
+      changeSummary: String(formData.get("changeSummary") ?? ""),
+      unexpected: String(formData.get("unexpected") ?? ""),
+      nextAction: String(formData.get("nextAction") ?? ""),
+      evidenceUrl: String(formData.get("evidenceUrl") ?? ""),
+      needsMeasurement: formData.get("needsMeasurement") === "on",
+    });
+  };
+
   return (
     <form
-      action={formAction}
+      onSubmit={handleSubmit}
       className="flex w-[calc(100vw-4rem)] max-w-md flex-col gap-3"
     >
-      <input type="hidden" name="todoId" value={todo.id} />
-      {result && <input type="hidden" name="resultId" value={result.id} />}
       <p className="text-sm font-medium text-zinc-500">{todo.title}</p>
       <label className="flex flex-col gap-1 text-sm font-semibold text-zinc-600">
         <span>
@@ -97,7 +109,7 @@ export default function ResultForm({
         />
         나중에 측정 필요
       </label>
-      {state.error && <p className="text-sm text-red-500">{state.error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
       {deleteError && <p className="text-sm text-red-500">{deleteError}</p>}
       <div className="flex justify-between gap-2">
         {result && (

@@ -42,7 +42,6 @@ export default async function RootLayout({
               {children}
             </div>
           </div>
-          <div id="portal-root"></div>
         </StoreProvider>
       </body>
     </html>

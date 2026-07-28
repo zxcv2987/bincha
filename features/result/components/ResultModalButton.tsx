@@ -5,6 +5,7 @@ import Dialog from "@/features/shared/components/Dialog";
 import ResultForm from "@/features/result/components/ResultForm";
 import useCreateResult from "@/features/result/hooks/useCreateResult";
 import useUpdateResult from "@/features/result/hooks/useUpdateResult";
+import { ResultInput } from "@/features/result/result.actions";
 import { TodoType } from "@/features/todo/types";
 
 export default function ResultModalButton({ todo }: { todo: TodoType }) {
@@ -17,7 +18,12 @@ export default function ResultModalButton({ todo }: { todo: TodoType }) {
   // (Rules of Hooks 위반). 둘 다 항상 부르고 실제로 쓸 것만 고른다.
   const createResult = useCreateResult(onSuccess);
   const updateResult = useUpdateResult(onSuccess);
-  const { state, formAction, pending } = hasResult ? updateResult : createResult;
+  const { pending, error } = hasResult ? updateResult : createResult;
+
+  const onSubmit = (input: ResultInput) => {
+    if (hasResult) updateResult.submit(todo.result!.id, input);
+    else createResult.submit(todo.id, input);
+  };
 
   return (
     <>
@@ -35,9 +41,9 @@ export default function ResultModalButton({ todo }: { todo: TodoType }) {
       >
         <ResultForm
           todo={todo}
-          state={state}
-          formAction={formAction}
+          error={error}
           pending={pending}
+          onSubmit={onSubmit}
           onClose={() => setOpen(false)}
         />
       </Dialog>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -19,81 +18,53 @@ export default function Dialog({
   disableBackdropClose?: boolean;
   children: React.ReactNode;
 }) {
-  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
+  // <dialog>는 open prop이 아니라 showModal()/close() 명령형 호출로 제어한다.
+  // 실제로 닫히는 경로(ESC, 백드롭 클릭, X 버튼)는 전부 dialogRef.close()로
+  // 모으고, 네이티브 close 이벤트 하나가 onClose prop을 호출한다 — 그래서
+  // 이 effect는 열 때만 showModal()을 부르면 되고, dialog.open으로
+  // 중복 close 호출을 막는다.
   useEffect(() => {
-    if (!open) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) return;
-
     const dialog = dialogRef.current;
-    if (dialog && !dialog.contains(document.activeElement)) {
+    if (!dialog) return;
+    if (open && !dialog.open) {
+      dialog.showModal();
       dialog.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
     }
-
-    const trapTab = (event: KeyboardEvent) => {
-      if (event.key !== "Tab" || !dialogRef.current) return;
-      const focusable = Array.from(
-        dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-      );
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", trapTab);
-    return () => document.removeEventListener("keydown", trapTab);
+    if (!open && dialog.open) dialog.close();
   }, [open]);
 
   if (!open) return null;
 
-  const portalRoot = document.getElementById("portal-root");
-  if (!portalRoot) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        onClick={disableBackdropClose ? undefined : onClose}
-        className="absolute inset-0 bg-zinc-700 opacity-20"
-      />
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        onClick={(e) => e.stopPropagation()}
-        className="relative max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl bg-white p-4 shadow-xl"
-      >
-        <div className="flex w-full flex-row items-center justify-between border-b border-zinc-100 pb-3">
-          <h2 id="modal-title" className="text-2xl font-bold text-zinc-700">
-            {title}
-          </h2>
-          <button
-            type="button"
-            aria-label="모달 닫기"
-            onClick={onClose}
-            className="cursor-pointer px-1 text-sm font-thin text-zinc-700"
-          >
-            ✖
-          </button>
-        </div>
-        <div className="pt-4">{children}</div>
+  return (
+    <dialog
+      ref={dialogRef}
+      onClose={onClose}
+      onClick={(e) => {
+        if (!disableBackdropClose && e.target === dialogRef.current) {
+          dialogRef.current?.close();
+        }
+      }}
+      aria-labelledby="modal-title"
+      // dialog:modal의 기본 중앙정렬은 margin:auto인데, 전역 preflight가
+      // 모든 요소의 margin을 0으로 리셋해버려서 명시적으로 다시 넣어야 한다.
+      className="fixed inset-0 m-auto h-fit max-h-[calc(100vh-2rem)] w-fit overflow-y-auto rounded-xl bg-white p-4 shadow-xl backdrop:bg-zinc-700/20"
+    >
+      <div className="flex w-full flex-row items-center justify-between border-b border-zinc-100 pb-3">
+        <h2 id="modal-title" className="text-2xl font-bold text-zinc-700">
+          {title}
+        </h2>
+        <button
+          type="button"
+          aria-label="모달 닫기"
+          onClick={() => dialogRef.current?.close()}
+          className="cursor-pointer px-1 text-sm font-thin text-zinc-700"
+        >
+          ✖
+        </button>
       </div>
-    </div>,
-    portalRoot,
+      <div className="pt-4">{children}</div>
+    </dialog>
   );
 }

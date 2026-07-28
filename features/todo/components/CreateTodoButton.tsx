@@ -7,7 +7,7 @@ import useCreateTodo from "@/features/todo/hooks/useCreateTodo";
 
 export default function CreateTodoButton() {
   const [open, setOpen] = useState(false);
-  const { submit, pending, error } = useCreateTodo(() => setOpen(false));
+  const { submit, pending, fieldErrors } = useCreateTodo(() => setOpen(false));
 
   return (
     <div className="pb-2">
@@ -26,7 +26,7 @@ export default function CreateTodoButton() {
         title="할 일 추가하기"
         disableBackdropClose={pending}
       >
-        <TodoForm onSubmit={submit} pending={pending} error={error} />
+        <TodoForm onSubmit={submit} pending={pending} fieldErrors={fieldErrors} />
       </Dialog>
     </div>
   );

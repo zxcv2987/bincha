@@ -6,12 +6,12 @@ import { useId } from "react";
 export default function TodoForm({
   todo,
   pending,
-  error,
+  fieldErrors,
   onSubmit,
 }: {
   todo?: TodoType;
   pending: boolean;
-  error?: { title?: string; text?: string; categoryId?: string };
+  fieldErrors?: Record<string, string>;
   onSubmit: (input: TodoInput) => void;
 }) {
   const titleId = useId();
@@ -44,8 +44,8 @@ export default function TodoForm({
           defaultValue={todo && todo.title}
           spellCheck={false}
         />
-        {error?.title && (
-          <span className="text-xs text-red-400">{error.title}</span>
+        {fieldErrors?.title && (
+          <span className="text-xs text-red-400">{fieldErrors.title}</span>
         )}
       </div>
 
@@ -62,12 +62,11 @@ export default function TodoForm({
           defaultValue={todo && todo.text}
           spellCheck={false}
         />
-        {error?.text && <span className="text-xs text-red-400">{error.text}</span>}
       </div>
 
       <CategoryPicker
         defaultCategoryId={todo?.category_id}
-        error={error?.categoryId}
+        error={fieldErrors?.categoryId}
       />
 
       <button className="btn btn-primary" disabled={pending} type="submit">
