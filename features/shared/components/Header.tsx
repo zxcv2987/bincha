@@ -3,7 +3,11 @@ import LoginButton from "@/features/auth/components/LoginButton";
 import Profile from "@/features/auth/components/Profile";
 import { getCurrentUserId } from "@/lib/auth/session";
 
-export default async function Header() {
+export default async function Header({
+  showLoginAction = true,
+}: {
+  showLoginAction?: boolean;
+}) {
   const isLoggedIn = (await getCurrentUserId()) !== null;
 
   return (
@@ -22,7 +26,7 @@ export default async function Header() {
       </Link>
 
       <div className="flex shrink-0 items-end">
-        {isLoggedIn ? <Profile /> : <LoginButton />}
+        {isLoggedIn ? <Profile /> : showLoginAction ? <LoginButton /> : null}
       </div>
     </header>
   );

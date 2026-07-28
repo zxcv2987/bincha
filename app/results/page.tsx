@@ -1,6 +1,6 @@
 import Header from "@/features/shared/components/Header";
+import LoginGate from "@/features/auth/components/LoginGate";
 import Sidebar from "@/features/shared/components/Sidebar";
-import ListFetchError from "@/features/shared/components/ListFetchError";
 import PendingResultCard from "@/features/result/components/PendingResultCard";
 import CompletedResultCard from "@/features/result/components/CompletedResultCard";
 import { getPendingTodos, getResults } from "@/features/result/result.service";
@@ -15,8 +15,8 @@ export default async function ResultsPage() {
   } catch {
     return (
       <>
-        <Header />
-        <ListFetchError message="로그인 후 결과함을 확인할 수 있습니다." />
+        <Header showLoginAction={false} />
+        <LoginGate />
       </>
     );
   }

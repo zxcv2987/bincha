@@ -1,5 +1,6 @@
 import { getTodoBoardData } from "@/app/page.data";
 import Header from "@/features/shared/components/Header";
+import LoginGate from "@/features/auth/components/LoginGate";
 import ListFetchError from "@/features/shared/components/ListFetchError";
 import TodoList from "@/features/todo/components/TodoList";
 import { requireCurrentUserId } from "@/lib/auth/session";
@@ -11,8 +12,8 @@ export default async function Home() {
   } catch {
     return (
       <>
-        <Header />
-        <ListFetchError message="로그인 후 할 일을 확인할 수 있습니다." />
+        <Header showLoginAction={false} />
+        <LoginGate />
       </>
     );
   }
