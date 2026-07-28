@@ -2,6 +2,7 @@ import { TodoType } from "@/features/todo/todo.types";
 import { TodoInput } from "@/features/todo/todo.actions";
 import CategoryPicker from "@/features/category/components/CategoryPicker";
 import { useId } from "react";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function TodoForm({
   todo,
@@ -70,7 +71,9 @@ export default function TodoForm({
       />
 
       <button className="btn btn-primary" disabled={pending} type="submit">
-        {pending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
+        <ButtonLabel pending={pending} pendingText="로딩 중...">
+          {todo ? "할 일 수정" : "할 일 추가"}
+        </ButtonLabel>
       </button>
     </form>
   );

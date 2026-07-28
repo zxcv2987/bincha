@@ -4,6 +4,7 @@ import { useCategoryStore } from "@/features/category/provider";
 import useCreateCategory from "@/features/category/hooks/useCreateCategory";
 import { CategoryType } from "@/features/category/category.types";
 import { useEffect, useId, useRef, useState } from "react";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function CategoryPicker({
   defaultCategoryId,
@@ -139,7 +140,9 @@ function InlineCategoryCreate({
           onClick={handleSubmit}
           className="shrink-0 rounded-lg px-2 py-1.5 text-sm font-semibold text-brand-600 hover:bg-brand-50"
         >
-          {pending ? "추가 중..." : "추가"}
+          <ButtonLabel pending={pending} pendingText="추가 중...">
+            추가
+          </ButtonLabel>
         </button>
         <button
           type="button"

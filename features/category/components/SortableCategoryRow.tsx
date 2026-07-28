@@ -6,6 +6,7 @@ import { useSortable } from "@dnd-kit/react/sortable";
 import { CategoryType } from "@/features/category/category.types";
 import useRenameCategory from "@/features/category/hooks/useRenameCategory";
 import useDeleteCategory from "@/features/category/hooks/useDeleteCategory";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function SortableCategoryRow({
   category,
@@ -116,7 +117,9 @@ export default function SortableCategoryRow({
               onClick={() => submitRename()}
               className="shrink-0 rounded-md px-2 py-1.5 text-sm font-semibold text-brand-600 hover:bg-brand-50 disabled:opacity-50"
             >
-              {rename.pending ? "저장 중" : "저장"}
+              <ButtonLabel pending={rename.pending} pendingText="저장 중...">
+                저장
+              </ButtonLabel>
             </button>
             <button
               type="button"
@@ -144,7 +147,9 @@ export default function SortableCategoryRow({
               }}
               className="shrink-0 rounded-md bg-red-600 px-2 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
             >
-              {remove.pending ? "삭제 중" : "삭제"}
+              <ButtonLabel pending={remove.pending} pendingText="삭제 중...">
+                삭제
+              </ButtonLabel>
             </button>
             <button
               type="button"

@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import useDeleteTodo from "@/features/todo/hooks/useDeleteTodo";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function DeleteTodoButton({
   todoId,
@@ -35,7 +36,9 @@ export default function DeleteTodoButton({
           setIsLoading(false);
         }}
       >
-        {pending ? "삭제 중..." : "할 일 삭제"}
+        <ButtonLabel pending={pending} pendingText="삭제 중...">
+          할 일 삭제
+        </ButtonLabel>
       </button>
       {error && <span className="text-xs text-red-400">{error}</span>}
     </>

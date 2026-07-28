@@ -7,6 +7,7 @@ import { CategoryType } from "@/features/category/category.types";
 import { useCategoryStore } from "@/features/category/provider";
 import useReorderCategories from "@/features/category/hooks/useReorderCategories";
 import SortableCategoryRow from "@/features/category/components/SortableCategoryRow";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function CategoryManagementDialog({
   categories,
@@ -151,7 +152,9 @@ export default function CategoryManagementDialog({
           onClick={onClose}
           className="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700"
         >
-          {mutationPending ? "저장 중..." : "닫기"}
+          <ButtonLabel pending={mutationPending} pendingText="저장 중...">
+            닫기
+          </ButtonLabel>
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { useId } from "react";
 import useAsyncAction from "@/features/shared/hooks/useAsyncAction";
 import { createCategoryByName } from "@/features/category/category.actions";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function CategoryForm({ onClose }: { onClose: () => void }) {
   const { submit, pending, error } = useAsyncAction(createCategoryByName, {
@@ -38,7 +39,9 @@ export default function CategoryForm({ onClose }: { onClose: () => void }) {
         disabled={pending}
         className={clsx("btn btn-primary", pending && "opacity-90")}
       >
-        {pending ? "추가 중..." : "카테고리 추가"}
+        <ButtonLabel pending={pending} pendingText="추가 중...">
+          카테고리 추가
+        </ButtonLabel>
       </button>
     </form>
   );
