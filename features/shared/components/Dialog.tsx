@@ -52,10 +52,14 @@ export default function Dialog({
         if (!confirmDiscard()) e.preventDefault();
       }}
       onChangeCapture={(e) => {
-        const target = e.target as unknown as HTMLInputElement;
+        const target = e.target;
         // 라디오/체크박스 선택은 원클릭으로 되돌릴 수 있는 "선택"이지 잃어버릴
         // "작성 중인 내용"이 아니므로 dirty 판단에서 제외한다.
-        if (target.type === "radio" || target.type === "checkbox") return;
+        if (
+          target instanceof HTMLInputElement &&
+          (target.type === "radio" || target.type === "checkbox")
+        )
+          return;
         dirtyRef.current = true;
       }}
       onClick={(e) => {
