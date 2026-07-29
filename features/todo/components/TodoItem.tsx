@@ -111,7 +111,7 @@ export default function TodoItem({
             onEdit();
           }
         }}
-        className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
+        className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 rounded-lg text-left focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
       >
         <h3 className="w-full truncate text-sm font-semibold break-words text-zinc-700">
           {todo.title.trim() || "제목 없음"}
