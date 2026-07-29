@@ -54,7 +54,7 @@ export default function CategoryPicker({
                   checked={selectedId === String(category.id)}
                   onChange={() => setSelectedId(String(category.id))}
                 />
-                <span className="flex max-w-40 items-center truncate rounded-lg px-3 py-1.5 text-sm text-zinc-500 transition-colors peer-checked:bg-brand-50 peer-checked:font-semibold peer-checked:text-brand-700 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-1 peer-not-checked:hover:bg-zinc-50 peer-not-checked:hover:text-zinc-800">
+                <span className="flex max-w-40 items-center truncate rounded-lg px-3 py-1.5 text-sm text-zinc-500 transition-colors peer-checked:bg-brand-50 peer-checked:font-semibold peer-checked:text-brand-700 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-1 peer-not-checked:hover:bg-zinc-50 peer-not-checked:hover:text-zinc-800">
                   {category.category_name.trim() || "이름 없음"}
                 </span>
               </label>

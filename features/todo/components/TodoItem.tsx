@@ -73,7 +73,7 @@ export default function TodoItem({
         <span
           className={clsx(
             "flex size-5 items-center justify-center rounded-full border-2 transition-colors",
-            "peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-2",
+            "peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-2",
             "peer-disabled:opacity-50",
             todo.completed
               ? "border-brand-600 bg-brand-600"
