@@ -68,7 +68,7 @@ export default function TodoItem({
           checked={todo.completed}
           disabled={togglePending}
           onChange={() => toggleComplete(todo.id)}
-          className="peer sr-only"
+          className="peer sr-only outline-none"
         />
         <span
           className={clsx(
@@ -121,10 +121,10 @@ export default function TodoItem({
             <LinkifiedText content={todo.text} />
           </span>
         ) : (
-          <span className="w-full text-sm text-zinc-400">내용 없음</span>
+          <span className="w-full text-sm text-zinc-500">내용 없음</span>
         )}
         {todo.completed && todo.completed_at && (
-          <span className="w-full text-xs text-zinc-400">
+          <span className="w-full text-xs text-zinc-500">
             완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
           </span>
         )}
@@ -148,7 +148,7 @@ export default function TodoItem({
         aria-label={`${todo.title || "제목 없음"} 삭제`}
         onClick={handleDelete}
         disabled={deletePending}
-        className="shrink-0 self-center rounded-lg p-2 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 disabled:opacity-50 group-hover:opacity-100"
+        className="shrink-0 self-center rounded-lg p-2 text-zinc-500 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none disabled:opacity-50 group-hover:opacity-100"
       >
         <svg
           viewBox="0 0 20 20"

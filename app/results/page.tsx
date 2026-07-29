@@ -37,7 +37,7 @@ export default async function ResultsPage() {
               결과 기록 대기
             </h2>
             {pendingTodos.length === 0 ? (
-              <p className="rounded-xl bg-zinc-50 p-4 text-zinc-400">
+              <p className="rounded-xl bg-zinc-50 p-4 text-zinc-500">
                 결과를 기다리는 완료 작업이 없습니다.
               </p>
             ) : (
@@ -52,7 +52,7 @@ export default async function ResultsPage() {
               결과 기록 완료
             </h2>
             {completedResults.length === 0 ? (
-              <p className="rounded-xl bg-zinc-50 p-4 text-zinc-400">
+              <p className="rounded-xl bg-zinc-50 p-4 text-zinc-500">
                 아직 기록한 결과가 없습니다.
               </p>
             ) : (

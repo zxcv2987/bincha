@@ -7,7 +7,7 @@ export default function PendingResultCard({ todo }: { todo: TodoType }) {
       <div>
         <h3 className="font-semibold text-zinc-700">{todo.title}</h3>
         {todo.completed_at && (
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-zinc-500">
             완료일: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
           </p>
         )}

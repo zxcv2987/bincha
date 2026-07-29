@@ -26,7 +26,7 @@ export default function Sidebar({ children }: { children?: React.ReactNode }) {
               href={href}
               aria-current={active ? "page" : undefined}
               className={clsx(
-                "rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap",
+                "rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
                 active
                   ? "bg-brand-50 text-brand-700"
                   : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",

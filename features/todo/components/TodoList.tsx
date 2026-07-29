@@ -55,7 +55,7 @@ export default function TodoList({
       <Sidebar>
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between px-3">
-            <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               카테고리
             </h2>
             <CategoryManagementButton categories={categories} />
@@ -72,7 +72,7 @@ export default function TodoList({
         <div className="border-t border-zinc-200" />
 
         <div className="flex flex-col gap-1">
-          <h2 className="px-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+          <h2 className="px-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             완료 상태
           </h2>
           <div className="flex flex-col gap-0.5" aria-label="완료 상태 필터">
@@ -81,7 +81,7 @@ export default function TodoList({
                 key={value}
                 type="button"
                 className={clsx(
-                  "w-full rounded-lg px-3 py-1.5 text-left text-sm",
+                  "w-full rounded-lg px-3 py-1.5 text-left text-sm focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
                   completionFilter === value
                     ? "bg-brand-50 font-semibold text-brand-700"
                     : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",

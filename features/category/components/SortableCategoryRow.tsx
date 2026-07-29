@@ -83,7 +83,7 @@ export default function SortableCategoryRow({
           disabled={
             editing || confirmingDelete || reorderPending || mutationPending
           }
-          className="shrink-0 cursor-grab rounded-md px-1.5 py-2 text-base leading-none text-zinc-400 hover:bg-white hover:text-zinc-700 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
+          className="shrink-0 cursor-grab rounded-md px-1.5 py-2 text-base leading-none text-zinc-500 hover:bg-white hover:text-zinc-700 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
         >
           ⠿
         </button>
@@ -155,7 +155,7 @@ export default function SortableCategoryRow({
               type="button"
               disabled={remove.pending}
               onClick={() => setConfirmingDelete(false)}
-              className="shrink-0 rounded-md px-2 py-1.5 text-xs text-zinc-500 hover:bg-white disabled:opacity-50"
+              className="shrink-0 rounded-md px-2 py-1.5 text-xs text-zinc-500 hover:bg-white focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none disabled:opacity-50"
             >
               취소
             </button>
