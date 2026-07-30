@@ -23,15 +23,14 @@
 
 작업에 필요한 문서만 읽는다.
 
-- 현재 MVP 제품 범위와 사용자 흐름: `docs/mvp-plan.md`
-- 현재 MVP 구현 계약, 데이터 모델, 정책, 테스트 범위: `docs/mvp-technical-plan.md`
-- 장기 제품 방향과 MVP 이후 우선순위: `docs/product-plan.md`
-- 장기 기술 방향과 MVP 이후 아키텍처: `docs/technical-proposal.md`
+- 현재 제품 범위와 사용자 흐름: `docs/product-plan.md`
+- 현재 구현 계약, 데이터 모델, 정책과 목표 아키텍처: `docs/technical-proposal.md`
+- 완료된 MVP의 역사적 기록: `docs/archive/mvp-plan.md`, `docs/archive/mvp-technical-plan.md`
 - 문서 안내: `docs/index.md`
 
-제품 동작, 기능 범위, 사용자 흐름 또는 우선순위에 영향을 주는 변경 전에는 `docs/mvp-plan.md`를 먼저 읽는다. MVP 범위를 넘어서는 제안이나 변경이라면 `docs/product-plan.md`도 확인한다.
+제품 동작, 기능 범위, 사용자 흐름 또는 우선순위에 영향을 주는 변경 전에는 `docs/product-plan.md`를 먼저 읽는다. 아카이브 문서는 과거 결정의 배경이 필요할 때만 확인한다.
 
-데이터 모델, 인증, 사용자 데이터 경계, 캐시, 삭제 정책 또는 서비스 계약을 바꾸기 전에는 `docs/mvp-technical-plan.md`를 먼저 읽는다. MVP 이후 구조를 다루는 경우에만 `docs/technical-proposal.md`도 확인한다.
+데이터 모델, 인증, 사용자 데이터 경계, 캐시, 삭제 정책 또는 서비스 계약을 바꾸기 전에는 `docs/technical-proposal.md`를 먼저 읽는다.
 
 코드와 문서의 계약이 달라지는 변경은 같은 작업에서 관련 문서를 갱신한다. 내부 구현만 바뀌고 문서화된 동작이나 계약이 그대로라면 불필요한 문서 수정은 하지 않는다.
 
@@ -62,7 +61,7 @@
 - 서비스 통합 테스트: `pnpm test`
 - 프로덕션 빌드: `pnpm build`
 
-`pnpm test`는 `.env.test`와 분리된 테스트 스키마가 필요하다. 설정과 마이그레이션 절차는 `docs/mvp-technical-plan.md`의 테스트 섹션을 따른다.
+`pnpm test`는 `.env.test`와 분리된 테스트 스키마가 필요하다. 현재 테스트 전략은 `docs/technical-proposal.md`를 따르며, 기존 테스트 스키마 설정과 마이그레이션 절차는 `docs/archive/mvp-technical-plan.md`에 보관한다.
 
 ## Verification
 
