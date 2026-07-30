@@ -148,7 +148,7 @@ export default function TodoItem({
         aria-label={`${todo.title || "제목 없음"} 삭제`}
         onClick={handleDelete}
         disabled={deletePending}
-        className="shrink-0 self-center rounded-lg p-2 text-zinc-500 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none disabled:opacity-50 group-hover:opacity-100"
+        className="flex size-11 shrink-0 self-center items-center justify-center rounded-lg text-zinc-500 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none disabled:opacity-50 [@media(hover:hover)_and_(pointer:fine)]:opacity-0 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100 [@media(hover:hover)_and_(pointer:fine)]:focus-visible:opacity-100"
       >
         <svg
           viewBox="0 0 20 20"

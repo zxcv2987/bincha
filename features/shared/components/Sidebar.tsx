@@ -9,7 +9,13 @@ const NAV_ITEMS = [
   { href: "/results", label: "결과함" },
 ] as const;
 
-export default function Sidebar({ children }: { children?: React.ReactNode }) {
+export default function Sidebar({
+  children,
+  childrenClassName,
+}: {
+  children?: React.ReactNode;
+  childrenClassName?: string;
+}) {
   const pathname = usePathname();
 
   return (
@@ -38,7 +44,12 @@ export default function Sidebar({ children }: { children?: React.ReactNode }) {
         })}
       </nav>
       {children && (
-        <div className="flex flex-col gap-5 border-t border-zinc-200 pt-5">
+        <div
+          className={clsx(
+            "flex flex-col gap-5 border-t border-zinc-200 pt-5",
+            childrenClassName,
+          )}
+        >
           {children}
         </div>
       )}

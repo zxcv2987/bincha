@@ -13,12 +13,12 @@ import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
 import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
 import CategoryManagementButton from "@/features/category/components/CategoryManagementButton";
-
-const COMPLETION_FILTERS = [
-  ["all", "전체"],
-  ["active", "진행 중"],
-  ["completed", "완료"],
-] as const;
+import MobileTodoToolbar from "@/features/todo/components/MobileTodoToolbar";
+import {
+  COMPLETION_FILTERS,
+  CompletionFilter,
+  filterTodosByCompletion,
+} from "@/features/todo/todoFilters";
 
 export default function TodoList({
   todos,
@@ -27,9 +27,8 @@ export default function TodoList({
   todos: TodoType[];
   categories: CategoryType[];
 }) {
-  const [completionFilter, setCompletionFilter] = useState<
-    "all" | "active" | "completed"
-  >("active");
+  const [completionFilter, setCompletionFilter] =
+    useState<CompletionFilter>("active");
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const setCategories = useCategoryStore((s) => s.setCategories);
   const selectedCategoryId = useCategoryStore((s) => s.selectedCategoryId);
@@ -44,15 +43,11 @@ export default function TodoList({
     (category) =>
       selectedCategoryId === null || category.id === selectedCategoryId,
   );
-  const filteredTodos = todos.filter((todo) => {
-    if (completionFilter === "active") return !todo.completed;
-    if (completionFilter === "completed") return todo.completed;
-    return true;
-  });
+  const filteredTodos = filterTodosByCompletion(todos, completionFilter);
 
   return (
     <div className="flex w-full flex-col gap-6 border-t border-zinc-200 pt-6 md:flex-row md:items-start">
-      <Sidebar>
+      <Sidebar childrenClassName="hidden md:flex">
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between px-3">
             <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
@@ -96,6 +91,16 @@ export default function TodoList({
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <MobileTodoToolbar
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          completionFilter={completionFilter}
+          onApplyFilters={(categoryId, completion) => {
+            if (categoryId === null) resetCategory();
+            else setCategory(categoryId);
+            setCompletionFilter(completion);
+          }}
+        />
         <CreateTodoButton />
 
         {filteredTodos.length === 0 ? (
