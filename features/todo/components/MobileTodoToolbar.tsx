@@ -114,34 +114,68 @@ export default function MobileTodoToolbar({
                 id: category.id,
                 label: category.category_name,
               })),
-            ].map(({ id, label }) => (
-              <label key={id ?? "all"} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 text-sm text-zinc-700 hover:bg-zinc-50">
-                <input
-                  type="radio"
-                  name="mobile-category-filter"
-                  checked={draftCategoryId === id}
-                  onChange={() => setDraftCategoryId(id)}
-                  className="size-4 accent-brand-600"
-                />
-                {label}
-              </label>
-            ))}
+            ].map(({ id, label }) => {
+              const selected = draftCategoryId === id;
+
+              return (
+                <label
+                  key={id ?? "all"}
+                  className={clsx(
+                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 text-sm has-focus-visible:ring-2 has-focus-visible:ring-brand-500/40 has-focus-visible:ring-offset-1",
+                    selected
+                      ? "bg-brand-50 font-semibold text-brand-700"
+                      : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="mobile-category-filter"
+                    checked={selected}
+                    onChange={() => setDraftCategoryId(id)}
+                    className="sr-only"
+                  />
+                  <span className="min-w-0 flex-1 truncate">{label}</span>
+                  {selected && (
+                    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="size-4 shrink-0">
+                      <path d="m4 10 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </label>
+              );
+            })}
           </fieldset>
 
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-2 text-sm font-semibold text-zinc-700">완료 상태</legend>
-            {COMPLETION_FILTERS.map(([value, label]) => (
-              <label key={value} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 text-sm text-zinc-700 hover:bg-zinc-50">
-                <input
-                  type="radio"
-                  name="mobile-completion-filter"
-                  checked={draftCompletion === value}
-                  onChange={() => setDraftCompletion(value)}
-                  className="size-4 accent-brand-600"
-                />
-                {label}
-              </label>
-            ))}
+            {COMPLETION_FILTERS.map(([value, label]) => {
+              const selected = draftCompletion === value;
+
+              return (
+                <label
+                  key={value}
+                  className={clsx(
+                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 text-sm has-focus-visible:ring-2 has-focus-visible:ring-brand-500/40 has-focus-visible:ring-offset-1",
+                    selected
+                      ? "bg-brand-50 font-semibold text-brand-700"
+                      : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="mobile-completion-filter"
+                    checked={selected}
+                    onChange={() => setDraftCompletion(value)}
+                    className="sr-only"
+                  />
+                  <span className="min-w-0 flex-1 truncate">{label}</span>
+                  {selected && (
+                    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="size-4 shrink-0">
+                      <path d="m4 10 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </label>
+              );
+            })}
           </fieldset>
 
           <div className="sticky bottom-0 flex gap-2 border-t border-zinc-100 bg-white pt-4">
