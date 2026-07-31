@@ -4,7 +4,7 @@ import { CategoryType } from "@/features/category/category.types";
 import { TodoType } from "@/features/todo/todo.types";
 import { useEffect, useId, useState } from "react";
 import clsx from "clsx";
-import { DragDropProvider } from "@dnd-kit/react";
+import { DragDropProvider, PointerSensor } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import Sidebar from "@/features/shared/components/Sidebar";
 import TodosByCategory from "@/features/shared/components/TodosByCategory";
@@ -114,8 +114,8 @@ export default function TodoList({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <p id={instructionsId} className="sr-only">
-          순서 변경 버튼에 초점을 둔 뒤 Enter 또는 Space를 누르고, 방향키로
-          이동한 다음 다시 Enter 또는 Space를 눌러 완료하세요.
+          항목을 클릭하거나 Enter 또는 Space를 누르면 수정할 수 있고, 항목을
+          끌어서 순서를 변경할 수 있습니다.
         </p>
         <MobileTodoToolbar
           categories={categories}
@@ -156,6 +156,7 @@ export default function TodoList({
                 isEmpty={categoryVisibleTodos.length === 0}
               >
                 <DragDropProvider
+                  sensors={[PointerSensor]}
                   onDragEnd={async (event) => {
                     if (event.canceled || reorder.pending) return;
                     const nextVisible = move(categoryVisibleTodos, event);
