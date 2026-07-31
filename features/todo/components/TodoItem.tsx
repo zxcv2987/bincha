@@ -32,11 +32,30 @@ export default function TodoItem({
   const { submit: updateTodo, pending: updatePending, fieldErrors } =
     useUpdateTodo(todo.id, onCancelEdit);
   const { submit: deleteTodo, pending: deletePending } = useDeleteTodo();
-  const { ref, handleRef, isDragging } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: todo.id,
     index,
     disabled: isEditing || reorderPending,
   });
+
+  // 행 안의 실제 인터랙티브 요소(체크박스/삭제·결과 버튼/링크)를 눌렀을 때는
+  // 수정 진입으로 처리하지 않는다. 그 외 영역 클릭만 수정으로 인식한다.
+  const isInteractiveTarget = (target: EventTarget | null) =>
+    target instanceof Element &&
+    target.closest("input, button, a, label, [contenteditable]") !== null;
+
+  const handleRowClick = (event: React.MouseEvent) => {
+    if (isInteractiveTarget(event.target)) return;
+    onEdit();
+  };
+
+  const handleRowKeyDown = (event: React.KeyboardEvent) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onEdit();
+    }
+  };
 
   const handleDelete = async () => {
     const confirmMessage = todo.result
@@ -72,22 +91,17 @@ export default function TodoItem({
   return (
     <div
       ref={ref}
+      role="button"
+      tabIndex={0}
+      aria-label={`${todo.title || "제목 없음"} 수정. 드래그하여 순서 변경`}
+      aria-describedby={instructionsId}
+      onClick={handleRowClick}
+      onKeyDown={handleRowKeyDown}
       className={clsx(
-        "group flex w-full items-start gap-2 px-3 py-2.5 hover:bg-zinc-50",
-        isDragging && "z-10 bg-white opacity-70 shadow-lg",
+        "group flex w-full cursor-pointer items-start gap-2 px-3 py-2.5 hover:bg-zinc-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
+        isDragging && "z-10 cursor-grabbing bg-white opacity-70 shadow-lg",
       )}
     >
-      <button
-        ref={handleRef}
-        type="button"
-        aria-label={`${todo.title || "제목 없음"} 순서 변경`}
-        aria-describedby={instructionsId}
-        disabled={reorderPending}
-        className="mt-0.5 shrink-0 cursor-grab rounded-md px-1 py-1.5 text-base leading-none text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        ⠿
-      </button>
-
       <label className="flex shrink-0 cursor-pointer items-center pt-0.5">
         <input
           type="checkbox"
@@ -127,19 +141,7 @@ export default function TodoItem({
         </span>
       </label>
 
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={`${todo.title || "제목 없음"} 수정`}
-        onClick={onEdit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onEdit();
-          }
-        }}
-        className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 rounded-lg text-left focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
-      >
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
         <h3 className="w-full truncate text-base font-semibold break-words text-zinc-700">
           {todo.title.trim() || "제목 없음"}
         </h3>

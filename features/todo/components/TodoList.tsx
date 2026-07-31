@@ -4,7 +4,8 @@ import { CategoryType } from "@/features/category/category.types";
 import { TodoType } from "@/features/todo/todo.types";
 import { useEffect, useId, useState } from "react";
 import clsx from "clsx";
-import { DragDropProvider } from "@dnd-kit/react";
+import { DragDropProvider, PointerSensor } from "@dnd-kit/react";
+import { PointerActivationConstraints } from "@dnd-kit/dom";
 import { move } from "@dnd-kit/helpers";
 import Sidebar from "@/features/shared/components/Sidebar";
 import TodosByCategory from "@/features/shared/components/TodosByCategory";
@@ -22,6 +23,20 @@ import {
   CompletionFilter,
   filterTodosByCompletion,
 } from "@/features/todo/todoFilters";
+
+// 행 전체가 드래그 소스이므로 클릭(수정)과 드래그(순서 변경)를 구분해야 한다.
+// 마우스/펜은 거리 임계값만 사용해 짧은 클릭은 수정으로, 5px 이상 이동은
+// 드래그로 처리한다. 터치는 롱프레스를 요구해 리스트 스크롤과 충돌하지 않게 한다.
+// (기본값의 마우스 지연 제약은 tolerance 초과 시 활성화를 취소해 빠른 드래그가
+// 튕겨 돌아오는 문제가 있어 사용하지 않는다.)
+const todoSensors = [
+  PointerSensor.configure({
+    activationConstraints: (event: PointerEvent) =>
+      event.pointerType === "touch"
+        ? [new PointerActivationConstraints.Delay({ value: 250, tolerance: 5 })]
+        : [new PointerActivationConstraints.Distance({ value: 5 })],
+  }),
+];
 
 function mergeVisibleOrder(all: TodoType[], nextVisible: TodoType[]) {
   const visibleIds = new Set(nextVisible.map((todo) => todo.id));
@@ -114,8 +129,8 @@ export default function TodoList({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <p id={instructionsId} className="sr-only">
-          순서 변경 버튼에 초점을 둔 뒤 Enter 또는 Space를 누르고, 방향키로
-          이동한 다음 다시 Enter 또는 Space를 눌러 완료하세요.
+          항목을 클릭하거나 Enter 또는 Space를 누르면 수정할 수 있고, 항목을
+          끌어서 순서를 변경할 수 있습니다.
         </p>
         <MobileTodoToolbar
           categories={categories}
@@ -156,6 +171,7 @@ export default function TodoList({
                 isEmpty={categoryVisibleTodos.length === 0}
               >
                 <DragDropProvider
+                  sensors={todoSensors}
                   onDragEnd={async (event) => {
                     if (event.canceled || reorder.pending) return;
                     const nextVisible = move(categoryVisibleTodos, event);
