@@ -58,6 +58,9 @@ export default function TodoList({
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const [orderedTodos, setOrderedTodos] = useState(todos);
   const [prevTodos, setPrevTodos] = useState(todos);
+  // 완료 토글 실패 메시지는 목록 레벨에서 표시한다. 완료 즉시 해당 항목이
+  // 필터에서 사라져(TodoItem 언마운트) 행 단위 에러가 유실되기 때문이다.
+  const [completionError, setCompletionError] = useState<string | null>(null);
   const instructionsId = useId();
   const reorder = useReorderTodos();
   const setCategories = useCategoryStore((s) => s.setCategories);
@@ -75,6 +78,23 @@ export default function TodoList({
     setPrevTodos(todos);
     setOrderedTodos(todos);
   }
+
+  // 완료 토글을 낙관적으로 반영한다. 함수형 업데이트라 여러 항목을 동시에
+  // 토글해도 각자 자기 id만 안전하게 갱신한다. 서버 성공 시 revalidate로
+  // 실제 값이 내려와 동기화되고, 실패 시 호출부가 이전 값으로 되돌린다.
+  const setTodoCompletion = (
+    todoId: number,
+    completed: boolean,
+    completedAt: Date | null,
+  ) => {
+    setOrderedTodos((current) =>
+      current.map((todo) =>
+        todo.id === todoId
+          ? { ...todo, completed, completed_at: completedAt }
+          : todo,
+      ),
+    );
+  };
 
   const visibleCategories = categories.filter(
     (category) =>
@@ -216,6 +236,8 @@ export default function TodoList({
                       isEditing={editingTodoId === todo.id}
                       onEdit={() => setEditingTodoId(todo.id)}
                       onCancelEdit={() => setEditingTodoId(null)}
+                      onSetCompletion={setTodoCompletion}
+                      onCompletionError={setCompletionError}
                     />
                   ))}
                 </DragDropProvider>
@@ -226,6 +248,11 @@ export default function TodoList({
         {reorder.error && (
           <p role="alert" className="px-1 pt-2 text-sm text-red-600">
             {reorder.error}
+          </p>
+        )}
+        {completionError && (
+          <p role="alert" className="px-1 pt-2 text-sm text-red-600">
+            {completionError}
           </p>
         )}
       </div>
