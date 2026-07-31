@@ -11,7 +11,7 @@ import TodoItem from "@/features/todo/components/TodoItem";
 import { useCategoryStore } from "@/features/category/provider";
 import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
-import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
+import EmptyCard from "@/features/shared/components/EmptyCard";
 import CategoryManagementButton from "@/features/category/components/CategoryManagementButton";
 import MobileTodoToolbar from "@/features/todo/components/MobileTodoToolbar";
 import {
@@ -104,7 +104,7 @@ export default function TodoList({
         <CreateTodoButton />
 
         {filteredTodos.length === 0 ? (
-          <TodoEmptyCard
+          <EmptyCard
             message={
               todos.length === 0
                 ? "할 일을 추가해 보세요."
@@ -112,7 +112,7 @@ export default function TodoList({
             }
           />
         ) : visibleCategories.length === 0 ? (
-          <TodoEmptyCard message="선택한 카테고리에 할 일이 없습니다." />
+          <EmptyCard message="선택한 카테고리에 할 일이 없습니다." />
         ) : (
           visibleCategories.map((category) => {
             const categoryTodos = filteredTodos.filter(

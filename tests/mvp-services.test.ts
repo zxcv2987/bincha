@@ -22,6 +22,13 @@ import {
   CategoryNotFoundError,
   CategoryOrderConflictError,
 } from "@/features/category/category.errors";
+import {
+  createMemo,
+  updateMemo,
+  deleteMemo,
+  getMemos,
+} from "@/features/memo/memo.service";
+import { MemoNotFoundError } from "@/features/memo/memo.errors";
 
 const prisma = new PrismaClient();
 const runId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -84,6 +91,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (owner) {
+    await prisma.memo.deleteMany({ where: { user_id: owner.id } });
     await prisma.task_result.deleteMany({ where: { user_id: owner.id } });
     await prisma.todos.deleteMany({ where: { user_id: owner.id } });
     await prisma.category.deleteMany({ where: { user_id: owner.id } });
@@ -158,6 +166,27 @@ test("다른 사용자는 Todo를 조회, 수정, 삭제할 수 없다", async (
   expect(
     await prisma.todos.findUnique({ where: { id: completedTodo.id } }),
   ).toBeTruthy();
+});
+
+test("다른 사용자는 메모를 조회, 수정, 삭제할 수 없다", async () => {
+  const memo = await createMemo("검증용 메모", "", owner.id);
+
+  const found = await getMemos(otherUser.id);
+  expect(found.some((m) => m.id === memo.id)).toBe(false);
+
+  await expect(
+    updateMemo({
+      id: memo.id,
+      content: "침범",
+      link: "",
+      userId: otherUser.id,
+    }),
+  ).rejects.toBeInstanceOf(MemoNotFoundError);
+
+  await expect(deleteMemo(memo.id, otherUser.id)).rejects.toBeInstanceOf(
+    MemoNotFoundError,
+  );
+  expect(await prisma.memo.findUnique({ where: { id: memo.id } })).toBeTruthy();
 });
 
 test("카테고리 이름을 수정하면 변경된 이름이 저장된다", async () => {

@@ -7,6 +7,7 @@ import clsx from "clsx";
 const NAV_ITEMS = [
   { href: "/", label: "할 일" },
   { href: "/results", label: "결과함" },
+  { href: "/memos", label: "메모" },
 ] as const;
 
 export default function Sidebar({
