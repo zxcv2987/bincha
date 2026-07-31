@@ -77,6 +77,9 @@ export default function TodoList({
   if (todos !== prevTodos) {
     setPrevTodos(todos);
     setOrderedTodos(todos);
+    // 서버 상태가 갱신되면(편집·드래그·생성·삭제·다른 항목 완료 성공) 이전
+    // 완료 실패 메시지는 더 이상 유효하지 않으므로 해제한다.
+    setCompletionError(null);
   }
 
   // 완료 토글을 낙관적으로 반영한다. 함수형 업데이트라 여러 항목을 동시에
@@ -138,7 +141,10 @@ export default function TodoList({
                     ? "bg-brand-50 font-semibold text-brand-700"
                     : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
                 )}
-                onClick={() => setCompletionFilter(value)}
+                onClick={() => {
+                  setCompletionFilter(value);
+                  setCompletionError(null);
+                }}
               >
                 {label}
               </button>
@@ -160,6 +166,7 @@ export default function TodoList({
             if (categoryId === null) resetCategory();
             else setCategory(categoryId);
             setCompletionFilter(completion);
+            setCompletionError(null);
           }}
         />
         <CreateTodoButton />
@@ -234,7 +241,10 @@ export default function TodoList({
                       instructionsId={instructionsId}
                       reorderPending={reorder.pending}
                       isEditing={editingTodoId === todo.id}
-                      onEdit={() => setEditingTodoId(todo.id)}
+                      onEdit={() => {
+                        setCompletionError(null);
+                        setEditingTodoId(todo.id);
+                      }}
                       onCancelEdit={() => setEditingTodoId(null)}
                       onSetCompletion={setTodoCompletion}
                       onCompletionError={setCompletionError}
