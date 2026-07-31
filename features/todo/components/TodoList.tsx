@@ -212,8 +212,8 @@ export default function TodoList({
                       sort_order: index,
                     }));
                     const previous = orderedTodos;
-                    setOrderedTodos([
-                      ...orderedTodos.filter(
+                    setOrderedTodos((current) => [
+                      ...current.filter(
                         (todo) => todo.category_id !== category.id,
                       ),
                       ...nextCategory,
