@@ -35,12 +35,13 @@ model todos {
   title        String       @default("")
   completed    Boolean      @default(false)
   completed_at DateTime?    @db.Timestamptz(6)
+  sort_order   Int          @default(0)
   category     category     @relation(fields: [category_id], references: [id], onDelete: Restrict)
   user         user         @relation(fields: [user_id], references: [id])
   result       task_result?
 
   @@index([user_id, completed])
-  @@index([category_id])
+  @@index([category_id, sort_order])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.

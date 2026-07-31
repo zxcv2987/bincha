@@ -4,11 +4,14 @@ import { revalidatePath } from "next/cache";
 import {
   createTodo,
   deleteTodo,
+  reorderTodos,
   toggleTodoCompleted,
   updateTodo,
 } from "./todo.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
+import { CategoryNotFoundError } from "@/features/category/category.errors";
+import { TodoOrderConflictError } from "./todo.errors";
 
 export type TodoInput = {
   title: string;
@@ -74,6 +77,38 @@ export async function deleteTodoAction(todoId: number): Promise<ActionResult> {
   } catch (error) {
     console.error("할 일 삭제 중 오류 발생:", error);
     return { ok: false, error: "삭제 실패" };
+  }
+}
+
+export async function reorderTodosAction(
+  categoryId: number,
+  todoIds: number[],
+): Promise<ActionResult> {
+  if (
+    !Number.isInteger(categoryId) ||
+    categoryId <= 0 ||
+    todoIds.some((id) => !Number.isInteger(id) || id <= 0)
+  ) {
+    return { ok: false, error: "잘못된 할 일 순서입니다." };
+  }
+
+  try {
+    const userId = await requireCurrentUserId();
+    await reorderTodos({ categoryId, todoIds, userId });
+    revalidatePath("/");
+    return { ok: true };
+  } catch (error) {
+    if (error instanceof CategoryNotFoundError) {
+      return { ok: false, error: "카테고리를 찾을 수 없습니다." };
+    }
+    if (error instanceof TodoOrderConflictError) {
+      return {
+        ok: false,
+        error: "할 일 목록이 변경됐어요. 새로고침 후 다시 시도해 주세요.",
+      };
+    }
+    console.error("할 일 순서 변경 중 오류 발생:", error);
+    return { ok: false, error: "할 일 순서 변경 실패" };
   }
 }
 
