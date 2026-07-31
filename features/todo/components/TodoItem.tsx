@@ -114,7 +114,7 @@ export default function TodoItem({
       ref={ref}
       role="button"
       tabIndex={0}
-      aria-label={`${todo.title || "제목 없음"} 수정. 드래그하여 순서 변경`}
+      aria-label={`${todo.title || "제목 없음"} 수정`}
       aria-describedby={instructionsId}
       onClick={handleRowClick}
       onKeyDown={handleRowKeyDown}
