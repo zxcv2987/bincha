@@ -2,8 +2,10 @@
 
 import { CategoryType } from "@/features/category/category.types";
 import { TodoType } from "@/features/todo/todo.types";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import clsx from "clsx";
+import { DragDropProvider } from "@dnd-kit/react";
+import { move } from "@dnd-kit/helpers";
 import Sidebar from "@/features/shared/components/Sidebar";
 import TodosByCategory from "@/features/shared/components/TodosByCategory";
 import CreateTodoButton from "@/features/todo/components/CreateTodoButton";
@@ -11,14 +13,23 @@ import TodoItem from "@/features/todo/components/TodoItem";
 import { useCategoryStore } from "@/features/category/provider";
 import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
-import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
+import EmptyCard from "@/features/shared/components/EmptyCard";
 import CategoryManagementButton from "@/features/category/components/CategoryManagementButton";
 import MobileTodoToolbar from "@/features/todo/components/MobileTodoToolbar";
+import useReorderTodos from "@/features/todo/hooks/useReorderTodos";
 import {
   COMPLETION_FILTERS,
   CompletionFilter,
   filterTodosByCompletion,
 } from "@/features/todo/todoFilters";
+
+function mergeVisibleOrder(all: TodoType[], nextVisible: TodoType[]) {
+  const visibleIds = new Set(nextVisible.map((todo) => todo.id));
+  const queue = [...nextVisible];
+  return all.map((todo) =>
+    visibleIds.has(todo.id) ? queue.shift()! : todo,
+  );
+}
 
 export default function TodoList({
   todos,
@@ -30,6 +41,10 @@ export default function TodoList({
   const [completionFilter, setCompletionFilter] =
     useState<CompletionFilter>("active");
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+  const [orderedTodos, setOrderedTodos] = useState(todos);
+  const [prevTodos, setPrevTodos] = useState(todos);
+  const instructionsId = useId();
+  const reorder = useReorderTodos();
   const setCategories = useCategoryStore((s) => s.setCategories);
   const selectedCategoryId = useCategoryStore((s) => s.selectedCategoryId);
   const resetCategory = useCategoryStore((s) => s.resetCategory);
@@ -39,11 +54,18 @@ export default function TodoList({
     setCategories(categories);
   }, [categories, setCategories]);
 
+  // 서버에서 새 todos가 내려오면(재검증 등) 로컬 낙관적 순서를 최신 값으로 맞춘다.
+  // 렌더 도중 조정해 불필요한 effect 왕복을 피한다.
+  if (todos !== prevTodos) {
+    setPrevTodos(todos);
+    setOrderedTodos(todos);
+  }
+
   const visibleCategories = categories.filter(
     (category) =>
       selectedCategoryId === null || category.id === selectedCategoryId,
   );
-  const filteredTodos = filterTodosByCompletion(todos, completionFilter);
+  const filteredTodos = filterTodosByCompletion(orderedTodos, completionFilter);
 
   return (
     <div className="flex w-full flex-col gap-6 border-t border-zinc-200 pt-6 md:flex-row md:items-start">
@@ -91,6 +113,10 @@ export default function TodoList({
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <p id={instructionsId} className="sr-only">
+          순서 변경 버튼에 초점을 둔 뒤 Enter 또는 Space를 누르고, 방향키로
+          이동한 다음 다시 Enter 또는 Space를 눌러 완료하세요.
+        </p>
         <MobileTodoToolbar
           categories={categories}
           selectedCategoryId={selectedCategoryId}
@@ -104,7 +130,7 @@ export default function TodoList({
         <CreateTodoButton />
 
         {filteredTodos.length === 0 ? (
-          <TodoEmptyCard
+          <EmptyCard
             message={
               todos.length === 0
                 ? "할 일을 추가해 보세요."
@@ -112,32 +138,79 @@ export default function TodoList({
             }
           />
         ) : visibleCategories.length === 0 ? (
-          <TodoEmptyCard message="선택한 카테고리에 할 일이 없습니다." />
+          <EmptyCard message="선택한 카테고리에 할 일이 없습니다." />
         ) : (
           visibleCategories.map((category) => {
-            const categoryTodos = filteredTodos.filter(
-              (todo) =>
-                todo.category_id === category.id,
+            const categoryTodos = orderedTodos.filter(
+              (todo) => todo.category_id === category.id,
+            );
+            const categoryVisibleTodos = filterTodosByCompletion(
+              categoryTodos,
+              completionFilter,
             );
 
             return (
               <TodosByCategory
                 key={category.id}
                 category={category}
-                isEmpty={categoryTodos.length === 0}
+                isEmpty={categoryVisibleTodos.length === 0}
               >
-                {categoryTodos.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    isEditing={editingTodoId === todo.id}
-                    onEdit={() => setEditingTodoId(todo.id)}
-                    onCancelEdit={() => setEditingTodoId(null)}
-                  />
-                ))}
+                <DragDropProvider
+                  onDragEnd={async (event) => {
+                    if (event.canceled || reorder.pending) return;
+                    const nextVisible = move(categoryVisibleTodos, event);
+                    if (
+                      nextVisible.every(
+                        (todo, index) =>
+                          todo.id === categoryVisibleTodos[index]?.id,
+                      )
+                    ) {
+                      return;
+                    }
+
+                    const nextCategory = mergeVisibleOrder(
+                      categoryTodos,
+                      nextVisible,
+                    ).map((todo, index) => ({
+                      ...todo,
+                      sort_order: index,
+                    }));
+                    const previous = orderedTodos;
+                    setOrderedTodos([
+                      ...orderedTodos.filter(
+                        (todo) => todo.category_id !== category.id,
+                      ),
+                      ...nextCategory,
+                    ]);
+
+                    const result = await reorder.submit(
+                      category.id,
+                      nextCategory.map(({ id }) => id),
+                    );
+                    if (!result?.ok) setOrderedTodos(previous);
+                  }}
+                >
+                  {categoryVisibleTodos.map((todo, index) => (
+                    <TodoItem
+                      key={todo.id}
+                      todo={todo}
+                      index={index}
+                      instructionsId={instructionsId}
+                      reorderPending={reorder.pending}
+                      isEditing={editingTodoId === todo.id}
+                      onEdit={() => setEditingTodoId(todo.id)}
+                      onCancelEdit={() => setEditingTodoId(null)}
+                    />
+                  ))}
+                </DragDropProvider>
               </TodosByCategory>
             );
           })
+        )}
+        {reorder.error && (
+          <p role="alert" className="px-1 pt-2 text-sm text-red-600">
+            {reorder.error}
+          </p>
         )}
       </div>
     </div>

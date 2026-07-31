@@ -58,6 +58,7 @@ export default function TodoForm({
           )}
           defaultValue={todo && todo.title}
           spellCheck={false}
+          autoFocus
         />
         {fieldErrors?.title && (
           <span className="text-xs text-red-400">{fieldErrors.title}</span>

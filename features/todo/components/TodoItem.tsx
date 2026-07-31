@@ -8,14 +8,21 @@ import useUpdateTodo from "@/features/todo/hooks/useUpdateTodo";
 import useDeleteTodo from "@/features/todo/hooks/useDeleteTodo";
 import clsx from "clsx";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
+import { useSortable } from "@dnd-kit/react/sortable";
 
 export default function TodoItem({
   todo,
+  index,
+  instructionsId,
+  reorderPending,
   isEditing,
   onEdit,
   onCancelEdit,
 }: {
   todo: TodoType;
+  index: number;
+  instructionsId: string;
+  reorderPending: boolean;
   isEditing: boolean;
   onEdit: () => void;
   onCancelEdit: () => void;
@@ -25,6 +32,11 @@ export default function TodoItem({
   const { submit: updateTodo, pending: updatePending, fieldErrors } =
     useUpdateTodo(todo.id, onCancelEdit);
   const { submit: deleteTodo, pending: deletePending } = useDeleteTodo();
+  const { ref, handleRef, isDragging } = useSortable({
+    id: todo.id,
+    index,
+    disabled: isEditing || reorderPending,
+  });
 
   const handleDelete = async () => {
     const confirmMessage = todo.result
@@ -37,6 +49,7 @@ export default function TodoItem({
   if (isEditing) {
     return (
       <div
+        ref={ref}
         className="w-full px-3 py-2.5"
         onKeyDown={(e) => {
           if (e.key === "Escape") onCancelEdit();
@@ -58,9 +71,23 @@ export default function TodoItem({
 
   return (
     <div
-      key={todo.id}
-      className="group flex w-full items-start gap-3 px-3 py-2.5 hover:bg-zinc-50"
+      ref={ref}
+      className={clsx(
+        "group flex w-full items-start gap-2 px-3 py-2.5 hover:bg-zinc-50",
+        isDragging && "z-10 bg-white opacity-70 shadow-lg",
+      )}
     >
+      <button
+        ref={handleRef}
+        type="button"
+        aria-label={`${todo.title || "제목 없음"} 순서 변경`}
+        aria-describedby={instructionsId}
+        disabled={reorderPending}
+        className="mt-0.5 shrink-0 cursor-grab rounded-md px-1 py-1.5 text-base leading-none text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        ⠿
+      </button>
+
       <label className="flex shrink-0 cursor-pointer items-center pt-0.5">
         <input
           type="checkbox"
@@ -113,7 +140,7 @@ export default function TodoItem({
         }}
         className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 rounded-lg text-left focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
       >
-        <h3 className="w-full truncate text-sm font-semibold break-words text-zinc-700">
+        <h3 className="w-full truncate text-base font-semibold break-words text-zinc-700">
           {todo.title.trim() || "제목 없음"}
         </h3>
         {todo.text.trim() ? (

@@ -63,6 +63,11 @@
       box-shadow 0.2s;
   }
 
+  .input::placeholder {
+    font-size: 0.875rem; /* text-sm, 본문과 동일 */
+    line-height: 1.25rem;
+  }
+
   .input:focus {
     border-color: var(--color-brand-500);
     box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand-500) 25%, transparent);
