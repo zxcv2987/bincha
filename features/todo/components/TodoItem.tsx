@@ -18,6 +18,8 @@ export default function TodoItem({
   isEditing,
   onEdit,
   onCancelEdit,
+  onSetCompletion,
+  onCompletionError,
 }: {
   todo: TodoType;
   index: number;
@@ -26,9 +28,14 @@ export default function TodoItem({
   isEditing: boolean;
   onEdit: () => void;
   onCancelEdit: () => void;
+  onSetCompletion: (
+    todoId: number,
+    completed: boolean,
+    completedAt: Date | null,
+  ) => void;
+  onCompletionError: (message: string | null) => void;
 }) {
-  const { submit: toggleComplete, pending: togglePending, error: toggleError } =
-    useToggleTodo();
+  const { submit: toggleComplete, pending: togglePending } = useToggleTodo();
   const { submit: updateTodo, pending: updatePending, fieldErrors } =
     useUpdateTodo(todo.id, onCancelEdit);
   const { submit: deleteTodo, pending: deletePending } = useDeleteTodo();
@@ -54,6 +61,20 @@ export default function TodoItem({
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onEdit();
+    }
+  };
+
+  // 완료 상태를 낙관적으로 먼저 바꾸고, 서버 요청이 실패하면 이전 값으로 되돌린다.
+  const handleToggle = async () => {
+    onCompletionError(null);
+    const previousCompleted = todo.completed;
+    const previousCompletedAt = todo.completed_at;
+    const nextCompleted = !previousCompleted;
+    onSetCompletion(todo.id, nextCompleted, nextCompleted ? new Date() : null);
+    const result = await toggleComplete(todo.id);
+    if (result && !result.ok) {
+      onSetCompletion(todo.id, previousCompleted, previousCompletedAt);
+      onCompletionError(result.error ?? "완료 상태를 변경하지 못했습니다.");
     }
   };
 
@@ -108,7 +129,7 @@ export default function TodoItem({
           aria-label={`${todo.title || "제목 없음"} 완료 상태`}
           checked={todo.completed}
           disabled={togglePending}
-          onChange={() => toggleComplete(todo.id)}
+          onChange={handleToggle}
           className="peer sr-only outline-none"
         />
         <span
@@ -156,9 +177,6 @@ export default function TodoItem({
           <span className="w-full text-xs text-zinc-500">
             완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
           </span>
-        )}
-        {toggleError && (
-          <span className="w-full text-xs text-red-400">{toggleError}</span>
         )}
         {todo.completed && (
           <div
