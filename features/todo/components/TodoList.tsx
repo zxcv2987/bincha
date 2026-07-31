@@ -11,14 +11,14 @@ import TodoItem from "@/features/todo/components/TodoItem";
 import { useCategoryStore } from "@/features/category/provider";
 import CategoryList from "@/features/category/components/CategoryList";
 import CreateCategoryButton from "@/features/category/components/CreateCategoryButton";
-import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
+import EmptyCard from "@/features/shared/components/EmptyCard";
 import CategoryManagementButton from "@/features/category/components/CategoryManagementButton";
-
-const COMPLETION_FILTERS = [
-  ["all", "전체"],
-  ["active", "진행 중"],
-  ["completed", "완료"],
-] as const;
+import MobileTodoToolbar from "@/features/todo/components/MobileTodoToolbar";
+import {
+  COMPLETION_FILTERS,
+  CompletionFilter,
+  filterTodosByCompletion,
+} from "@/features/todo/todoFilters";
 
 export default function TodoList({
   todos,
@@ -27,9 +27,9 @@ export default function TodoList({
   todos: TodoType[];
   categories: CategoryType[];
 }) {
-  const [completionFilter, setCompletionFilter] = useState<
-    "all" | "active" | "completed"
-  >("all");
+  const [completionFilter, setCompletionFilter] =
+    useState<CompletionFilter>("active");
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
   const setCategories = useCategoryStore((s) => s.setCategories);
   const selectedCategoryId = useCategoryStore((s) => s.selectedCategoryId);
   const resetCategory = useCategoryStore((s) => s.resetCategory);
@@ -43,18 +43,14 @@ export default function TodoList({
     (category) =>
       selectedCategoryId === null || category.id === selectedCategoryId,
   );
-  const filteredTodos = todos.filter((todo) => {
-    if (completionFilter === "active") return !todo.completed;
-    if (completionFilter === "completed") return todo.completed;
-    return true;
-  });
+  const filteredTodos = filterTodosByCompletion(todos, completionFilter);
 
   return (
     <div className="flex w-full flex-col gap-6 border-t border-zinc-200 pt-6 md:flex-row md:items-start">
-      <Sidebar>
+      <Sidebar childrenClassName="hidden md:flex">
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between px-3">
-            <h2 className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
               카테고리
             </h2>
             <CategoryManagementButton categories={categories} />
@@ -71,7 +67,7 @@ export default function TodoList({
         <div className="border-t border-zinc-200" />
 
         <div className="flex flex-col gap-1">
-          <h2 className="px-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+          <h2 className="px-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             완료 상태
           </h2>
           <div className="flex flex-col gap-0.5" aria-label="완료 상태 필터">
@@ -80,7 +76,7 @@ export default function TodoList({
                 key={value}
                 type="button"
                 className={clsx(
-                  "w-full rounded-lg px-3 py-1.5 text-left text-sm",
+                  "w-full rounded-lg px-3 py-1.5 text-left text-sm focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
                   completionFilter === value
                     ? "bg-brand-50 font-semibold text-brand-700"
                     : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",
@@ -95,10 +91,20 @@ export default function TodoList({
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <MobileTodoToolbar
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          completionFilter={completionFilter}
+          onApplyFilters={(categoryId, completion) => {
+            if (categoryId === null) resetCategory();
+            else setCategory(categoryId);
+            setCompletionFilter(completion);
+          }}
+        />
         <CreateTodoButton />
 
         {filteredTodos.length === 0 ? (
-          <TodoEmptyCard
+          <EmptyCard
             message={
               todos.length === 0
                 ? "할 일을 추가해 보세요."
@@ -106,7 +112,7 @@ export default function TodoList({
             }
           />
         ) : visibleCategories.length === 0 ? (
-          <TodoEmptyCard message="선택한 카테고리에 할 일이 없습니다." />
+          <EmptyCard message="선택한 카테고리에 할 일이 없습니다." />
         ) : (
           visibleCategories.map((category) => {
             const categoryTodos = filteredTodos.filter(
@@ -121,7 +127,13 @@ export default function TodoList({
                 isEmpty={categoryTodos.length === 0}
               >
                 {categoryTodos.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    isEditing={editingTodoId === todo.id}
+                    onEdit={() => setEditingTodoId(todo.id)}
+                    onCancelEdit={() => setEditingTodoId(null)}
+                  />
                 ))}
               </TodosByCategory>
             );

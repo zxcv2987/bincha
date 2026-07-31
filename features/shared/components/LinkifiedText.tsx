@@ -16,7 +16,9 @@ export default function LinkifiedText({ content }: { content: string }) {
               href={part}
               target="_blank"
               rel="noopener noreferrer"
-              className="break-all text-zinc-400 underline underline-offset-2"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              className="rounded break-all text-zinc-500 underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
             >
               {part}
             </Link>

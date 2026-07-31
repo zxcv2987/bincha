@@ -10,12 +10,12 @@ export default async function AppHeader() {
       <Link
         href="/"
         aria-label="내가 해야 할 일 홈"
-        className="focus-visible:ring-brand-500 flex min-w-0 items-end gap-3 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="focus-visible:ring-brand-500/40 flex min-w-0 flex-col gap-0.5 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:flex-row sm:items-end sm:gap-3"
       >
-        <h1 className="min-w-0 truncate text-2xl font-semibold text-zinc-700 sm:text-4xl">
+        <h1 className="min-w-0 text-2xl font-semibold text-zinc-700 sm:truncate sm:text-4xl">
           내가 해야 할 일
         </h1>
-        <span className="min-w-0 truncate text-xs font-medium text-zinc-500">
+        <span className="min-w-0 text-xs font-medium text-zinc-500 sm:truncate">
           벌어야 할 돈 말고도 뭐가 있었는데
         </span>
       </Link>

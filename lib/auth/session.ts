@@ -1,7 +1,8 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { verifyAccessToken } from "@/lib/auth/tokens";
 
-export async function getCurrentUserId(): Promise<bigint | null> {
+export const getCurrentUserId = cache(async (): Promise<bigint | null> => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
 
@@ -13,7 +14,7 @@ export async function getCurrentUserId(): Promise<bigint | null> {
   } catch {
     return null;
   }
-}
+});
 
 export async function requireCurrentUserId(): Promise<bigint> {
   const userId = await getCurrentUserId();

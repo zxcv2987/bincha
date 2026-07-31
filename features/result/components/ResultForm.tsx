@@ -3,6 +3,7 @@
 import { TodoType } from "@/features/todo/todo.types";
 import { ResultInput } from "@/features/result/result.actions";
 import useDeleteResult from "@/features/result/hooks/useDeleteResult";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function ResultForm({
   todo,
@@ -106,6 +107,7 @@ export default function ResultForm({
           type="checkbox"
           name="needsMeasurement"
           defaultChecked={result?.needs_measurement}
+          className="accent-brand-600 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
         />
         나중에 측정 필요
       </label>
@@ -119,7 +121,9 @@ export default function ResultForm({
             disabled={deleting || pending}
             onClick={deleteResult}
           >
-            {deleting ? "삭제 중..." : "결과 삭제"}
+            <ButtonLabel pending={deleting} pendingText="삭제 중...">
+              결과 삭제
+            </ButtonLabel>
           </button>
         )}
         <button
@@ -127,7 +131,9 @@ export default function ResultForm({
           className="btn btn-primary ml-auto w-auto"
           disabled={pending || deleting}
         >
-          {pending ? "저장 중..." : result ? "결과 수정" : "결과 저장"}
+          <ButtonLabel pending={pending} pendingText="저장 중...">
+            {result ? "결과 수정" : "결과 저장"}
+          </ButtonLabel>
         </button>
       </div>
     </form>

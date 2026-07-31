@@ -2,17 +2,27 @@ import { TodoType } from "@/features/todo/todo.types";
 import { TodoInput } from "@/features/todo/todo.actions";
 import CategoryPicker from "@/features/category/components/CategoryPicker";
 import { useId } from "react";
+import clsx from "clsx";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function TodoForm({
   todo,
   pending,
   fieldErrors,
   onSubmit,
+  onCancel,
+  compact = false,
+  className = "w-xs md:w-md",
+  textRows = 5,
 }: {
   todo?: TodoType;
   pending: boolean;
   fieldErrors?: Record<string, string>;
   onSubmit: (input: TodoInput) => void;
+  onCancel?: () => void;
+  compact?: boolean;
+  className?: string;
+  textRows?: number;
 }) {
   const titleId = useId();
   const textId = useId();
@@ -30,17 +40,22 @@ export default function TodoForm({
           categoryId: typeof categoryId === "string" ? categoryId : null,
         });
       }}
-      className="flex w-xs flex-col gap-5 md:w-md"
+      className={clsx("flex flex-col gap-5", className)}
     >
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={titleId} className="text-sm font-semibold text-zinc-600">
-          할 일
-        </label>
+        {!compact && (
+          <label htmlFor={titleId} className="text-sm font-semibold text-zinc-600">
+            할 일
+          </label>
+        )}
         <input
           id={titleId}
           name="title"
           placeholder="할 일"
-          className="input"
+          className={clsx(
+            "input",
+            compact && "px-2.5 py-1.5 text-sm font-semibold text-zinc-700",
+          )}
           defaultValue={todo && todo.title}
           spellCheck={false}
           autoFocus
@@ -51,15 +66,21 @@ export default function TodoForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={textId} className="text-sm font-semibold text-zinc-600">
-          내용
-        </label>
+        {!compact && (
+          <label htmlFor={textId} className="text-sm font-semibold text-zinc-600">
+            내용
+          </label>
+        )}
         <textarea
           id={textId}
           name="text"
           placeholder="내용"
-          rows={5}
-          className="input"
+          rows={textRows}
+          className={clsx(
+            "input",
+            compact &&
+              "field-sizing-content max-h-52 overflow-y-auto px-2.5 py-1.5 text-sm text-zinc-500",
+          )}
           defaultValue={todo && todo.text}
           spellCheck={false}
         />
@@ -70,9 +91,31 @@ export default function TodoForm({
         error={fieldErrors?.categoryId}
       />
 
-      <button className="btn btn-primary" disabled={pending} type="submit">
-        {pending ? "로딩 중" : todo ? "할 일 수정" : "할 일 추가"}
-      </button>
+      <div className="flex gap-2">
+        <button
+          className={clsx(
+            "btn btn-primary",
+            onCancel && "w-auto",
+            compact && "px-6 py-3 text-sm",
+          )}
+          disabled={pending}
+          type="submit"
+        >
+          <ButtonLabel pending={pending} pendingText="로딩 중...">
+            {todo ? "할 일 수정" : "할 일 추가"}
+          </ButtonLabel>
+        </button>
+        {onCancel && (
+          <button
+            type="button"
+            className={clsx("btn w-auto", compact && "px-6 py-3 text-sm")}
+            disabled={pending}
+            onClick={onCancel}
+          >
+            취소
+          </button>
+        )}
+      </div>
     </form>
   );
 }

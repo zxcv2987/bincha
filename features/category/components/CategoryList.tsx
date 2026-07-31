@@ -18,7 +18,7 @@ export default function CategoryList({
       <button
         type="button"
         className={clsx(
-          "w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-sm",
+          "w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-sm focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
           selectedCategoryId === null
             ? "bg-brand-50 font-semibold text-brand-700"
             : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",

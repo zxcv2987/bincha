@@ -53,6 +53,20 @@ model user {
   categories    category[]
   todos         todos[]
   task_results  task_result[]
+  memos         memo[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model memo {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+  content    String
+  link       String   @default("")
+  user_id    BigInt
+  user       user     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
 }
 
 model task_result {

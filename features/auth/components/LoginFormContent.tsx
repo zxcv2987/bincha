@@ -3,6 +3,7 @@
 import { FormEvent, useEffect } from "react";
 import clsx from "clsx";
 import useLogin from "@/features/auth/hooks/useLogin";
+import ButtonLabel from "@/features/shared/components/ButtonLabel";
 
 export default function LoginFormContent({
   onLoadingChange,
@@ -43,7 +44,9 @@ export default function LoginFormContent({
         className={clsx("btn btn-primary", pending && "opacity-90")}
         disabled={pending}
       >
-        {pending ? "로그인 중..." : "로그인"}
+        <ButtonLabel pending={pending} pendingText="로그인 중...">
+          로그인
+        </ButtonLabel>
       </button>
     </form>
   );

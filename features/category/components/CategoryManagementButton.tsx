@@ -16,7 +16,7 @@ export default function CategoryManagementButton({
     <>
       <button
         type="button"
-        className="rounded-md px-1.5 py-1 text-xs font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
+        className="rounded-md px-1.5 py-1 text-xs font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
         onClick={() => setOpen(true)}
       >
         관리
