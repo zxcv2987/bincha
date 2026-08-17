@@ -9,6 +9,7 @@ import {
 } from "./todo.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
+import { toActionResult } from "@/features/shared/errors/toActionResult";
 
 export type TodoInput = {
   title: string;
@@ -36,8 +37,7 @@ export async function createTodoAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 추가 중 오류 발생:", error);
-    return { ok: false, error: "할 일을 추가하지 못했습니다." };
+    return toActionResult(error, "할 일을 추가하지 못했습니다.", "할 일 추가 중 오류 발생:");
   }
 }
 
@@ -60,8 +60,7 @@ export async function updateTodoAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 수정 중 오류 발생:", error);
-    return { ok: false, error: "할 일을 수정하지 못했습니다." };
+    return toActionResult(error, "할 일을 수정하지 못했습니다.", "할 일 수정 중 오류 발생:");
   }
 }
 
@@ -72,8 +71,7 @@ export async function deleteTodoAction(todoId: number): Promise<ActionResult> {
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 삭제 중 오류 발생:", error);
-    return { ok: false, error: "삭제 실패" };
+    return toActionResult(error, "삭제 실패", "할 일 삭제 중 오류 발생:");
   }
 }
 
@@ -86,7 +84,10 @@ export async function toggleTodoCompletedAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 완료 상태 변경 중 오류 발생:", error);
-    return { ok: false, error: "완료 상태를 변경하지 못했습니다." };
+    return toActionResult(
+      error,
+      "완료 상태를 변경하지 못했습니다.",
+      "할 일 완료 상태 변경 중 오류 발생:",
+    );
   }
 }

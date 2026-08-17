@@ -23,7 +23,8 @@ export default function useLogin() {
       });
 
       if (!res.ok) {
-        setError("로그인 실패");
+        const body = await res.json().catch(() => null);
+        setError(body?.message || "로그인 실패");
         setPending(false);
         return;
       }
