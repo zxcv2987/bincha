@@ -8,13 +8,8 @@ import {
   reorderCategories,
 } from "./category.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
-import {
-  CategoryAlreadyExistsError,
-  CategoryHasTodosError,
-  CategoryNotFoundError,
-  CategoryOrderConflictError,
-} from "./category.errors";
 import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
+import { toActionResult } from "@/features/shared/errors/toActionResult";
 import { CategoryType } from "./category.types";
 
 export async function createCategoryByName(
@@ -28,11 +23,7 @@ export async function createCategoryByName(
     revalidatePath("/");
     return { ok: true, data: created };
   } catch (error) {
-    if (error instanceof CategoryAlreadyExistsError) {
-      return { ok: false, error: "이미 사용 중인 카테고리 이름입니다." };
-    }
-    console.error("카테고리 추가 중 오류 발생:", error);
-    return { ok: false, error: "카테고리 추가 실패" };
+    return toActionResult(error, "카테고리 추가 실패", "카테고리 추가 중 오류 발생:");
   }
 }
 
@@ -45,14 +36,7 @@ export async function deleteCategoryAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    if (error instanceof CategoryHasTodosError) {
-      return {
-        ok: false,
-        error: `이 카테고리에 할 일이 ${error.todoCount}개 있어 삭제할 수 없어요. 먼저 할 일을 다른 카테고리로 옮기거나 삭제해 주세요.`,
-      };
-    }
-    console.error("카테고리 삭제 중 오류 발생:", error);
-    return { ok: false, error: "삭제 실패" };
+    return toActionResult(error, "삭제 실패", "카테고리 삭제 중 오류 발생:");
   }
 }
 
@@ -75,14 +59,7 @@ export async function renameCategoryAction(
     revalidatePath("/");
     return { ok: true, data: renamed };
   } catch (error) {
-    if (error instanceof CategoryAlreadyExistsError) {
-      return { ok: false, error: "이미 사용 중인 카테고리 이름입니다." };
-    }
-    if (error instanceof CategoryNotFoundError) {
-      return { ok: false, error: "카테고리를 찾을 수 없습니다." };
-    }
-    console.error("카테고리 수정 중 오류 발생:", error);
-    return { ok: false, error: "카테고리 수정 실패" };
+    return toActionResult(error, "카테고리 수정 실패", "카테고리 수정 중 오류 발생:");
   }
 }
 
@@ -99,13 +76,10 @@ export async function reorderCategoriesAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    if (error instanceof CategoryOrderConflictError) {
-      return {
-        ok: false,
-        error: "카테고리 목록이 변경됐어요. 새로고침 후 다시 시도해 주세요.",
-      };
-    }
-    console.error("카테고리 순서 변경 중 오류 발생:", error);
-    return { ok: false, error: "카테고리 순서 변경 실패" };
+    return toActionResult(
+      error,
+      "카테고리 순서 변경 실패",
+      "카테고리 순서 변경 중 오류 발생:",
+    );
   }
 }

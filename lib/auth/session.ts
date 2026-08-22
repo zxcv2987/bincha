@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { verifyAccessToken } from "@/lib/auth/tokens";
+import { AuthError } from "@/lib/auth/errors";
 
 export const getCurrentUserId = cache(async (): Promise<bigint | null> => {
   const cookieStore = await cookies();
@@ -19,7 +20,7 @@ export const getCurrentUserId = cache(async (): Promise<bigint | null> => {
 export async function requireCurrentUserId(): Promise<bigint> {
   const userId = await getCurrentUserId();
 
-  if (!userId) throw new Error("AUTH_REQUIRED");
+  if (!userId) throw new AuthError("UNAUTHORIZED", "로그인이 필요합니다");
 
   return userId;
 }

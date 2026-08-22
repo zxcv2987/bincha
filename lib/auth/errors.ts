@@ -1,3 +1,5 @@
+import { DomainError } from "@/features/shared/errors/DomainError";
+
 export type AuthErrorCode =
   | "INVALID_CREDENTIALS"
   | "INVALID_TOKEN"
@@ -5,13 +7,12 @@ export type AuthErrorCode =
   | "INVALID_PASSWORD"
   | "UNAUTHORIZED";
 
-export class AuthError extends Error {
+export class AuthError extends DomainError {
   constructor(
     public code: AuthErrorCode,
     message: string,
   ) {
     super(message);
-    this.name = "AuthError";
   }
 }
 

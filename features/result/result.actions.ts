@@ -7,12 +7,8 @@ import {
   deleteTaskResult,
   updateTaskResult,
 } from "./result.service";
-import {
-  CompletedTodoRequiredError,
-  ResultAlreadyExistsError,
-  ResultNotFoundError,
-} from "./result.errors";
 import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
+import { toActionResult } from "@/features/shared/errors/toActionResult";
 
 export type ResultInput = {
   summary: string;
@@ -69,14 +65,7 @@ export async function createTaskResultAction(
     revalidateResultPaths();
     return { ok: true };
   } catch (error) {
-    if (error instanceof CompletedTodoRequiredError) {
-      return { ok: false, error: "완료한 작업에만 결과를 기록할 수 있습니다." };
-    }
-    if (error instanceof ResultAlreadyExistsError) {
-      return { ok: false, error: "이미 결과가 기록된 할 일입니다." };
-    }
-    console.error("결과 생성 중 오류 발생:", error);
-    return { ok: false, error: "결과를 저장하지 못했습니다." };
+    return toActionResult(error, "결과를 저장하지 못했습니다.", "결과 생성 중 오류 발생:");
   }
 }
 
@@ -93,11 +82,7 @@ export async function updateTaskResultAction(
     revalidateResultPaths();
     return { ok: true };
   } catch (error) {
-    if (error instanceof ResultNotFoundError) {
-      return { ok: false, error: "결과를 찾을 수 없습니다." };
-    }
-    console.error("결과 수정 중 오류 발생:", error);
-    return { ok: false, error: "결과를 저장하지 못했습니다." };
+    return toActionResult(error, "결과를 저장하지 못했습니다.", "결과 수정 중 오류 발생:");
   }
 }
 
@@ -110,7 +95,6 @@ export async function deleteTaskResultAction(
     revalidateResultPaths();
     return { ok: true };
   } catch (error) {
-    console.error("결과 삭제 중 오류 발생:", error);
-    return { ok: false, error: "결과를 삭제하지 못했습니다." };
+    return toActionResult(error, "결과를 삭제하지 못했습니다.", "결과 삭제 중 오류 발생:");
   }
 }

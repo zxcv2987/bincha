@@ -4,6 +4,10 @@ import { hashPassword, isBcryptHash, verifyPassword } from "./password";
 import { createAccessToken, createRefreshToken } from "./tokens";
 
 export async function authenticateAndIssueTokens(password: string) {
+  if (!password || typeof password !== "string") {
+    throw new AuthError("INVALID_CREDENTIALS", "Invalid credentials");
+  }
+
   const user = await prisma.user.findUnique({
     where: { username: "admin" },
   });

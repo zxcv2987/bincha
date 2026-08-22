@@ -10,8 +10,7 @@ import {
 } from "./todo.service";
 import { requireCurrentUserId } from "@/lib/auth/session";
 import { ActionResult } from "@/features/shared/hooks/useAsyncAction";
-import { CategoryNotFoundError } from "@/features/category/category.errors";
-import { TodoOrderConflictError } from "./todo.errors";
+import { toActionResult } from "@/features/shared/errors/toActionResult";
 
 export type TodoInput = {
   title: string;
@@ -39,8 +38,7 @@ export async function createTodoAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 추가 중 오류 발생:", error);
-    return { ok: false, error: "할 일을 추가하지 못했습니다." };
+    return toActionResult(error, "할 일을 추가하지 못했습니다.", "할 일 추가 중 오류 발생:");
   }
 }
 
@@ -63,8 +61,7 @@ export async function updateTodoAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 수정 중 오류 발생:", error);
-    return { ok: false, error: "할 일을 수정하지 못했습니다." };
+    return toActionResult(error, "할 일을 수정하지 못했습니다.", "할 일 수정 중 오류 발생:");
   }
 }
 
@@ -75,8 +72,7 @@ export async function deleteTodoAction(todoId: number): Promise<ActionResult> {
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 삭제 중 오류 발생:", error);
-    return { ok: false, error: "삭제 실패" };
+    return toActionResult(error, "삭제 실패", "할 일 삭제 중 오류 발생:");
   }
 }
 
@@ -98,17 +94,11 @@ export async function reorderTodosAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    if (error instanceof CategoryNotFoundError) {
-      return { ok: false, error: "카테고리를 찾을 수 없습니다." };
-    }
-    if (error instanceof TodoOrderConflictError) {
-      return {
-        ok: false,
-        error: "할 일 목록이 변경됐어요. 새로고침 후 다시 시도해 주세요.",
-      };
-    }
-    console.error("할 일 순서 변경 중 오류 발생:", error);
-    return { ok: false, error: "할 일 순서 변경 실패" };
+    return toActionResult(
+      error,
+      "할 일 순서 변경 실패",
+      "할 일 순서 변경 중 오류 발생:",
+    );
   }
 }
 
@@ -121,7 +111,10 @@ export async function toggleTodoCompletedAction(
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    console.error("할 일 완료 상태 변경 중 오류 발생:", error);
-    return { ok: false, error: "완료 상태를 변경하지 못했습니다." };
+    return toActionResult(
+      error,
+      "완료 상태를 변경하지 못했습니다.",
+      "할 일 완료 상태 변경 중 오류 발생:",
+    );
   }
 }

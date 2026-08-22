@@ -123,20 +123,35 @@ export async function deleteCategory(
   id: number,
   userId: bigint,
 ): Promise<void> {
-  await prisma.$transaction(async (transaction) => {
-    await lockCategoryMutations(transaction, userId);
-    // 스키마상 todos.category는 onDelete: Restrict라 할 일이 남아있으면
-    // DB가 삭제를 거부한다. 사전에 개수를 확인해 구체적인 이유를 알려준다.
-    const todoCount = await transaction.todos.count({
-      where: { category_id: id, user_id: userId },
-    });
-    if (todoCount > 0) throw new CategoryHasTodosError(todoCount);
+  try {
+    await prisma.$transaction(async (transaction) => {
+      await lockCategoryMutations(transaction, userId);
+      // 스키마상 todos.category는 onDelete: Restrict라 할 일이 남아있으면
+      // DB가 삭제를 거부한다. 사전에 개수를 확인해 구체적인 이유를 알려준다.
+      const todoCount = await transaction.todos.count({
+        where: { category_id: id, user_id: userId },
+      });
+      if (todoCount > 0) throw new CategoryHasTodosError(todoCount);
 
-    const deleted = await transaction.category.deleteMany({
-      where: { id, user_id: userId },
+      const deleted = await transaction.category.deleteMany({
+        where: { id, user_id: userId },
+      });
+      if (deleted.count === 0) throw new CategoryNotFoundError();
     });
-    if (deleted.count === 0) throw new CategoryNotFoundError();
-  });
+  } catch (error) {
+    // count 체크와 delete 사이에 할 일이 추가되는 레이스에서는 FK 제약(P2003)이
+    // 대신 걸린다. 이 경우에도 같은 도메인 에러로 번역해 이유를 알려준다.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2003"
+    ) {
+      const todoCount = await prisma.todos.count({
+        where: { category_id: id, user_id: userId },
+      });
+      throw new CategoryHasTodosError(todoCount);
+    }
+    throw error;
+  }
 }
 
 async function lockCategoryMutations(
