@@ -9,6 +9,7 @@ export interface TodoType {
   title: string;
   completed: boolean;
   completed_at: Date | null;
+  sort_order: number;
   category: CategoryType;
   result?: TaskResultType | null;
 }

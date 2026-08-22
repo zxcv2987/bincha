@@ -86,7 +86,7 @@ export default function Dialog({
           type="button"
           aria-label="모달 닫기"
           onClick={() => confirmDiscard() && dialogRef.current?.close()}
-          className="cursor-pointer px-1 text-sm font-thin text-zinc-700"
+          className="cursor-pointer rounded px-1 text-sm font-thin text-zinc-700 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
         >
           ✖
         </button>

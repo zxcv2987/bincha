@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "features/todo/components/TodoItem.tsx"
+        ],
+        "createdAt": "2026-07-31T01:53:58.218Z",
+        "reason": "삭제 버튼 hover 배경(bg-red-50)과 기본 상태 zinc 텍스트 조합은 의도된 디자인, 오탐"
+      }
+    ]
+  }
+}

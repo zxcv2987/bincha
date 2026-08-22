@@ -14,7 +14,7 @@ export default function CategoryItem({
   return (
     <button
       className={clsx(
-        "min-w-0 flex-1 cursor-pointer truncate rounded-lg px-3 py-1.5 text-left text-sm",
+        "min-w-0 flex-1 cursor-pointer truncate rounded-lg px-3 py-1.5 text-left text-sm focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
         selected
           ? "bg-brand-50 font-semibold text-brand-700"
           : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800",

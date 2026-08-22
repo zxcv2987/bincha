@@ -23,15 +23,14 @@
 
 작업에 필요한 문서만 읽는다.
 
-- 현재 MVP 제품 범위와 사용자 흐름: `docs/mvp-plan.md`
-- 현재 MVP 구현 계약, 데이터 모델, 정책, 테스트 범위: `docs/mvp-technical-plan.md`
-- 장기 제품 방향과 MVP 이후 우선순위: `docs/product-plan.md`
-- 장기 기술 방향과 MVP 이후 아키텍처: `docs/technical-proposal.md`
+- 현재 제품 범위와 사용자 흐름: `docs/product-plan.md`
+- 현재 구현 계약, 데이터 모델, 정책과 목표 아키텍처: `docs/technical-proposal.md`
+- 완료된 MVP의 역사적 기록: `docs/archive/mvp-plan.md`, `docs/archive/mvp-technical-plan.md`
 - 문서 안내: `docs/index.md`
 
-제품 동작, 기능 범위, 사용자 흐름 또는 우선순위에 영향을 주는 변경 전에는 `docs/mvp-plan.md`를 먼저 읽는다. MVP 범위를 넘어서는 제안이나 변경이라면 `docs/product-plan.md`도 확인한다.
+제품 동작, 기능 범위, 사용자 흐름 또는 우선순위에 영향을 주는 변경 전에는 `docs/product-plan.md`를 먼저 읽는다. 아카이브 문서는 과거 결정의 배경이 필요할 때만 확인한다.
 
-데이터 모델, 인증, 사용자 데이터 경계, 캐시, 삭제 정책 또는 서비스 계약을 바꾸기 전에는 `docs/mvp-technical-plan.md`를 먼저 읽는다. MVP 이후 구조를 다루는 경우에만 `docs/technical-proposal.md`도 확인한다.
+데이터 모델, 인증, 사용자 데이터 경계, 캐시, 삭제 정책 또는 서비스 계약을 바꾸기 전에는 `docs/technical-proposal.md`를 먼저 읽는다.
 
 코드와 문서의 계약이 달라지는 변경은 같은 작업에서 관련 문서를 갱신한다. 내부 구현만 바뀌고 문서화된 동작이나 계약이 그대로라면 불필요한 문서 수정은 하지 않는다.
 
@@ -62,7 +61,7 @@
 - 서비스 통합 테스트: `pnpm test`
 - 프로덕션 빌드: `pnpm build`
 
-`pnpm test`는 `.env.test`와 분리된 테스트 스키마가 필요하다. 설정과 마이그레이션 절차는 `docs/mvp-technical-plan.md`의 테스트 섹션을 따른다.
+`pnpm test`는 `.env.test`와 분리된 테스트 스키마가 필요하다. 현재 테스트 전략은 `docs/technical-proposal.md`를 따르며, 기존 테스트 스키마 설정과 마이그레이션 절차는 `docs/archive/mvp-technical-plan.md`에 보관한다.
 
 ## Verification
 
@@ -77,3 +76,14 @@
 ## Project Learnings
 
 - 테스트의 `it(...)`와 `test(...)` 설명은 한국어 문장으로 작성한다. 고유 기술 용어는 원문 표기를 유지할 수 있다.
+
+## Cursor Cloud specific instructions
+
+이 환경은 관리형 Supabase 대신 VM 안의 로컬 PostgreSQL 16을 사용한다. 의존성 설치(`pnpm install`)는 시작 시 업데이트 스크립트가 처리하지만, 아래는 매 세션에서 직접 확인/실행해야 하는 비자명한 사항이다.
+
+- **DB 서비스 시작(부팅마다 필요):** Postgres는 자동 시작되지 않는다. 서비스 실행 전에 `sudo pg_ctlcluster 16 main start`를 실행한다(이미 실행 중이면 무시해도 됨: `sudo pg_lsclusters`로 확인). DB 데이터, 역할, 마이그레이션, `admin` 사용자는 스냅샷에 이미 들어 있으므로 재생성할 필요가 없다.
+- **로컬 접속 정보:** DB 역할 `bincha`/비밀번호 `bincha`, 개발 DB `bincha`, 테스트 DB `bincha_test`. 연결 문자열은 `.env`(개발)와 `.env.test`(테스트, `schema=test` 필수)에 이미 설정되어 있다. 이 파일들은 `.env*` gitignore로 커밋되지 않으며 스냅샷에만 존재한다. 값 형식은 `.env.example` 참고.
+- **Supabase 전용 마이그레이션 호환:** `20260727110000_enable_data_api_rls`는 Supabase 역할 `anon`/`authenticated`를 참조하고 RLS를 켠다. 로컬에서는 이 역할들을 미리 생성했고, Prisma가 접속하는 `bincha` 역할에 `BYPASSRLS`를 부여해 RLS가 서버측 쿼리를 막지 않도록 해두었다(마이그레이션 주석의 "Prisma role has BYPASSRLS" 전제와 일치). 이 역할/속성은 스냅샷에 유지된다.
+- **로그인 자격:** 앱은 단일 사용자(username `admin`) 비밀번호 로그인이다. 시드된 개발용 비밀번호는 `admin123`이다. 로그인 없이 접근 가능한 라우트는 정적 자산뿐이므로 UI 테스트에는 먼저 로그인이 필요하다.
+- **마이그레이션 재적용(스키마 변경 시):** 개발 DB는 `pnpm exec prisma migrate deploy`, 테스트 스키마는 앞에 `DATABASE_URL`/`DIRECT_URL`을 `bincha_test?schema=test`로 지정해 동일 명령을 실행한다.
+- 개발 서버/린트/타입검사/테스트/빌드 명령은 위 `## Commands`를 그대로 사용한다.

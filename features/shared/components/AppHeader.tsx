@@ -10,7 +10,7 @@ export default async function AppHeader() {
       <Link
         href="/"
         aria-label="내가 해야 할 일 홈"
-        className="focus-visible:ring-brand-500 flex min-w-0 flex-col gap-0.5 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:flex-row sm:items-end sm:gap-3"
+        className="focus-visible:ring-brand-500/40 flex min-w-0 flex-col gap-0.5 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:flex-row sm:items-end sm:gap-3"
       >
         <h1 className="min-w-0 text-2xl font-semibold text-zinc-700 sm:truncate sm:text-4xl">
           내가 해야 할 일

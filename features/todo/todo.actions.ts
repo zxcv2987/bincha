@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   createTodo,
   deleteTodo,
+  reorderTodos,
   toggleTodoCompleted,
   updateTodo,
 } from "./todo.service";
@@ -72,6 +73,32 @@ export async function deleteTodoAction(todoId: number): Promise<ActionResult> {
     return { ok: true };
   } catch (error) {
     return toActionResult(error, "삭제 실패", "할 일 삭제 중 오류 발생:");
+  }
+}
+
+export async function reorderTodosAction(
+  categoryId: number,
+  todoIds: number[],
+): Promise<ActionResult> {
+  if (
+    !Number.isInteger(categoryId) ||
+    categoryId <= 0 ||
+    todoIds.some((id) => !Number.isInteger(id) || id <= 0)
+  ) {
+    return { ok: false, error: "잘못된 할 일 순서입니다." };
+  }
+
+  try {
+    const userId = await requireCurrentUserId();
+    await reorderTodos({ categoryId, todoIds, userId });
+    revalidatePath("/");
+    return { ok: true };
+  } catch (error) {
+    return toActionResult(
+      error,
+      "할 일 순서 변경 실패",
+      "할 일 순서 변경 중 오류 발생:",
+    );
   }
 }
 

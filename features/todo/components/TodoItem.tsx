@@ -8,23 +8,75 @@ import useUpdateTodo from "@/features/todo/hooks/useUpdateTodo";
 import useDeleteTodo from "@/features/todo/hooks/useDeleteTodo";
 import clsx from "clsx";
 import ResultModalButton from "@/features/result/components/ResultModalButton";
+import { useSortable } from "@dnd-kit/react/sortable";
 
 export default function TodoItem({
   todo,
+  index,
+  instructionsId,
+  reorderPending,
   isEditing,
   onEdit,
   onCancelEdit,
+  onSetCompletion,
+  onCompletionError,
 }: {
   todo: TodoType;
+  index: number;
+  instructionsId: string;
+  reorderPending: boolean;
   isEditing: boolean;
   onEdit: () => void;
   onCancelEdit: () => void;
+  onSetCompletion: (
+    todoId: number,
+    completed: boolean,
+    completedAt: Date | null,
+  ) => void;
+  onCompletionError: (message: string | null) => void;
 }) {
-  const { submit: toggleComplete, pending: togglePending, error: toggleError } =
-    useToggleTodo();
+  const { submit: toggleComplete, pending: togglePending } = useToggleTodo();
   const { submit: updateTodo, pending: updatePending, fieldErrors } =
     useUpdateTodo(todo.id, onCancelEdit);
   const { submit: deleteTodo, pending: deletePending } = useDeleteTodo();
+  const { ref, isDragging } = useSortable({
+    id: todo.id,
+    index,
+    disabled: isEditing || reorderPending,
+  });
+
+  // 행 안의 실제 인터랙티브 요소(체크박스/삭제·결과 버튼/링크)를 눌렀을 때는
+  // 수정 진입으로 처리하지 않는다. 그 외 영역 클릭만 수정으로 인식한다.
+  const isInteractiveTarget = (target: EventTarget | null) =>
+    target instanceof Element &&
+    target.closest("input, button, a, label, [contenteditable]") !== null;
+
+  const handleRowClick = (event: React.MouseEvent) => {
+    if (isInteractiveTarget(event.target)) return;
+    onEdit();
+  };
+
+  const handleRowKeyDown = (event: React.KeyboardEvent) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onEdit();
+    }
+  };
+
+  // 완료 상태를 낙관적으로 먼저 바꾸고, 서버 요청이 실패하면 이전 값으로 되돌린다.
+  const handleToggle = async () => {
+    onCompletionError(null);
+    const previousCompleted = todo.completed;
+    const previousCompletedAt = todo.completed_at;
+    const nextCompleted = !previousCompleted;
+    onSetCompletion(todo.id, nextCompleted, nextCompleted ? new Date() : null);
+    const result = await toggleComplete(todo.id);
+    if (result && !result.ok) {
+      onSetCompletion(todo.id, previousCompleted, previousCompletedAt);
+      onCompletionError(result.error ?? "완료 상태를 변경하지 못했습니다.");
+    }
+  };
 
   const handleDelete = async () => {
     const confirmMessage = todo.result
@@ -37,6 +89,7 @@ export default function TodoItem({
   if (isEditing) {
     return (
       <div
+        ref={ref}
         className="w-full px-3 py-2.5"
         onKeyDown={(e) => {
           if (e.key === "Escape") onCancelEdit();
@@ -58,8 +111,17 @@ export default function TodoItem({
 
   return (
     <div
-      key={todo.id}
-      className="group flex w-full items-start gap-3 px-3 py-2.5 hover:bg-zinc-50"
+      ref={ref}
+      role="button"
+      tabIndex={0}
+      aria-label={`${todo.title || "제목 없음"} 수정`}
+      aria-describedby={instructionsId}
+      onClick={handleRowClick}
+      onKeyDown={handleRowKeyDown}
+      className={clsx(
+        "group flex w-full cursor-pointer items-start gap-2 px-3 py-2.5 hover:bg-zinc-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none",
+        isDragging && "z-10 cursor-grabbing bg-white opacity-70 shadow-lg",
+      )}
     >
       <label className="flex shrink-0 cursor-pointer items-center pt-0.5">
         <input
@@ -67,13 +129,13 @@ export default function TodoItem({
           aria-label={`${todo.title || "제목 없음"} 완료 상태`}
           checked={todo.completed}
           disabled={togglePending}
-          onChange={() => toggleComplete(todo.id)}
-          className="peer sr-only"
+          onChange={handleToggle}
+          className="peer sr-only outline-none"
         />
         <span
           className={clsx(
             "flex size-5 items-center justify-center rounded-full border-2 transition-colors",
-            "peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-2",
+            "peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/40 peer-focus-visible:ring-offset-2",
             "peer-disabled:opacity-50",
             todo.completed
               ? "border-brand-600 bg-brand-600"
@@ -100,20 +162,8 @@ export default function TodoItem({
         </span>
       </label>
 
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={`${todo.title || "제목 없음"} 수정`}
-        onClick={onEdit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onEdit();
-          }
-        }}
-        className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
-      >
-        <h3 className="w-full truncate text-sm font-semibold break-words text-zinc-700">
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+        <h3 className="w-full truncate text-base font-semibold break-words text-zinc-700">
           {todo.title.trim() || "제목 없음"}
         </h3>
         {todo.text.trim() ? (
@@ -121,15 +171,12 @@ export default function TodoItem({
             <LinkifiedText content={todo.text} />
           </span>
         ) : (
-          <span className="w-full text-sm text-zinc-400">내용 없음</span>
+          <span className="w-full text-sm text-zinc-500">내용 없음</span>
         )}
         {todo.completed && todo.completed_at && (
-          <span className="w-full text-xs text-zinc-400">
+          <span className="w-full text-xs text-zinc-500">
             완료: {new Date(todo.completed_at).toLocaleDateString("ko-KR")}
           </span>
-        )}
-        {toggleError && (
-          <span className="w-full text-xs text-red-400">{toggleError}</span>
         )}
         {todo.completed && (
           <div
@@ -148,7 +195,7 @@ export default function TodoItem({
         aria-label={`${todo.title || "제목 없음"} 삭제`}
         onClick={handleDelete}
         disabled={deletePending}
-        className="shrink-0 self-center rounded-lg p-2 text-zinc-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 disabled:opacity-50 group-hover:opacity-100"
+        className="flex size-11 shrink-0 self-center items-center justify-center rounded-lg text-zinc-500 transition-opacity hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none disabled:opacity-50 [@media(hover:hover)_and_(pointer:fine)]:opacity-0 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100 [@media(hover:hover)_and_(pointer:fine)]:focus-visible:opacity-100"
       >
         <svg
           viewBox="0 0 20 20"

@@ -14,9 +14,8 @@ Todo 완료
 
 현재 애플리케이션 구조를 최대한 유지하면서 단계적으로 확장하는 것을 원칙으로 한다.
 
-> 이 문서는 Bincha의 **최종 기술 방향(전체 아키텍처)**을 정의한다.
-> 1차로 구현할 범위는 [[mvp-technical-plan|MVP 기술 계획]] 문서를 따른다.
-> Achievement / Measurement / Evidence 관련 구현(11~12장, 24장 3~5단계)은 MVP 범위가 아니다.
+> Todo와 TaskResult를 중심으로 한 MVP 구현은 완료됐다. 당시 계약은 [[archive/mvp-technical-plan|MVP 기술 계획 (아카이브)]]에 보존한다.
+> 현재 시스템에는 사용자별 자유 메모가 포함된다. Achievement / Measurement / Evidence는 후속 기술 방향이다.
 
 ---
 
@@ -45,7 +44,9 @@ Todo 완료
 features/
 ├─ auth/
 ├─ category/
+├─ memo/
 ├─ modal/
+├─ result/
 ├─ shared/
 └─ todo/
 ```
@@ -68,96 +69,86 @@ components/
 user
 category
 todos
+task_result
+memo
 ```
 
 현재 관계는 다음과 같다.
 
 ```text
-category
-└─ todos
+user
+├─ category
+│  └─ todos
+│     └─ task_result
+└─ memo
 ```
 
-`user`와 `category`, `todos` 사이에는 직접적인 소유 관계가 없다.
+모든 사용자 데이터는 `user_id`로 소유권을 구분한다. 메모는 Todo/TaskResult와 독립적으로 빠른 기록을 보관한다.
 
-### 2.4 현재 Todo 모델
+### 2.4 현재 완료 및 결과 기록
 
-Todo에는 이미 다음 완료 필드가 존재한다.
+Todo는 다음 필드로 완료 상태와 완료 시각을 저장한다.
 
 ```prisma
-completed Boolean @default(false)
+completed    Boolean   @default(false)
+completed_at DateTime? @db.Timestamptz(6)
 ```
 
-하지만 현재 Todo 타입, Server Action, Service, UI에서는 완료 상태를 사용하지 않는다.
-
-따라서 신규 도메인 구현 전 Todo 완료 기능을 먼저 복원해야 한다.
+완료 전환은 사용자 소유권을 확인한 뒤 처리하며, 완료된 Todo에만 `task_result`를 0..1개 기록할 수 있다.
 
 ---
 
-## 3. 현재 구조의 주요 문제
+## 3. 구현된 기반과 남은 과제
 
-## 3.1 사용자별 데이터 경계 부재
+## 3.1 사용자별 데이터 경계
 
-현재 Todo와 Category 조회에서 사용자 조건이 적용되지 않는다.
+Category, Todo, TaskResult, Memo의 모든 조회·수정·삭제는 인증된 `user_id`를 조건으로 사용한다.
 
-다중 사용자가 존재하면 모든 사용자가 같은 데이터를 조회하거나 수정할 가능성이 있다.
-
-신규 Result와 Achievement 모델을 추가하기 전에 사용자별 데이터 소유 관계를 먼저 구성해야 한다.
-
-목표 관계:
+현재 관계:
 
 ```text
 user
 ├─ categories
 ├─ todos
 ├─ taskResults
-└─ achievements
+└─ memos
 ```
 
----
-
-## 3.2 완료 기능이 도메인에 연결되지 않음
-
-데이터베이스에는 `completed`가 존재하지만 다음 영역에서 사용되지 않는다.
-
-- Todo Type
-- Todo 생성 및 수정 Action
-- Todo Service
-- Todo Card
-- Todo List Filter
-- 완료 시각 기록
-
-Bincha 2.0에서 완료는 Result 생성 흐름의 진입점이므로 우선 구현해야 한다.
+향후 Achievement를 추가할 때도 같은 소유권 검증을 적용한다.
 
 ---
 
-## 3.3 전역 캐시
+## 3.2 완료 기능과 실행 결과
 
-현재 Todo와 Category는 사용자 구분 없이 전역 캐시를 사용한다.
+Todo 완료·완료 취소, 완료 시각, 진행 중·완료 필터가 구현되어 있다. 완료된 Todo만 실행 결과를 기록할 수 있고, 완료를 취소해도 기존 결과는 유지한다.
 
-사용자별 데이터가 추가되면 전역 캐시는 다음 문제를 만들 수 있다.
+---
+
+## 3.3 사용자 데이터 캐시
+
+인증 사용자 데이터에는 사용자 구분 없는 전역 캐시를 사용하지 않는다. 캐시를 다시 도입할 경우 다음 문제를 방지해야 한다.
 
 - 다른 사용자의 데이터가 같은 캐시 키를 사용함
 - 한 사용자의 수정이 전체 캐시를 무효화함
 - 인증 정보가 캐시 함수 내부에서 안전하게 분리되지 않을 수 있음
 
-초기에는 정확성을 위해 사용자 데이터 Query에서 전역 캐시를 제거하는 방안을 우선 고려한다.
-
-이후 필요하면 사용자별 키를 사용한다.
+필요하면 사용자별 키를 사용한다.
 
 ```text
 todos:{userId}
 categories:{userId}
 results:{userId}
+memos:{userId}
 achievements:{userId}
 ```
 
 ---
 
-## 3.4 Cascade 삭제 위험
+## 3.4 삭제 정책
 
-현재 Category 삭제 시 연결된 Todo도 Cascade 삭제된다.
+Category의 Todo 관계는 `Restrict`이며, 연결된 Todo가 있으면 Category를 바로 삭제하지 않는다. Todo 삭제 시 연결된 TaskResult는 함께 삭제할 수 있지만 UI에서 사전 경고한다.
 
-Result와 Achievement가 추가되면 Category 하나를 삭제하면서 다음 기록이 연쇄적으로 손실될 수 있다.
+향후 Achievement 연결이 추가되면 다음 기록의 연쇄 손실을 막는 정책을 확장한다.
 
 ```text
 Category
@@ -167,17 +158,9 @@ Category
 → Evidence
 ```
 
-Category 삭제 정책을 변경해야 한다.
+## 3.5 인증 사용자 ID
 
----
-
-## 3.5 인증 사용자 ID 함수의 위치
-
-현재 인증된 사용자 ID를 조회하는 함수가 인증 Action 파일 내부에 존재한다.
-
-다른 Feature에서 사용자 ID가 필요해지므로 공통 인증 모듈로 분리해야 한다.
-
-제안:
+인증 사용자 조회는 다음 공통 모듈에서 제공한다.
 
 ```text
 lib/auth/session.ts
@@ -194,7 +177,7 @@ requireCurrentUserId();
 
 ## 4. 목표 아키텍처 (최종 그림)
 
-> Category/Todo/TaskResult까지가 MVP(P0~P2). Achievement/Measurement는 MVP 이후(P3~P4). 상세는 [[mvp-technical-plan|MVP 기술 계획]] 참고.
+> Category/Todo/TaskResult/Memo는 현재 구현 범위다. Achievement/Measurement는 후속 단계다.
 
 ### 4.1 도메인 구조
 
@@ -206,6 +189,7 @@ User
 │        ├─ Evidence
 │        └─ AchievementResult
 │
+├─ Memo
 └─ Achievement
    ├─ AchievementResult
    ├─ Measurement
@@ -218,6 +202,7 @@ User
 User 1 ─ N Category
 User 1 ─ N Todo
 User 1 ─ N TaskResult
+User 1 ─ N Memo
 User 1 ─ N Achievement
 
 Category 1 ─ N Todo
@@ -237,7 +222,7 @@ Todo 하나에는 대표 실행 결과 하나를 연결한다.
 
 ## 5. 데이터 모델 제안 (최종 그림)
 
-> 5.2~5.5 (User/Category/Todo/TaskResult)는 MVP. 5.6~5.11 (Achievement/Measurement/Evidence)은 MVP 이후.
+> 5.2~5.6 (User/Category/Todo/TaskResult/Memo)는 현재 구현 범위다. Achievement/Measurement/Evidence는 후속 목표다.
 
 ## 5.1 공통 명명 규칙
 
@@ -251,7 +236,7 @@ Database Table: snake_case
 Field: snake_case 또는 camelCase 중 하나로 통일
 ```
 
-기존 모델을 한 번에 변경하면 마이그레이션 위험이 있으므로 MVP에서는 기존 명명을 유지하면서 신규 모델만 일관성 있게 추가할 수 있다.
+기존 모델을 한 번에 변경하면 마이그레이션 위험이 있으므로 현재 명명을 유지하면서 신규 모델을 추가한다.
 
 장기적으로는 다음과 같이 정리한다.
 
@@ -278,6 +263,7 @@ model user {
   categories    category[]
   todos         todos[]
   task_results  task_result[]
+  memos         memo[]
   achievements  achievement[]
 }
 ```
@@ -382,7 +368,29 @@ model task_result {
 
 ---
 
-## 5.6 Achievement Status
+## 5.6 Memo
+
+```prisma
+model memo {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+  content    String
+  link       String   @default("")
+  user_id    BigInt
+  user       user     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+```
+
+메모의 내용은 공백을 제거한 뒤 필수 검증한다. 링크는 선택이며 HTTP/HTTPS URL만 허용한다. 모든 조회·수정·삭제에는 `user_id` 조건을 포함한다.
+
+Supabase Data API의 `anon`, `authenticated` 역할에는 테이블 권한을 부여하지 않고 RLS를 활성화한 채 허용 정책을 만들지 않는다. 메모 접근은 서버 측 Prisma 연결로만 수행한다.
+
+---
+
+## 5.7 Achievement Status
 
 ```prisma
 enum AchievementStatus {
@@ -411,7 +419,7 @@ ON_HOLD:
 
 ---
 
-## 5.7 Achievement
+## 5.8 Achievement
 
 ```prisma
 model achievement {
@@ -438,7 +446,7 @@ model achievement {
 
 ---
 
-## 5.8 Achievement Result
+## 5.9 Achievement Result
 
 ```prisma
 model achievement_result {
@@ -470,7 +478,7 @@ model achievement_result {
 
 ---
 
-## 5.9 Measurement
+## 5.10 Measurement
 
 ```prisma
 model measurement {
@@ -516,7 +524,7 @@ value_type
 
 ---
 
-## 5.10 Evidence Type
+## 5.11 Evidence Type
 
 ```prisma
 enum EvidenceType {
@@ -532,7 +540,7 @@ enum EvidenceType {
 
 ---
 
-## 5.11 Evidence
+## 5.12 Evidence
 
 ```prisma
 model evidence {
@@ -735,7 +743,7 @@ await prisma.$transaction(async (tx) => {
 
 ## 7. Feature 구조 (최종 그림)
 
-> `result/`까지는 MVP. `achievement/`, `measurement/`, `evidence/`, `review/`는 MVP 이후.
+> `memo/`와 `result/`까지는 현재 구현됐다. `achievement/`, `measurement/`, `evidence/`, `review/`는 후속 목표다.
 
 기존 역할별 분리 방식을 유지한다.
 
@@ -758,6 +766,14 @@ features/
 │  ├─ result.queries.ts
 │  ├─ result.errors.ts
 │  └─ types.ts
+│
+├─ memo/
+│  ├─ components/
+│  ├─ hooks/
+│  ├─ memo.actions.ts
+│  ├─ memo.service.ts
+│  ├─ memo.errors.ts
+│  └─ memo.types.ts
 │
 ├─ achievement/
 │  ├─ components/
@@ -790,13 +806,16 @@ features/
 
 ## 8. 페이지 구조 (최종 그림)
 
-> `/results`까지는 MVP. `/achievements`, `/review`는 MVP 이후.
+> `/memos`와 `/results`까지는 현재 구현됐다. `/achievements`, `/review`는 후속 목표다.
 
 ```text
 app/
 ├─ page.tsx
 │
 ├─ results/
+│  └─ page.tsx
+│
+├─ memos/
 │  └─ page.tsx
 │
 ├─ achievements/
@@ -823,6 +842,9 @@ Todo 목록
 
 /results:
 결과 기록 대기 및 결과 목록
+
+/memos:
+사용자별 자유 메모 목록과 생성·수정·삭제
 
 /achievements:
 성과 목록
@@ -1006,7 +1028,7 @@ prisma.todos.findMany({
 
 ---
 
-## 11. Achievement 구현 (MVP 이후)
+## 11. Achievement 구현 (후속 단계)
 
 ## 11.1 생성 방식
 
@@ -1087,7 +1109,7 @@ await prisma.$transaction(async (tx) => {
 
 ---
 
-## 12. Measurement 구현 (MVP 이후)
+## 12. Measurement 구현 (후속 단계)
 
 ## 12.1 생성 조건
 
@@ -1312,7 +1334,7 @@ Achievement를 삭제해도 Result와 Todo는 유지한다.
 공유 토큰 기반 읽기 전용 보드
 ```
 
-공유 기능은 MVP 이후로 미룬다.
+공유 기능은 현재 개인 사용 흐름의 검증 이후로 미룬다.
 
 ---
 
@@ -1582,7 +1604,7 @@ Foreign Key 정책 변경 전에 기존 데이터를 확인한다.
 
 ## 24. 구현 단계 (최종 그림)
 
-> 0~2단계 = MVP. 3단계 이후는 [[mvp-plan|MVP 계획]]에서 실사용 검증 후 착수.
+> 0~2단계와 자유 메모는 구현 완료됐다. 3단계 이후는 결과와 메모의 실사용 검증 후 착수한다.
 
 ## 0단계: 기반 정리
 
@@ -1782,7 +1804,7 @@ AI가 Result를 실제로 확인된 Achievement처럼 표현하지 않도록 상
 
 ## 27. 최종 권장 우선순위
 
-> 1~5 = MVP. 6~10 = MVP 이후.
+> 1~5와 자유 메모 = 구현 완료. 6~10 = 후속 단계.
 
 ```text
 1. 사용자별 데이터 소유권

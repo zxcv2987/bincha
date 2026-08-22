@@ -58,6 +58,7 @@ export default function TodoForm({
           )}
           defaultValue={todo && todo.title}
           spellCheck={false}
+          autoFocus
         />
         {fieldErrors?.title && (
           <span className="text-xs text-red-400">{fieldErrors.title}</span>
@@ -77,7 +78,8 @@ export default function TodoForm({
           rows={textRows}
           className={clsx(
             "input",
-            compact && "px-2.5 py-1.5 text-sm text-zinc-500",
+            compact &&
+              "field-sizing-content max-h-52 overflow-y-auto px-2.5 py-1.5 text-sm text-zinc-500",
           )}
           defaultValue={todo && todo.text}
           spellCheck={false}

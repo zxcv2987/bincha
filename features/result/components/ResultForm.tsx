@@ -107,6 +107,7 @@ export default function ResultForm({
           type="checkbox"
           name="needsMeasurement"
           defaultChecked={result?.needs_measurement}
+          className="accent-brand-600 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
         />
         나중에 측정 필요
       </label>

@@ -1,7 +1,7 @@
 "use client";
 
 import { CategoryType } from "@/features/category/category.types";
-import TodoEmptyCard from "@/features/todo/components/TodoEmptyCard";
+import EmptyCard from "@/features/shared/components/EmptyCard";
 
 export default function TodosByCategory({
   category,
@@ -20,7 +20,7 @@ export default function TodosByCategory({
         {categoryName}
       </h2>
       {isEmpty ? (
-        <TodoEmptyCard message="이 카테고리에 할 일이 없습니다." />
+        <EmptyCard message="이 카테고리에 할 일이 없습니다." />
       ) : (
         <div className="flex flex-col divide-y divide-zinc-100">
           {children}

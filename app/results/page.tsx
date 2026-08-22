@@ -33,11 +33,11 @@ export default async function ResultsPage() {
           ) : (
             <>
               <section className="flex flex-col gap-3">
-                <h2 className="text-2xl font-bold text-zinc-700">
+                <h2 className="text-base font-bold text-zinc-700">
                   결과 기록 대기
                 </h2>
                 {result.pendingTodos.length === 0 ? (
-                  <p className="rounded-xl bg-zinc-50 p-4 text-zinc-400">
+                  <p className="rounded-xl bg-zinc-50 p-4 text-zinc-500">
                     결과를 기다리는 완료 작업이 없습니다.
                   </p>
                 ) : (
@@ -48,11 +48,11 @@ export default async function ResultsPage() {
               </section>
 
               <section className="flex flex-col gap-3">
-                <h2 className="text-2xl font-bold text-zinc-700">
+                <h2 className="text-base font-bold text-zinc-700">
                   결과 기록 완료
                 </h2>
                 {result.completedResults.length === 0 ? (
-                  <p className="rounded-xl bg-zinc-50 p-4 text-zinc-400">
+                  <p className="rounded-xl bg-zinc-50 p-4 text-zinc-500">
                     아직 기록한 결과가 없습니다.
                   </p>
                 ) : (

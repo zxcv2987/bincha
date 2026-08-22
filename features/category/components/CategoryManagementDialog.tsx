@@ -150,7 +150,7 @@ export default function CategoryManagementDialog({
           type="button"
           disabled={mutationPending}
           onClick={onClose}
-          className="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700"
+          className="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
         >
           <ButtonLabel pending={mutationPending} pendingText="저장 중...">
             닫기

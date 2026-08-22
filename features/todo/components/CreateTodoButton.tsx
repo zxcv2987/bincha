@@ -12,7 +12,7 @@ export default function CreateTodoButton() {
   return (
     <div className="pb-2">
       <button
-        className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-brand-600 hover:bg-brand-50"
+        className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-brand-600 hover:bg-brand-50 focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-1 focus-visible:outline-none"
         onClick={() => setOpen(true)}
       >
         <span aria-hidden="true" className="text-base leading-none">
